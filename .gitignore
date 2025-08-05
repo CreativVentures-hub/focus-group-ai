@@ -1,0 +1,29 @@
+# Development files
+simple-server.ps1
+cors-server.ps1
+start-server.bat
+start-cors-server.bat
+deploy.bat
+deploy/
+
+# Configuration files (keep only production config)
+config.js
+!config.production.js
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp 

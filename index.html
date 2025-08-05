@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Group System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Login Section -->
+        <div id="loginSection" class="login-section">
+            <div class="login-card">
+                <h1>Focus Group System</h1>
+                <p>Enter password to access the system</p>
+                <form id="loginForm" class="login-form">
+                    <div class="input-group">
+                        <input type="password" id="passwordInput" placeholder="Enter password" required>
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</button>
+                    </div>
+                </form>
+                <div id="loginError" class="error-message" style="display: none;">
+                    Invalid password. Please try again.
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Application Section (Hidden by default) -->
+        <div id="mainSection" class="main-section" style="display: none;">
+            <header class="app-header">
+                <h1>Focus Group System</h1>
+                <div class="header-controls">
+                    <select id="languageSelect" class="language-select">
+                        <option value="en">[US] English</option>
+                        <option value="zh-cn">[CN] 中文 (简体)</option>
+                        <option value="zh-hk">[HK] 中文 (繁體)</option>
+                    </select>
+                    <button id="logoutBtn" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                </div>
+            </header>
+
+            <div class="forms-container">
+                <!-- Run Focus Group -->
+                <div class="form-card">
+                    <h2><i class="fas fa-comments"></i> Run Focus Group</h2>
+                    <form id="focusGroupForm" class="form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="sessionType">Session Type:</label>
+                                <select id="sessionType" name="sessionType" required>
+                                    <option value="">Select session type</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="sessionName">Session Name:</label>
+                                <input type="text" id="sessionName" name="sessionName" placeholder="Enter session name..." required>
+                            </div>
+                        </div>
+
+                        <!-- Participant Selection Criteria -->
+                        <div class="form-group">
+                            <label for="numberOfParticipants">Number of Participants: <span id="numberOfParticipantsValue">12</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="numberOfParticipants" name="numberOfParticipants" min="6" max="20" value="12" class="slider" required>
+                                <div class="slider-labels">
+                                    <span>6</span>
+                                    <span>20</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selected Chips Display -->
+                        <div class="selected-chips-container">
+                            <div class="selected-categories">
+                                <!-- All selected chips will appear here -->
+                            </div>
+                        </div>
+
+                        <!-- Selection Buttons -->
+                        <div class="selection-grid">
+                            <div class="selection-item">
+                                <div class="category-selector">
+                                    <button type="button" id="openCategoryModal" class="btn btn-outline selection-btn">
+                                        <i class="fas fa-tags"></i> <span id="categoryButtonText">Select Categories</span>
+                                        <span class="category-count" id="categoryCount" style="display: none;">0 selected</span>
+                                    </button>
+                                    <input type="hidden" id="category" name="category" required>
+                                </div>
+                            </div>
+
+                            <div class="selection-item">
+                                <div class="category-selector">
+                                    <button type="button" id="openGenderModal" class="btn btn-outline selection-btn">
+                                        <i class="fas fa-venus-mars"></i> <span id="genderButtonText">Select Gender</span>
+                                        <span class="category-count" id="genderCount" style="display: none;">0 selected</span>
+                                    </button>
+                                    <input type="hidden" id="gender" name="gender" required>
+                                </div>
+                            </div>
+
+                            <div class="selection-item">
+                                <div class="category-selector">
+                                    <button type="button" id="openAgeModal" class="btn btn-outline selection-btn">
+                                        <i class="fas fa-birthday-cake"></i> <span id="ageButtonText">Select Age Range</span>
+                                        <span class="category-count" id="ageCount" style="display: none;">0 selected</span>
+                                    </button>
+                                    <input type="hidden" id="age" name="age" required>
+                                </div>
+                            </div>
+
+                            <div class="selection-item">
+                                <div class="category-selector">
+                                    <button type="button" id="openIncomeModal" class="btn btn-outline selection-btn">
+                                        <i class="fas fa-dollar-sign"></i> <span id="incomeButtonText">Select Income Range</span>
+                                        <span class="category-count" id="incomeCount" style="display: none;">0 selected</span>
+                                    </button>
+                                    <input type="hidden" id="income" name="income" required>
+                                </div>
+                            </div>
+
+                            <div class="selection-item">
+                                <div class="category-selector">
+                                    <button type="button" id="openMaritalModal" class="btn btn-outline selection-btn">
+                                        <i class="fas fa-heart"></i> <span id="maritalButtonText">Select Marital Status</span>
+                                        <span class="category-count" id="maritalCount" style="display: none;">0 selected</span>
+                                    </button>
+                                    <input type="hidden" id="maritalStatus" name="maritalStatus" required>
+                                </div>
+                            </div>
+
+                            <div class="selection-item">
+                                <div class="category-selector">
+                                    <button type="button" id="openChildrenModal" class="btn btn-outline selection-btn">
+                                        <i class="fas fa-baby"></i> <span id="childrenButtonText">Select Children Status</span>
+                                        <span class="category-count" id="childrenCount" style="display: none;">0 selected</span>
+                                    </button>
+                                    <input type="hidden" id="hasChildren" name="hasChildren" required>
+                                </div>
+                            </div>
+
+                            <div class="selection-item">
+                                <div class="category-selector">
+                                    <button type="button" id="openEducationModal" class="btn btn-outline selection-btn">
+                                        <i class="fas fa-graduation-cap"></i> <span id="educationButtonText">Select Education Level</span>
+                                        <span class="category-count" id="educationCount" style="display: none;">0 selected</span>
+                                    </button>
+                                    <input type="hidden" id="education" name="education" required>
+                                </div>
+                            </div>
+
+                            <div class="selection-item">
+                                <div class="category-selector">
+                                    <button type="button" id="openRaceModal" class="btn btn-outline selection-btn">
+                                        <i class="fas fa-globe-americas"></i> <span id="raceButtonText">Select Race</span>
+                                        <span class="category-count" id="raceCount" style="display: none;">0 selected</span>
+                                    </button>
+                                    <input type="hidden" id="race" name="race" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Session-specific fields (hidden by default) -->
+                        <div id="sessionFields" class="session-fields" style="display: none;">
+                            <!-- Product Research Fields -->
+                            <div id="productResearchFields" class="session-type-fields" style="display: none;">
+                                <div class="form-group">
+                                    <label for="productName">Product Name: <span class="char-count">(<span id="productNameCount">0</span>/250)</span></label>
+                                    <input type="text" id="productName" name="productName" maxlength="250" placeholder="Enter product name...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="productDescription">Product Description: <span class="char-count">(<span id="productDescriptionCount">0</span>/1000)</span></label>
+                                    <textarea id="productDescription" name="productDescription" maxlength="1000" rows="4" placeholder="Describe the product in detail..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="productImage">Product Image:</label>
+                                    <div class="file-upload">
+                                        <input type="file" id="productImage" name="productImage" accept="image/*">
+                                        <div class="file-upload-text">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            Click to upload product image or drag and drop
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Questions (10 required):</label>
+                                    <div id="productQuestions" class="questions-container">
+                                        <!-- Questions will be generated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Market Research Fields -->
+                            <div id="marketResearchFields" class="session-type-fields" style="display: none;">
+                                <div class="form-group">
+                                    <label for="marketName">Market Name:</label>
+                                    <input type="text" id="marketName" name="marketName" placeholder="Enter market name...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="marketDescription">Market Description: <span class="char-count">(<span id="marketDescriptionCount">0</span>/1000)</span></label>
+                                    <textarea id="marketDescription" name="marketDescription" maxlength="1000" rows="4" placeholder="Describe the market in detail..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Questions (10 required):</label>
+                                    <div id="marketQuestions" class="questions-container">
+                                        <!-- Questions will be generated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Brand Perception Fields -->
+                            <div id="brandPerceptionFields" class="session-type-fields" style="display: none;">
+                                <div class="form-group">
+                                    <label for="brandName">Brand Name:</label>
+                                    <input type="text" id="brandName" name="brandName" placeholder="Enter brand name...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="brandDescription">Brand Description: <span class="char-count">(<span id="brandDescriptionCount">0</span>/1000)</span></label>
+                                    <textarea id="brandDescription" name="brandDescription" maxlength="1000" rows="4" placeholder="Describe the brand in detail..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="brandImage">Brand Image:</label>
+                                    <div class="file-upload">
+                                        <input type="file" id="brandImage" name="brandImage" accept="image/*">
+                                        <div class="file-upload-text">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            Click to upload brand image or drag and drop
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Questions (10 required):</label>
+                                    <div id="brandQuestions" class="questions-container">
+                                        <!-- Questions will be generated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-play"></i> Start Focus Group</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Selection Modal -->
+    <div id="categoryModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Participant Categories</h3>
+                <button type="button" id="closeCategoryModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="category-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="categorySearch" placeholder="Search categories..." autocomplete="off">
+                </div>
+                <div class="category-tabs" id="categoryTabs">
+                    <!-- Tabs will be populated by JavaScript -->
+                </div>
+                <div class="category-list" id="categoryList">
+                    <!-- Categories will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="clearAllCategories" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
+                <button type="button" id="applyCategories" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gender Selection Modal -->
+    <div id="genderModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Gender</h3>
+                <button type="button" id="closeGenderModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="category-list" id="genderList">
+                    <div class="category-checkbox" data-category="Any">
+                        <input type="checkbox" id="gender-any" data-category="Any">
+                        <label for="gender-any">Any</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Male">
+                        <input type="checkbox" id="gender-male" data-category="Male">
+                        <label for="gender-male">Male</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Female">
+                        <input type="checkbox" id="gender-female" data-category="Female">
+                        <label for="gender-female">Female</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="clearAllGenders" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
+                <button type="button" id="applyGenders" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Age Range Selection Modal -->
+    <div id="ageModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Age Range</h3>
+                <button type="button" id="closeAgeModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="category-list" id="ageList">
+                    <div class="category-checkbox" data-category="18-25">
+                        <input type="checkbox" id="age-18-25" data-category="18-25">
+                        <label for="age-18-25">18-25 (Young Adults)</label>
+                    </div>
+                    <div class="category-checkbox" data-category="26-35">
+                        <input type="checkbox" id="age-26-35" data-category="26-35">
+                        <label for="age-26-35">26-35 (Early Career)</label>
+                    </div>
+                    <div class="category-checkbox" data-category="36-45">
+                        <input type="checkbox" id="age-36-45" data-category="36-45">
+                        <label for="age-36-45">36-45 (Mid Career)</label>
+                    </div>
+                    <div class="category-checkbox" data-category="46-55">
+                        <input type="checkbox" id="age-46-55" data-category="46-55">
+                        <label for="age-46-55">46-55 (Established)</label>
+                    </div>
+                    <div class="category-checkbox" data-category="56-65">
+                        <input type="checkbox" id="age-56-65" data-category="56-65">
+                        <label for="age-56-65">56-65 (Pre-Retirement)</label>
+                    </div>
+                    <div class="category-checkbox" data-category="65+">
+                        <input type="checkbox" id="age-65-plus" data-category="65+">
+                        <label for="age-65-plus">65+ (Retirement Age)</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="clearAllAges" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
+                <button type="button" id="applyAges" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Income Range Selection Modal -->
+    <div id="incomeModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Income Range</h3>
+                <button type="button" id="closeIncomeModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="category-list" id="incomeList">
+                    <div class="category-checkbox" data-category="$20k-$40k">
+                        <input type="checkbox" id="income-20k-40k" data-category="$20k-$40k">
+                        <label for="income-20k-40k">$20,000 - $40,000</label>
+                    </div>
+                    <div class="category-checkbox" data-category="$40k-$60k">
+                        <input type="checkbox" id="income-40k-60k" data-category="$40k-$60k">
+                        <label for="income-40k-60k">$40,000 - $60,000</label>
+                    </div>
+                    <div class="category-checkbox" data-category="$60k-$80k">
+                        <input type="checkbox" id="income-60k-80k" data-category="$60k-$80k">
+                        <label for="income-60k-80k">$60,000 - $80,000</label>
+                    </div>
+                    <div class="category-checkbox" data-category="$80k-$100k">
+                        <input type="checkbox" id="income-80k-100k" data-category="$80k-$100k">
+                        <label for="income-80k-100k">$80,000 - $100,000</label>
+                    </div>
+                    <div class="category-checkbox" data-category="$100k-$150k">
+                        <input type="checkbox" id="income-100k-150k" data-category="$100k-$150k">
+                        <label for="income-100k-150k">$100,000 - $150,000</label>
+                    </div>
+                    <div class="category-checkbox" data-category="$150k+">
+                        <input type="checkbox" id="income-150k-plus" data-category="$150k+">
+                        <label for="income-150k-plus">$150,000+</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="clearAllIncomes" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
+                <button type="button" id="applyIncomes" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Marital Status Selection Modal -->
+    <div id="maritalModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Marital Status</h3>
+                <button type="button" id="closeMaritalModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="category-list" id="maritalList">
+                    <div class="category-checkbox" data-category="Any">
+                        <input type="checkbox" id="marital-any" data-category="Any">
+                        <label for="marital-any">Any</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Single">
+                        <input type="checkbox" id="marital-single" data-category="Single">
+                        <label for="marital-single">Single</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Married">
+                        <input type="checkbox" id="marital-married" data-category="Married">
+                        <label for="marital-married">Married</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Divorced">
+                        <input type="checkbox" id="marital-divorced" data-category="Divorced">
+                        <label for="marital-divorced">Divorced</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Widowed">
+                        <input type="checkbox" id="marital-widowed" data-category="Widowed">
+                        <label for="marital-widowed">Widowed</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Partnered">
+                        <input type="checkbox" id="marital-partnered" data-category="Partnered">
+                        <label for="marital-partnered">Partnered</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="clearAllMaritals" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
+                <button type="button" id="applyMaritals" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Children Status Selection Modal -->
+    <div id="childrenModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Children Status</h3>
+                <button type="button" id="closeChildrenModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="category-list" id="childrenList">
+                    <div class="category-checkbox" data-category="Any">
+                        <input type="checkbox" id="children-any" data-category="Any">
+                        <label for="children-any">Any</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Yes">
+                        <input type="checkbox" id="children-yes" data-category="Yes">
+                        <label for="children-yes">Has Children</label>
+                    </div>
+                    <div class="category-checkbox" data-category="No">
+                        <input type="checkbox" id="children-no" data-category="No">
+                        <label for="children-no">No Children</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="clearAllChildren" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
+                <button type="button" id="applyChildren" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Education Level Selection Modal -->
+    <div id="educationModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Education Level</h3>
+                <button type="button" id="closeEducationModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="category-list" id="educationList">
+                    <div class="category-checkbox" data-category="Any">
+                        <input type="checkbox" id="education-any" data-category="Any">
+                        <label for="education-any">Any</label>
+                    </div>
+                    <div class="category-checkbox" data-category="High School">
+                        <input type="checkbox" id="education-high-school" data-category="High School">
+                        <label for="education-high-school">High School</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Some College">
+                        <input type="checkbox" id="education-some-college" data-category="Some College">
+                        <label for="education-some-college">Some College</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Associate's Degree">
+                        <input type="checkbox" id="education-associates" data-category="Associate's Degree">
+                        <label for="education-associates">Associate's Degree</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Bachelor's Degree">
+                        <input type="checkbox" id="education-bachelors" data-category="Bachelor's Degree">
+                        <label for="education-bachelors">Bachelor's Degree</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Master's Degree">
+                        <input type="checkbox" id="education-masters" data-category="Master's Degree">
+                        <label for="education-masters">Master's Degree</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Doctorate">
+                        <input type="checkbox" id="education-doctorate" data-category="Doctorate">
+                        <label for="education-doctorate">Doctorate</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="clearAllEducations" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
+                <button type="button" id="applyEducations" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Race Selection Modal -->
+    <div id="raceModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Race</h3>
+                <button type="button" id="closeRaceModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="category-list" id="raceList">
+                    <div class="category-checkbox" data-category="Any">
+                        <input type="checkbox" id="race-any" data-category="Any">
+                        <label for="race-any">Any</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Caucasian">
+                        <input type="checkbox" id="race-caucasian" data-category="Caucasian">
+                        <label for="race-caucasian">Caucasian</label>
+                    </div>
+                    <div class="category-checkbox" data-category="African American">
+                        <input type="checkbox" id="race-african-american" data-category="African American">
+                        <label for="race-african-american">African American</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Latino">
+                        <input type="checkbox" id="race-latino" data-category="Latino">
+                        <label for="race-latino">Latino</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Asian">
+                        <input type="checkbox" id="race-asian" data-category="Asian">
+                        <label for="race-asian">Asian</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Native American">
+                        <input type="checkbox" id="race-native-american" data-category="Native American">
+                        <label for="race-native-american">Native American</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Pacific Islander">
+                        <input type="checkbox" id="race-pacific-islander" data-category="Pacific Islander">
+                        <label for="race-pacific-islander">Pacific Islander</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Middle Eastern">
+                        <input type="checkbox" id="race-middle-eastern" data-category="Middle Eastern">
+                        <label for="race-middle-eastern">Middle Eastern</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Mixed Race">
+                        <input type="checkbox" id="race-mixed" data-category="Mixed Race">
+                        <label for="race-mixed">Mixed Race</label>
+                    </div>
+                    <div class="category-checkbox" data-category="Other">
+                        <input type="checkbox" id="race-other" data-category="Other">
+                        <label for="race-other">Other</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="clearAllRaces" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
+                <button type="button" id="applyRaces" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
