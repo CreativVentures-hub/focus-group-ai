@@ -55,6 +55,15 @@ const languageSelect = document.getElementById('languageSelect');
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing app...');
+    
+    // Debug: Check if elements exist
+    console.log('=== DOM ELEMENTS CHECK ===');
+    console.log('loginSection:', document.getElementById('loginSection'));
+    console.log('loginForm:', document.getElementById('loginForm'));
+    console.log('passwordInput:', document.getElementById('passwordInput'));
+    console.log('loginError:', document.getElementById('loginError'));
+    console.log('mainSection:', document.getElementById('mainSection'));
+    
     initializeApp();
     setupEventListeners();
     populateDropdowns();
@@ -399,6 +408,41 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     document.body.appendChild(webhookUrlTestButton);
+    
+    // Add a manual login test button
+    const manualLoginButton = document.createElement('button');
+    manualLoginButton.textContent = 'Manual Login Test';
+    manualLoginButton.style.position = 'fixed';
+    manualLoginButton.style.top = '290px';
+    manualLoginButton.style.right = '10px';
+    manualLoginButton.style.zIndex = '9999';
+    manualLoginButton.style.padding = '10px';
+    manualLoginButton.style.background = 'purple';
+    manualLoginButton.style.color = 'white';
+    manualLoginButton.style.border = 'none';
+    manualLoginButton.style.borderRadius = '5px';
+    manualLoginButton.style.cursor = 'pointer';
+    
+    manualLoginButton.addEventListener('click', function() {
+        console.log('=== MANUAL LOGIN TEST ===');
+        console.log('Password input value:', passwordInput ? passwordInput.value : 'N/A');
+        console.log('Expected password:', CONFIG.PASSWORD);
+        
+        if (passwordInput && passwordInput.value.trim() === CONFIG.PASSWORD) {
+            console.log('Manual login successful!');
+            sessionStorage.setItem('focusGroupLoggedIn', 'true');
+            showMainSection();
+            clearLoginForm();
+        } else {
+            console.log('Manual login failed - password incorrect or input not found');
+            if (passwordInput) {
+                passwordInput.value = CONFIG.PASSWORD; // Auto-fill for testing
+                console.log('Auto-filled password for testing');
+            }
+        }
+    });
+    
+    document.body.appendChild(manualLoginButton);
 });
 
 function initializeApp() {
@@ -1180,13 +1224,22 @@ async function handleFocusGroupForm(e) {
 }
 
 function showMainSection() {
-    loginSection.style.display = 'none';
-    mainSection.style.display = 'block';
+    console.log('showMainSection called');
+    console.log('loginSection element:', loginSection);
+    console.log('mainSection element:', mainSection);
     
-    // Re-initialize slider after showing main section
-    setTimeout(() => {
-        initializeSlider();
-    }, 100);
+    if (loginSection && mainSection) {
+        loginSection.style.display = 'none';
+        mainSection.style.display = 'block';
+        console.log('Sections updated successfully');
+        
+        // Re-initialize slider after showing main section
+        setTimeout(() => {
+            initializeSlider();
+        }, 100);
+    } else {
+        console.error('Section elements not found!');
+    }
 }
 
 function showLoginSection() {
