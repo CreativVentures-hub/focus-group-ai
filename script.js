@@ -1333,25 +1333,21 @@ function populateCategoryModal() {
 function populateCategoryTabs() {
     categoryTabs.innerHTML = '';
     
-    Object.keys(CONFIG.PARTICIPANT_CATEGORIES).forEach((groupName, index) => {
-        const tab = document.createElement('button');
-        tab.type = 'button';
-        tab.className = 'category-tab';
-        tab.textContent = groupName;
-        tab.dataset.group = groupName;
-        
-        // Set first tab as active by default
-        if (index === 0) {
-            tab.classList.add('active');
-        }
-        
-        // Handle tab click
-        tab.addEventListener('click', () => {
-            switchToTab(groupName);
-        });
-        
-        categoryTabs.appendChild(tab);
+    // Since PARTICIPANT_CATEGORIES is an array, we'll create a single tab
+    const groupName = 'All Categories';
+    
+    const tab = document.createElement('button');
+    tab.type = 'button';
+    tab.className = 'category-tab active';
+    tab.textContent = groupName;
+    tab.dataset.group = groupName;
+    
+    // Handle tab click
+    tab.addEventListener('click', () => {
+        switchToTab(groupName);
     });
+    
+    categoryTabs.appendChild(tab);
 }
 
 function populateCategoryGroups() {
