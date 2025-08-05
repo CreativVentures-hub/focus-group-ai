@@ -132,7 +132,7 @@ function populateDropdowns() {
         // Fallback session types if config fails to load
         const fallbackSessionTypes = [
             { value: 'market_research', label: 'Market Research' },
-            { value: 'product_testing', label: 'Product Testing' },
+            { value: 'product_research', label: 'Product Research' },
             { value: 'user_experience', label: 'User Experience', disabled: true },
             { value: 'customer_feedback', label: 'Customer Feedback', disabled: true },
             { value: 'brand_perception', label: 'Brand Perception' }
@@ -239,7 +239,7 @@ function handleSessionTypeChange() {
     
     // Show specific fields based on session type
     switch (selectedType) {
-        case 'product_testing':
+        case 'product_research':
             document.getElementById('productResearchFields').style.display = 'block';
             initializeQuestions('productQuestions', 10);
             setupCharacterCounters();

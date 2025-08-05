@@ -20,7 +20,7 @@ const CONFIG = {
     // Session types for the Run Focus Group form (Market Research is default)
     SESSION_TYPES: [
         { value: "market_research", label: "Market Research" },
-        { value: "product_testing", label: "Product Testing" },
+        { value: "product_research", label: "Product Research" },
         { value: "user_experience", label: "User Experience", disabled: true },
         { value: "customer_feedback", label: "Customer Feedback", disabled: true },
         { value: "brand_perception", label: "Brand Perception" },
