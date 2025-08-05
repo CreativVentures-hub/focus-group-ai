@@ -12,7 +12,7 @@ if (document.readyState === 'loading') {
     console.log('DOM ready!');
 }
 
-alert('Script loaded! CONFIG.SESSION_TYPES length: ' + (CONFIG && CONFIG.SESSION_TYPES ? CONFIG.SESSION_TYPES.length : 'undefined'));
+console.log('Script loaded! CONFIG.SESSION_TYPES length: ' + (CONFIG && CONFIG.SESSION_TYPES ? CONFIG.SESSION_TYPES.length : 'undefined'));
 
 // Global error handler
 window.addEventListener('error', function(e) {
@@ -73,22 +73,22 @@ let testMode = false;
 let currentLanguage = 'en';
 const languageSelect = document.getElementById('languageSelect');
 
-// Initialize the application
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing app...');
-    
-    // Debug: Check if elements exist
-    console.log('=== DOM ELEMENTS CHECK ===');
-    console.log('loginSection:', document.getElementById('loginSection'));
-    console.log('loginForm:', document.getElementById('loginForm'));
-    console.log('passwordInput:', document.getElementById('passwordInput'));
-    console.log('loginError:', document.getElementById('loginError'));
-    console.log('mainSection:', document.getElementById('mainSection'));
-    
-    initializeApp();
-    setupEventListeners();
-    populateDropdowns();
-    console.log('App initialization complete');
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing app...');
+        
+        // Debug: Check if elements exist
+        console.log('=== DOM ELEMENTS CHECK ===');
+        console.log('loginSection:', document.getElementById('loginSection'));
+        console.log('loginForm:', document.getElementById('loginForm'));
+        console.log('passwordInput:', document.getElementById('passwordInput'));
+        console.log('loginError:', document.getElementById('loginError'));
+        console.log('mainSection:', document.getElementById('mainSection'));
+        
+        initializeApp();
+        setupEventListeners();
+        // Don't populate dropdowns yet - wait for login
+        console.log('App initialization complete');
     
     // Initialize language
     initializeLanguage();
@@ -462,14 +462,21 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
-    // Skip login for now - show main section directly
-    console.log('Skipping login - showing main section directly');
-    showMainSection();
+    // Show login section by default
+    console.log('Showing login section by default');
+    showLoginSection();
 }
 
 function setupEventListeners() {
-    // Login functionality removed for now
-    console.log('Login functionality bypassed');
+    // Login functionality
+    console.log('Setting up login functionality');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+        console.log('Login form event listener added');
+    } else {
+        console.error('Login form not found!');
+    }
     
     // Logout button
     if (logoutBtn) {
@@ -586,36 +593,30 @@ function populateDropdowns() {
 function handleLogin(e) {
     e.preventDefault();
     console.log('Login function called');
-    alert('Login function called!');
     
     const password = passwordInput.value.trim();
     console.log('Password entered:', password ? '***' : 'empty');
     console.log('Expected password:', CONFIG.PASSWORD);
     console.log('Password match:', password === CONFIG.PASSWORD);
     
-    alert('Password entered: ' + (password ? '***' : 'empty') + '\nExpected: ' + CONFIG.PASSWORD + '\nMatch: ' + (password === CONFIG.PASSWORD));
-    
     if (password === CONFIG.PASSWORD) {
         console.log('Password correct! Logging in...');
-        alert('Password correct! Logging in...');
         
         // Store login state in session storage
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
         console.log('Session storage set');
-        alert('Session storage set');
         
         showMainSection();
         console.log('Main section shown');
-        alert('Main section shown');
+        
+        // Populate dropdowns after successful login
+        populateDropdowns();
+        console.log('Dropdowns populated');
         
         clearLoginForm();
         console.log('Login form cleared');
-        alert('Login form cleared');
-        
-        alert('Login successful! You should now see the main interface.');
     } else {
         console.log('Password incorrect! Showing error...');
-        alert('Password incorrect! Expected: ' + CONFIG.PASSWORD + ', Got: ' + password);
         showLoginError();
     }
 }
