@@ -31,20 +31,52 @@ const CONFIG = {
         { value: "satisfaction_survey", label: "Satisfaction Survey", disabled: true }
     ],
     
-    // Participant categories for the Run Focus Group form
-    PARTICIPANT_CATEGORIES: [
-        { value: "general_consumer", label: "General Consumer" },
-        { value: "online_shoppers", label: "Online Shoppers" },
-        { value: "budget_conscious", label: "Budget-conscious" },
+    // Buying behaviors for participant selection
+    BUYING_BEHAVIORS: [
+        { value: "general", label: "General" },
+        { value: "online", label: "Online" },
+        { value: "budget_conscious", label: "Budget-Conscious" },
         { value: "luxury", label: "Luxury" },
-        { value: "eco_conscious", label: "Eco-Conscious" }
+        { value: "eco_conscious", label: "Eco-Conscious" },
+        { value: "impulse_buyer", label: "Impulse Buyer" },
+        { value: "research_heavy", label: "Research Heavy" },
+        { value: "brand_loyal", label: "Brand Loyal" },
+        { value: "deal_seekers", label: "Deal Seekers" }
+    ],
+    
+    // Product categories for participant selection
+    PRODUCT_CATEGORIES: [
+        { value: "fashion_apparel", label: "Fashion and Apparel" },
+        { value: "grocery_household", label: "Grocery and Household" },
+        { value: "beauty_personal_care", label: "Beauty and Personal Care" },
+        { value: "baby_kid_products", label: "Baby and Kid Products" },
+        { value: "home_improvement", label: "Home Improvement" },
+        { value: "furniture_decor", label: "Furniture and Decor" },
+        { value: "garden_outdoor", label: "Garden and Outdoor" },
+        { value: "office_business", label: "Office and Business" },
+        { value: "dogs", label: "Dogs" },
+        { value: "cats", label: "Cats" },
+        { value: "birds", label: "Birds" },
+        { value: "fish", label: "Fish" },
+        { value: "small_animals", label: "Small Animals" },
+        { value: "reptiles", label: "Reptiles" },
+        { value: "automotive", label: "Automotive" },
+        { value: "sports_fitness", label: "Sports and Fitness" },
+        { value: "entertainment", label: "Entertainment" },
+        { value: "travel_hospitality", label: "Travel & Hospitality" },
+        { value: "food_beverage", label: "Food and Beverage" },
+        { value: "financial_services", label: "Financial Services" },
+        { value: "education_learning", label: "Education and Learning" },
+        { value: "hobbies_crafts", label: "Hobbies and Crafts" },
+        { value: "gifts_special_occasions", label: "Gifts and Special Occasions" }
     ],
     
     // Default form values
     DEFAULT_VALUES: {
         session_name: "",
         session_type: "market_research",
-        categories: ["general_consumer"],
+        buying_behaviors: ["general"],
+        product_categories: ["fashion_apparel"],
         number_of_participants: 10,
         session_duration: 60,
         incentive_amount: 50,

@@ -1347,51 +1347,56 @@ function populateCategoryModal() {
 function populateCategoryTabs() {
     categoryTabs.innerHTML = '';
     
-    // Since PARTICIPANT_CATEGORIES is an array, we'll create a single tab
-    const groupName = 'All Categories';
+    // Create tabs for both category types
+    const buyingBehaviorsTab = document.createElement('button');
+    buyingBehaviorsTab.type = 'button';
+    buyingBehaviorsTab.className = 'category-tab active';
+    buyingBehaviorsTab.textContent = 'Buying Behaviors';
+    buyingBehaviorsTab.dataset.group = 'buying_behaviors';
     
-    const tab = document.createElement('button');
-    tab.type = 'button';
-    tab.className = 'category-tab active';
-    tab.textContent = groupName;
-    tab.dataset.group = groupName;
+    const productCategoriesTab = document.createElement('button');
+    productCategoriesTab.type = 'button';
+    productCategoriesTab.className = 'category-tab';
+    productCategoriesTab.textContent = 'Product Categories';
+    productCategoriesTab.dataset.group = 'product_categories';
     
-    // Handle tab click
-    tab.addEventListener('click', () => {
-        switchToTab(groupName);
+    // Handle tab clicks
+    buyingBehaviorsTab.addEventListener('click', () => {
+        switchToTab('buying_behaviors');
     });
     
-    categoryTabs.appendChild(tab);
+    productCategoriesTab.addEventListener('click', () => {
+        switchToTab('product_categories');
+    });
+    
+    categoryTabs.appendChild(buyingBehaviorsTab);
+    categoryTabs.appendChild(productCategoriesTab);
 }
 
 function populateCategoryGroups() {
     categoryList.innerHTML = '';
 
-    // Since PARTICIPANT_CATEGORIES is an array, we'll create a single group
-    const groupName = 'All Categories';
-    
-    // Create group header
-    const groupHeader = document.createElement('div');
-    groupHeader.className = 'category-group-header';
-    groupHeader.textContent = groupName;
-    groupHeader.dataset.group = groupName;
-    categoryList.appendChild(groupHeader);
+    // Create Buying Behaviors group
+    const buyingBehaviorsHeader = document.createElement('div');
+    buyingBehaviorsHeader.className = 'category-group-header';
+    buyingBehaviorsHeader.textContent = 'Buying Behaviors';
+    buyingBehaviorsHeader.dataset.group = 'buying_behaviors';
+    categoryList.appendChild(buyingBehaviorsHeader);
 
-    // Create group container
-    const groupContainer = document.createElement('div');
-    groupContainer.className = 'category-group';
-    groupContainer.dataset.group = groupName;
+    const buyingBehaviorsContainer = document.createElement('div');
+    buyingBehaviorsContainer.className = 'category-group';
+    buyingBehaviorsContainer.dataset.group = 'buying_behaviors';
 
-    // Process each category in the array
-    CONFIG.PARTICIPANT_CATEGORIES.forEach(category => {
+    // Process buying behaviors
+    CONFIG.BUYING_BEHAVIORS.forEach(category => {
         const checkboxContainer = document.createElement('div');
         checkboxContainer.className = 'category-checkbox';
         checkboxContainer.dataset.category = category.label;
-        checkboxContainer.dataset.group = groupName;
+        checkboxContainer.dataset.group = 'buying_behaviors';
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.id = `category-${category.value}`;
+        checkbox.id = `buying-${category.value}`;
         checkbox.dataset.category = category.label;
 
         const label = document.createElement('label');
@@ -1412,11 +1417,9 @@ function populateCategoryGroups() {
 
         // Handle container click
         checkboxContainer.addEventListener('click', (e) => {
-            // Prevent the checkbox from being clicked twice
             e.preventDefault();
             e.stopPropagation();
             
-            // Toggle the checkbox
             checkbox.checked = !checkbox.checked;
             if (checkbox.checked) {
                 checkboxContainer.classList.add('selected');
@@ -1425,10 +1428,69 @@ function populateCategoryGroups() {
             }
         });
 
-        groupContainer.appendChild(checkboxContainer);
+        buyingBehaviorsContainer.appendChild(checkboxContainer);
     });
 
-    categoryList.appendChild(groupContainer);
+    categoryList.appendChild(buyingBehaviorsContainer);
+
+    // Create Product Categories group
+    const productCategoriesHeader = document.createElement('div');
+    productCategoriesHeader.className = 'category-group-header';
+    productCategoriesHeader.textContent = 'Product Categories';
+    productCategoriesHeader.dataset.group = 'product_categories';
+    productCategoriesHeader.style.display = 'none'; // Hidden by default
+    categoryList.appendChild(productCategoriesHeader);
+
+    const productCategoriesContainer = document.createElement('div');
+    productCategoriesContainer.className = 'category-group';
+    productCategoriesContainer.dataset.group = 'product_categories';
+    productCategoriesContainer.style.display = 'none'; // Hidden by default
+
+    // Process product categories
+    CONFIG.PRODUCT_CATEGORIES.forEach(category => {
+        const checkboxContainer = document.createElement('div');
+        checkboxContainer.className = 'category-checkbox';
+        checkboxContainer.dataset.category = category.label;
+        checkboxContainer.dataset.group = 'product_categories';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `product-${category.value}`;
+        checkbox.dataset.category = category.label;
+
+        const label = document.createElement('label');
+        label.htmlFor = checkbox.id;
+        label.textContent = category.label;
+
+        checkboxContainer.appendChild(checkbox);
+        checkboxContainer.appendChild(label);
+
+        // Handle checkbox change
+        checkbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                checkboxContainer.classList.add('selected');
+            } else {
+                checkboxContainer.classList.remove('selected');
+            }
+        });
+
+        // Handle container click
+        checkboxContainer.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            checkbox.checked = !checkbox.checked;
+            if (checkbox.checked) {
+                checkboxContainer.classList.add('selected');
+            } else {
+                checkboxContainer.classList.remove('selected');
+            }
+        });
+
+        productCategoriesContainer.appendChild(checkboxContainer);
+    });
+
+    categoryList.appendChild(productCategoriesContainer);
 }
 
 function switchToTab(groupName) {
