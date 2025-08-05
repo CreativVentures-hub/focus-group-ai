@@ -411,7 +411,23 @@ function initializeApp() {
 
 function setupEventListeners() {
     // Login form submission
-    loginForm.addEventListener('submit', handleLogin);
+    console.log('Setting up login form event listener...');
+    console.log('Login form element:', loginForm);
+    console.log('Password input element:', passwordInput);
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+        console.log('Login form event listener added successfully');
+        
+        // Also add click event to the login button as fallback
+        const loginButton = loginForm.querySelector('button[type="submit"]');
+        if (loginButton) {
+            loginButton.addEventListener('click', handleLogin);
+            console.log('Login button click event listener added');
+        }
+    } else {
+        console.error('Login form element not found!');
+    }
     
     // Logout button
     logoutBtn.addEventListener('click', handleLogout);
@@ -478,15 +494,20 @@ function populateDropdowns() {
 
 function handleLogin(e) {
     e.preventDefault();
+    console.log('Login function called');
     
     const password = passwordInput.value.trim();
+    console.log('Password entered:', password ? '***' : 'empty');
+    console.log('Expected password:', CONFIG.PASSWORD);
     
     if (password === CONFIG.PASSWORD) {
+        console.log('Password correct! Logging in...');
         // Store login state in session storage
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
         showMainSection();
         clearLoginForm();
     } else {
+        console.log('Password incorrect! Showing error...');
         showLoginError();
     }
 }
