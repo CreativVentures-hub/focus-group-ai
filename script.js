@@ -438,13 +438,13 @@ function populateDropdowns() {
     // Populate session types
     CONFIG.SESSION_TYPES.forEach(type => {
         const option = document.createElement('option');
-        option.value = type;
-        option.textContent = type;
+        option.value = type.value;
+        option.textContent = type.label;
         sessionTypeSelect.appendChild(option);
     });
     
     // Set Market Research as default
-    sessionTypeSelect.value = 'Market Research';
+    sessionTypeSelect.value = 'market_research';
     
     // Trigger session type change to show default fields
     handleSessionTypeChange();
@@ -517,23 +517,23 @@ function handleSessionTypeChange() {
     
     // Show specific fields based on session type
     switch (selectedType) {
-        case 'Product Research':
+        case 'product_testing':
             document.getElementById('productResearchFields').style.display = 'block';
             initializeQuestions('productQuestions', 10);
             setupCharacterCounters();
             break;
-        case 'Market Research':
+        case 'market_research':
             document.getElementById('marketResearchFields').style.display = 'block';
             initializeQuestions('marketQuestions', 10);
             setupCharacterCounters();
             break;
-        case 'Brand Perception':
+        case 'brand_perception':
             document.getElementById('brandPerceptionFields').style.display = 'block';
             initializeQuestions('brandQuestions', 10);
             setupCharacterCounters();
             break;
         default:
-            sessionFields.style.display = 'none';
+            // For now, don't hide session fields - just don't show specific ones
             break;
     }
 }
