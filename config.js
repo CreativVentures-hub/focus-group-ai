@@ -21,14 +21,14 @@ const CONFIG = {
     SESSION_TYPES: [
         { value: "market_research", label: "Market Research" },
         { value: "product_testing", label: "Product Testing" },
-        { value: "user_experience", label: "User Experience" },
-        { value: "customer_feedback", label: "Customer Feedback" },
+        { value: "user_experience", label: "User Experience", disabled: true },
+        { value: "customer_feedback", label: "Customer Feedback", disabled: true },
         { value: "brand_perception", label: "Brand Perception" },
-        { value: "competitive_analysis", label: "Competitive Analysis" },
-        { value: "advertising_testing", label: "Advertising Testing" },
-        { value: "pricing_research", label: "Pricing Research" },
-        { value: "concept_validation", label: "Concept Validation" },
-        { value: "satisfaction_survey", label: "Satisfaction Survey" }
+        { value: "competitive_analysis", label: "Competitive Analysis", disabled: true },
+        { value: "advertising_testing", label: "Advertising Testing", disabled: true },
+        { value: "pricing_research", label: "Pricing Research", disabled: true },
+        { value: "concept_validation", label: "Concept Validation", disabled: true },
+        { value: "satisfaction_survey", label: "Satisfaction Survey", disabled: true }
     ],
     
     // Participant categories for the Run Focus Group form

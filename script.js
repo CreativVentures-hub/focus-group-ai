@@ -133,8 +133,8 @@ function populateDropdowns() {
         const fallbackSessionTypes = [
             { value: 'market_research', label: 'Market Research' },
             { value: 'product_testing', label: 'Product Testing' },
-            { value: 'user_experience', label: 'User Experience' },
-            { value: 'customer_feedback', label: 'Customer Feedback' },
+            { value: 'user_experience', label: 'User Experience', disabled: true },
+            { value: 'customer_feedback', label: 'Customer Feedback', disabled: true },
             { value: 'brand_perception', label: 'Brand Perception' }
         ];
         
@@ -146,6 +146,13 @@ function populateDropdowns() {
             const option = document.createElement('option');
             option.value = type.value;
             option.textContent = type.label;
+            
+            // Add disabled attribute if specified
+            if (type.disabled) {
+                option.disabled = true;
+                option.textContent = type.label + ' (Coming Soon)';
+            }
+            
             sessionTypeSelect.appendChild(option);
         });
         
@@ -165,6 +172,13 @@ function populateDropdowns() {
         const option = document.createElement('option');
         option.value = type.value;
         option.textContent = type.label;
+        
+        // Add disabled attribute if specified
+        if (type.disabled) {
+            option.disabled = true;
+            option.textContent = type.label + ' (Coming Soon)';
+        }
+        
         sessionTypeSelect.appendChild(option);
     });
     
