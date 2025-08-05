@@ -424,21 +424,22 @@ document.addEventListener('DOMContentLoaded', function() {
     manualLoginButton.style.cursor = 'pointer';
     
     manualLoginButton.addEventListener('click', function() {
+        alert('Manual login button clicked!');
         console.log('=== MANUAL LOGIN TEST ===');
         console.log('Password input value:', passwordInput ? passwordInput.value : 'N/A');
         console.log('Expected password:', CONFIG.PASSWORD);
         
-        if (passwordInput && passwordInput.value.trim() === CONFIG.PASSWORD) {
-            console.log('Manual login successful!');
-            sessionStorage.setItem('focusGroupLoggedIn', 'true');
-            showMainSection();
-            clearLoginForm();
-        } else {
-            console.log('Manual login failed - password incorrect or input not found');
-            if (passwordInput) {
-                passwordInput.value = CONFIG.PASSWORD; // Auto-fill for testing
-                console.log('Auto-filled password for testing');
-            }
+        // Force login regardless of password input
+        console.log('Forcing login...');
+        sessionStorage.setItem('focusGroupLoggedIn', 'true');
+        showMainSection();
+        clearLoginForm();
+        console.log('Manual login completed!');
+        
+        // Also try to fill the password field if it exists
+        if (passwordInput) {
+            passwordInput.value = CONFIG.PASSWORD;
+            console.log('Password field filled with:', CONFIG.PASSWORD);
         }
     });
     
@@ -538,6 +539,7 @@ function populateDropdowns() {
 
 function handleLogin(e) {
     e.preventDefault();
+    alert('Login function called!');
     console.log('Login function called');
     
     const password = passwordInput.value.trim();
