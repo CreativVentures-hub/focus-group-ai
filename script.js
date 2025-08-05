@@ -458,16 +458,63 @@ function setupEventListeners() {
 }
 
 function populateDropdowns() {
+    console.log('=== POPULATING DROPDOWNS ===');
+    console.log('CONFIG:', CONFIG);
+    console.log('CONFIG.SESSION_TYPES:', CONFIG.SESSION_TYPES);
+    console.log('sessionTypeSelect element:', sessionTypeSelect);
+    
+    if (!CONFIG.SESSION_TYPES) {
+        console.error('CONFIG.SESSION_TYPES is undefined!');
+        
+        // Fallback session types if config fails to load
+        const fallbackSessionTypes = [
+            { value: 'market_research', label: 'Market Research' },
+            { value: 'product_testing', label: 'Product Testing' },
+            { value: 'user_experience', label: 'User Experience' },
+            { value: 'customer_feedback', label: 'Customer Feedback' },
+            { value: 'brand_perception', label: 'Brand Perception' }
+        ];
+        
+        console.log('Using fallback session types:', fallbackSessionTypes);
+        
+        // Clear existing options first
+        sessionTypeSelect.innerHTML = '<option value="">Select session type</option>';
+        
+        // Populate with fallback types
+        fallbackSessionTypes.forEach((type, index) => {
+            console.log(`Adding fallback session type ${index}:`, type);
+            const option = document.createElement('option');
+            option.value = type.value;
+            option.textContent = type.label;
+            sessionTypeSelect.appendChild(option);
+        });
+        
+        sessionTypeSelect.value = 'market_research';
+        return;
+    }
+    
+    if (!sessionTypeSelect) {
+        console.error('sessionTypeSelect element not found!');
+        return;
+    }
+    
+    // Clear existing options first
+    sessionTypeSelect.innerHTML = '<option value="">Select session type</option>';
+    
     // Populate session types
-    CONFIG.SESSION_TYPES.forEach(type => {
+    CONFIG.SESSION_TYPES.forEach((type, index) => {
+        console.log(`Adding session type ${index}:`, type);
         const option = document.createElement('option');
         option.value = type.value;
         option.textContent = type.label;
         sessionTypeSelect.appendChild(option);
     });
     
+    console.log('Final dropdown options:', sessionTypeSelect.options.length);
+    
     // Set Market Research as default
     sessionTypeSelect.value = 'market_research';
+    console.log('Set default value to:', sessionTypeSelect.value);
     
     // Trigger session type change to show default fields
     handleSessionTypeChange();
