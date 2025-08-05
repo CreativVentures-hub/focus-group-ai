@@ -542,11 +542,14 @@ function populateDropdowns() {
 function handleLogin(e) {
     e.preventDefault();
     console.log('Login function called');
+    alert('Login function called!');
     
     const password = passwordInput.value.trim();
     console.log('Password entered:', password ? '***' : 'empty');
     console.log('Expected password:', CONFIG.PASSWORD);
     console.log('Password match:', password === CONFIG.PASSWORD);
+    
+    alert('Password entered: ' + (password ? '***' : 'empty') + '\nExpected: ' + CONFIG.PASSWORD + '\nMatch: ' + (password === CONFIG.PASSWORD));
     
     if (password === CONFIG.PASSWORD) {
         console.log('Password correct! Logging in...');
@@ -555,12 +558,15 @@ function handleLogin(e) {
         // Store login state in session storage
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
         console.log('Session storage set');
+        alert('Session storage set');
         
         showMainSection();
         console.log('Main section shown');
+        alert('Main section shown');
         
         clearLoginForm();
         console.log('Login form cleared');
+        alert('Login form cleared');
         
         alert('Login successful! You should now see the main interface.');
     } else {
