@@ -1,6 +1,7 @@
 // Focus Group System JavaScript
 
 // Script loaded successfully
+alert('Script loaded! CONFIG.SESSION_TYPES length: ' + (CONFIG && CONFIG.SESSION_TYPES ? CONFIG.SESSION_TYPES.length : 'undefined'));
 
 // Global error handler
 window.addEventListener('error', function(e) {
@@ -73,6 +74,34 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize language
     initializeLanguage();
+    
+    // Manual test - force populate dropdown after a delay
+    setTimeout(() => {
+        console.log('=== MANUAL DROPDOWN TEST ===');
+        const dropdown = document.getElementById('sessionType');
+        console.log('Dropdown element:', dropdown);
+        
+        if (dropdown && dropdown.options.length <= 1) {
+            console.log('Dropdown is empty, manually populating...');
+            
+            const sessionTypes = [
+                'Market Research',
+                'Product Testing', 
+                'User Experience',
+                'Customer Feedback',
+                'Brand Perception'
+            ];
+            
+            sessionTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.toLowerCase().replace(' ', '_');
+                option.textContent = type;
+                dropdown.appendChild(option);
+            });
+            
+            console.log('Manual population complete. Options:', dropdown.options.length);
+        }
+    }, 2000);
     
     // Auto-refresh for development (only on localhost)
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
