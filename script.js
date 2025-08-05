@@ -74,79 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize language
     initializeLanguage();
     
-    // Add test mode toggle button
-    const testModeButton = document.createElement('button');
-    testModeButton.textContent = 'Test Mode: OFF';
-    testModeButton.style.position = 'fixed';
-    testModeButton.style.top = '10px';
-    testModeButton.style.right = '10px';
-    testModeButton.style.zIndex = '9999';
-    testModeButton.style.padding = '10px';
-    testModeButton.style.background = 'orange';
-    testModeButton.style.color = 'white';
-    testModeButton.style.border = 'none';
-    testModeButton.style.borderRadius = '5px';
-    testModeButton.style.cursor = 'pointer';
-    
-    testModeButton.addEventListener('click', function() {
-        testMode = !testMode;
-        testModeButton.textContent = `Test Mode: ${testMode ? 'ON' : 'OFF'}`;
-        testModeButton.style.background = testMode ? 'green' : 'orange';
-        console.log(`Test mode ${testMode ? 'enabled' : 'disabled'}`);
-    });
-    
-    document.body.appendChild(testModeButton);
-    
-    // Add a webhook test button
-    const webhookTestButton = document.createElement('button');
-    webhookTestButton.textContent = 'Test Webhook';
-    webhookTestButton.style.position = 'fixed';
-    webhookTestButton.style.top = '50px';
-    webhookTestButton.style.right = '10px';
-    webhookTestButton.style.zIndex = '9999';
-    webhookTestButton.style.padding = '10px';
-    webhookTestButton.style.background = 'blue';
-    webhookTestButton.style.color = 'white';
-    webhookTestButton.style.border = 'none';
-    webhookTestButton.style.borderRadius = '5px';
-    webhookTestButton.style.cursor = 'pointer';
-    
-    // Add a debug button
-    const debugButton = document.createElement('button');
-    debugButton.textContent = 'Debug Elements';
-    debugButton.style.position = 'fixed';
-    debugButton.style.top = '90px';
-    debugButton.style.right = '10px';
-    
-    // Add a slider test button
-    const sliderTestButton = document.createElement('button');
-    sliderTestButton.textContent = 'Test Slider Display';
-    sliderTestButton.style.position = 'fixed';
-    sliderTestButton.style.top = '130px';
-    sliderTestButton.style.right = '10px';
-    sliderTestButton.style.zIndex = '9999';
-    sliderTestButton.style.padding = '10px';
-    sliderTestButton.style.background = 'purple';
-    sliderTestButton.style.color = 'white';
-    sliderTestButton.style.border = 'none';
-    sliderTestButton.style.borderRadius = '5px';
-    sliderTestButton.style.cursor = 'pointer';
-    
-    sliderTestButton.addEventListener('click', function() {
-        if (numberOfParticipantsSlider && numberOfParticipantsValue) {
-            const currentValue = numberOfParticipantsSlider.value;
-            numberOfParticipantsValue.textContent = currentValue;
-            console.log('Manual slider display update - Value:', currentValue);
-            alert(`Slider Test:\nSlider Value: ${currentValue}\nDisplay Value: ${numberOfParticipantsValue.textContent}`);
-        } else {
-            alert('Slider elements not found!');
-        }
-    });
-    
-    document.body.appendChild(sliderTestButton);
-    debugButton.style.zIndex = '9999';
-    debugButton.style.padding = '10px';
-    debugButton.style.background = 'red';
+    // Test buttons removed - login screen bypassed
     debugButton.style.color = 'white';
     debugButton.style.border = 'none';
     debugButton.style.borderRadius = '5px';
@@ -456,35 +384,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
-    // Check if user is already logged in (session storage)
-    const isLoggedIn = sessionStorage.getItem('focusGroupLoggedIn');
-    if (isLoggedIn === 'true') {
-        showMainSection();
-    }
+    // Skip login for now - show main section directly
+    console.log('Skipping login - showing main section directly');
+    showMainSection();
 }
 
 function setupEventListeners() {
-    // Login form submission
-    console.log('Setting up login form event listener...');
-    console.log('Login form element:', loginForm);
-    console.log('Password input element:', passwordInput);
-    
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-        console.log('Login form event listener added successfully');
-        
-        // Also add click event to the login button as fallback
-        const loginButton = loginForm.querySelector('button[type="submit"]');
-        if (loginButton) {
-            loginButton.addEventListener('click', handleLogin);
-            console.log('Login button click event listener added');
-        }
-    } else {
-        console.error('Login form element not found!');
-    }
+    // Login functionality removed for now
+    console.log('Login functionality bypassed');
     
     // Logout button
-    logoutBtn.addEventListener('click', handleLogout);
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
     
     // Form submissions
     focusGroupForm.addEventListener('submit', handleFocusGroupForm);
