@@ -14,6 +14,9 @@ const CONFIG = {
     // Production settings
     IS_PRODUCTION: true, // Set to true when deployed to live server
     
+    // Authentication
+    PASSWORD: "focusgroup2024", // Password for accessing the system
+    
     // Session types for the Run Focus Group form (Market Research is default)
     SESSION_TYPES: [
         { value: "market_research", label: "Market Research" },
@@ -175,6 +178,82 @@ const CONFIG = {
         dynamicMessages: true,
         corsProxy: false, // Disabled in production
         testButtons: false // Disabled in production
+    },
+    
+    // Language translations
+    TRANSLATIONS: {
+        en: {
+            focusGroupSystem: "Focus Group System",
+            logout: "Logout",
+            sessionType: "Session Type:",
+            selectSessionType: "Select session type",
+            sessionName: "Session Name:",
+            enterSessionName: "Enter session name...",
+            numberOfParticipants: "Number of Participants:",
+            productName: "Product Name:",
+            enterProductName: "Enter product name...",
+            productDescription: "Product Description:",
+            describeProduct: "Describe the product...",
+            productCategory: "Product Category:",
+            productCategoryExample: "e.g., Electronics, Fashion, Food...",
+            startFocusGroup: "Start Focus Group",
+            selectCategories: "Select Categories",
+            selectGender: "Select Gender",
+            selectAgeRange: "Select Age Range",
+            selectIncomeRange: "Select Income Range",
+            selectMaritalStatus: "Select Marital Status",
+            selectChildrenStatus: "Select Children Status",
+            selectEducationLevel: "Select Education Level",
+            selectRace: "Select Race"
+        },
+        "zh-cn": {
+            focusGroupSystem: "焦点小组系统",
+            logout: "登出",
+            sessionType: "会议类型:",
+            selectSessionType: "选择会议类型",
+            sessionName: "会议名称:",
+            enterSessionName: "输入会议名称...",
+            numberOfParticipants: "参与者人数:",
+            productName: "产品名称:",
+            enterProductName: "输入产品名称...",
+            productDescription: "产品描述:",
+            describeProduct: "描述产品...",
+            productCategory: "产品类别:",
+            productCategoryExample: "例如：电子产品、时尚、食品...",
+            startFocusGroup: "开始焦点小组",
+            selectCategories: "选择类别",
+            selectGender: "选择性别",
+            selectAgeRange: "选择年龄范围",
+            selectIncomeRange: "选择收入范围",
+            selectMaritalStatus: "选择婚姻状况",
+            selectChildrenStatus: "选择子女状况",
+            selectEducationLevel: "选择教育水平",
+            selectRace: "选择种族"
+        },
+        "zh-hk": {
+            focusGroupSystem: "焦點小組系統",
+            logout: "登出",
+            sessionType: "會議類型:",
+            selectSessionType: "選擇會議類型",
+            sessionName: "會議名稱:",
+            enterSessionName: "輸入會議名稱...",
+            numberOfParticipants: "參與者人數:",
+            productName: "產品名稱:",
+            enterProductName: "輸入產品名稱...",
+            productDescription: "產品描述:",
+            describeProduct: "描述產品...",
+            productCategory: "產品類別:",
+            productCategoryExample: "例如：電子產品、時尚、食品...",
+            startFocusGroup: "開始焦點小組",
+            selectCategories: "選擇類別",
+            selectGender: "選擇性別",
+            selectAgeRange: "選擇年齡範圍",
+            selectIncomeRange: "選擇收入範圍",
+            selectMaritalStatus: "選擇婚姻狀況",
+            selectChildrenStatus: "選擇子女狀況",
+            selectEducationLevel: "選擇教育水平",
+            selectRace: "選擇種族"
+        }
     }
 };
 
