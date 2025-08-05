@@ -7,7 +7,7 @@ deploy.bat
 deploy/
 
 # Configuration files (keep only production config)
-config.js
+# config.js  # Temporarily commented out for GitHub Pages deployment
 !config.production.js
 
 # IDE files
