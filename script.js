@@ -1,18 +1,6 @@
 // Focus Group System JavaScript
 
 // Script loaded successfully
-console.log('=== SCRIPT LOADED ===');
-console.log('CONFIG object:', CONFIG);
-console.log('CONFIG.SESSION_TYPES:', CONFIG && CONFIG.SESSION_TYPES);
-
-// Test if DOM is ready
-if (document.readyState === 'loading') {
-    console.log('DOM still loading...');
-} else {
-    console.log('DOM ready!');
-}
-
-console.log('Script loaded! CONFIG.SESSION_TYPES length: ' + (CONFIG && CONFIG.SESSION_TYPES ? CONFIG.SESSION_TYPES.length : 'undefined'));
 
 // Global error handler
 window.addEventListener('error', function(e) {
@@ -39,10 +27,10 @@ const loginForm = document.getElementById('loginForm');
 const passwordInput = document.getElementById('passwordInput');
 const loginError = document.getElementById('loginError');
 const logoutBtn = document.getElementById('logoutBtn');
-// const participantsForm = document.getElementById('participantsForm'); // Removed - no longer exists
+
 const focusGroupForm = document.getElementById('focusGroupForm');
 const sessionTypeSelect = document.getElementById('sessionType');
-const productFields = document.getElementById('productFields');
+
 const categorySearch = document.getElementById('categorySearch');
 const categoryTabs = document.getElementById('categoryTabs');
 const categoryList = document.getElementById('categoryList');
@@ -58,16 +46,9 @@ const categoryCount = document.getElementById('categoryCount');
 const numberOfParticipantsSlider = document.getElementById('numberOfParticipants');
 const numberOfParticipantsValue = document.getElementById('numberOfParticipantsValue');
 
-// Debug DOM elements
-console.log('DOM Elements Check:', {
-    slider: numberOfParticipantsSlider,
-    value: numberOfParticipantsValue,
-    sliderFound: !!numberOfParticipantsSlider,
-    valueFound: !!numberOfParticipantsValue
-});
 
-// Test mode flag
-let testMode = false;
+
+
 
 // Language management
 let currentLanguage = 'en';
@@ -75,59 +56,14 @@ const languageSelect = document.getElementById('languageSelect');
 
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM loaded, initializing app...');
-        
-        // Debug: Check if elements exist
-        console.log('=== DOM ELEMENTS CHECK ===');
-        console.log('loginSection:', document.getElementById('loginSection'));
-        console.log('loginForm:', document.getElementById('loginForm'));
-        console.log('passwordInput:', document.getElementById('passwordInput'));
-        console.log('loginError:', document.getElementById('loginError'));
-        console.log('mainSection:', document.getElementById('mainSection'));
-        
         initializeApp();
         setupEventListeners();
         // Don't populate dropdowns yet - wait for login
-        console.log('App initialization complete');
     
     // Initialize language
     initializeLanguage();
     
-    // Manual test - force populate dropdown after a delay
-    setTimeout(() => {
-        console.log('=== MANUAL DROPDOWN TEST ===');
-        const dropdown = document.getElementById('sessionType');
-        console.log('Dropdown element:', dropdown);
-        
-        // Test all form elements
-        console.log('All form elements:');
-        console.log('- sessionType:', document.getElementById('sessionType'));
-        console.log('- sessionName:', document.getElementById('sessionName'));
-        console.log('- numberOfParticipants:', document.getElementById('numberOfParticipants'));
-        console.log('- openCategoryModal:', document.getElementById('openCategoryModal'));
-        console.log('- openGenderModal:', document.getElementById('openGenderModal'));
-        
-        if (dropdown && dropdown.options.length <= 1) {
-            console.log('Dropdown is empty, manually populating...');
-            
-            const sessionTypes = [
-                'Market Research',
-                'Product Testing', 
-                'User Experience',
-                'Customer Feedback',
-                'Brand Perception'
-            ];
-            
-            sessionTypes.forEach(type => {
-                const option = document.createElement('option');
-                option.value = type.toLowerCase().replace(' ', '_');
-                option.textContent = type;
-                dropdown.appendChild(option);
-            });
-            
-            console.log('Manual population complete. Options:', dropdown.options.length);
-        }
-    }, 2000);
+
     
     // Auto-refresh for development (only on localhost)
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -158,19 +94,13 @@ const languageSelect = document.getElementById('languageSelect');
 
 function initializeApp() {
     // Show login section by default
-    console.log('Showing login section by default');
     showLoginSection();
 }
 
 function setupEventListeners() {
     // Login functionality
-    console.log('Setting up login functionality');
-    
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
-        console.log('Login form event listener added');
-    } else {
-        console.error('Login form not found!');
     }
     
     // Logout button
@@ -184,10 +114,7 @@ function setupEventListeners() {
     // Session type change (for showing/hiding product fields)
     sessionTypeSelect.addEventListener('change', handleSessionTypeChange);
     
-    // Participant count slider - moved to initializeSlider function
-    
     // Category modal events
-    console.log('Setting up category modal...');
     setupCategoryModal();
     
     // Setup all demographic modals
@@ -198,31 +125,10 @@ function setupEventListeners() {
     
     // Initialize slider
     initializeSlider();
-    
-    // Debug button for slider
-    const debugSliderBtn = document.getElementById('debugSlider');
-    if (debugSliderBtn) {
-        debugSliderBtn.addEventListener('click', function() {
-            console.log('=== DEBUG SLIDER INFO ===');
-            console.log('Slider element:', numberOfParticipantsSlider);
-            console.log('Slider value:', numberOfParticipantsSlider ? numberOfParticipantsSlider.value : 'N/A');
-            console.log('Slider type:', numberOfParticipantsSlider ? numberOfParticipantsSlider.type : 'N/A');
-            console.log('Display value:', numberOfParticipantsValue ? numberOfParticipantsValue.textContent : 'N/A');
-            console.log('Selected categories:', window.selectedCategories);
-            alert(`Slider Debug Info:\nSlider Value: ${numberOfParticipantsSlider ? numberOfParticipantsSlider.value : 'N/A'}\nDisplay Value: ${numberOfParticipantsValue ? numberOfParticipantsValue.textContent : 'N/A'}\nSelected Categories: ${window.selectedCategories ? window.selectedCategories.join(', ') : 'None'}`);
-        });
-    }
 }
 
 function populateDropdowns() {
-    console.log('=== POPULATING DROPDOWNS ===');
-    console.log('CONFIG:', CONFIG);
-    console.log('CONFIG.SESSION_TYPES:', CONFIG.SESSION_TYPES);
-    console.log('sessionTypeSelect element:', sessionTypeSelect);
-    
     if (!CONFIG.SESSION_TYPES) {
-        console.error('CONFIG.SESSION_TYPES is undefined!');
-        
         // Fallback session types if config fails to load
         const fallbackSessionTypes = [
             { value: 'market_research', label: 'Market Research' },
@@ -232,14 +138,11 @@ function populateDropdowns() {
             { value: 'brand_perception', label: 'Brand Perception' }
         ];
         
-        console.log('Using fallback session types:', fallbackSessionTypes);
-        
         // Clear existing options first
         sessionTypeSelect.innerHTML = '<option value="">Select session type</option>';
         
         // Populate with fallback types
-        fallbackSessionTypes.forEach((type, index) => {
-            console.log(`Adding fallback session type ${index}:`, type);
+        fallbackSessionTypes.forEach(type => {
             const option = document.createElement('option');
             option.value = type.value;
             option.textContent = type.label;
@@ -251,7 +154,6 @@ function populateDropdowns() {
     }
     
     if (!sessionTypeSelect) {
-        console.error('sessionTypeSelect element not found!');
         return;
     }
     
@@ -259,19 +161,15 @@ function populateDropdowns() {
     sessionTypeSelect.innerHTML = '<option value="">Select session type</option>';
     
     // Populate session types
-    CONFIG.SESSION_TYPES.forEach((type, index) => {
-        console.log(`Adding session type ${index}:`, type);
+    CONFIG.SESSION_TYPES.forEach(type => {
         const option = document.createElement('option');
         option.value = type.value;
         option.textContent = type.label;
         sessionTypeSelect.appendChild(option);
     });
     
-    console.log('Final dropdown options:', sessionTypeSelect.options.length);
-    
     // Set Market Research as default
     sessionTypeSelect.value = 'market_research';
-    console.log('Set default value to:', sessionTypeSelect.value);
     
     // Trigger session type change to show default fields
     handleSessionTypeChange();
@@ -287,31 +185,20 @@ function populateDropdowns() {
 
 function handleLogin(e) {
     e.preventDefault();
-    console.log('Login function called');
     
     const password = passwordInput.value.trim();
-    console.log('Password entered:', password ? '***' : 'empty');
-    console.log('Expected password:', CONFIG.PASSWORD);
-    console.log('Password match:', password === CONFIG.PASSWORD);
     
     if (password === CONFIG.PASSWORD) {
-        console.log('Password correct! Logging in...');
-        
         // Store login state in session storage
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
-        console.log('Session storage set');
         
         showMainSection();
-        console.log('Main section shown');
         
         // Populate dropdowns after successful login
         populateDropdowns();
-        console.log('Dropdowns populated');
         
         clearLoginForm();
-        console.log('Login form cleared');
     } else {
-        console.log('Password incorrect! Showing error...');
         showLoginError();
     }
 }
@@ -1102,7 +989,6 @@ function setupCategoryModal() {
     
     // Initialize selected categories array
     window.selectedCategories = [];
-    console.log('window.selectedCategories initialized:', window.selectedCategories);
 }
 
 // Demographic Modal Functions
@@ -1266,7 +1152,7 @@ function applySelection(type, list, modal) {
     
     window[arrayName] = selectedItems;
     
-    console.log(`Stored in window.${arrayName}:`, selectedItems);
+    
     
     // Update display
     updateSelectionDisplay(type, selectedItems);
@@ -2071,7 +1957,6 @@ function showResponseScreen(result) {
     
     // Reset form
     focusGroupForm.reset();
-    productFields.style.display = 'none';
     
     // Clear selected categories
     window.selectedCategories = [];
@@ -2176,7 +2061,7 @@ function showFileDownloadScreen(data) {
                     <i class="fas fa-download"></i> Download Report
                 </button>
                 
-                <button class="btn btn-secondary" onclick="previewFile(data.blob)">
+                                    <button class="btn btn-secondary" onclick="previewFile(data.blob, data.filename)">
                     <i class="fas fa-eye"></i> Preview Content
                 </button>
             </div>
@@ -2194,7 +2079,6 @@ function showFileDownloadScreen(data) {
     
     // Reset form
     focusGroupForm.reset();
-    productFields.style.display = 'none';
     
     // Clear selected categories
     window.selectedCategories = [];
@@ -2215,7 +2099,7 @@ function downloadFile(filename, blob) {
     document.body.removeChild(a);
 }
 
-function previewFile(blob) {
+function previewFile(blob, filename) {
     const reader = new FileReader();
     reader.onload = function(e) {
         const content = e.target.result;
