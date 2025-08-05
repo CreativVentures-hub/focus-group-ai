@@ -1,7 +1,6 @@
 // Focus Group System JavaScript
 
-// Test if script loads
-alert('Script loaded successfully!');
+// Script loaded successfully
 
 // Global error handler
 window.addEventListener('error', function(e) {
@@ -542,21 +541,31 @@ function populateDropdowns() {
 
 function handleLogin(e) {
     e.preventDefault();
-    alert('Login function called!');
     console.log('Login function called');
     
     const password = passwordInput.value.trim();
     console.log('Password entered:', password ? '***' : 'empty');
     console.log('Expected password:', CONFIG.PASSWORD);
+    console.log('Password match:', password === CONFIG.PASSWORD);
     
     if (password === CONFIG.PASSWORD) {
         console.log('Password correct! Logging in...');
+        alert('Password correct! Logging in...');
+        
         // Store login state in session storage
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
+        console.log('Session storage set');
+        
         showMainSection();
+        console.log('Main section shown');
+        
         clearLoginForm();
+        console.log('Login form cleared');
+        
+        alert('Login successful! You should now see the main interface.');
     } else {
         console.log('Password incorrect! Showing error...');
+        alert('Password incorrect! Expected: ' + CONFIG.PASSWORD + ', Got: ' + password);
         showLoginError();
     }
 }
