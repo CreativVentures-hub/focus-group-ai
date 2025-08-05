@@ -1,5 +1,8 @@
 // Focus Group System JavaScript
 
+// Test if script loads
+alert('Script loaded successfully!');
+
 // Global error handler
 window.addEventListener('error', function(e) {
     console.error('Global error caught:', e.error);
