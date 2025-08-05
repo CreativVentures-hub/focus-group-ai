@@ -33,28 +33,18 @@ const CONFIG = {
     
     // Participant categories for the Run Focus Group form
     PARTICIPANT_CATEGORIES: [
-        { value: "general_consumers", label: "General Consumers" },
+        { value: "general_consumer", label: "General Consumer" },
         { value: "online_shoppers", label: "Online Shoppers" },
-        { value: "budget_conscious_shoppers", label: "Budget-Conscious Shoppers" },
-        { value: "luxury_buyers", label: "Luxury Buyers" },
-        { value: "electronics_buyers", label: "Electronics Buyers" },
-        { value: "fashion_enthusiasts", label: "Fashion Enthusiasts" },
-        { value: "health_conscious", label: "Health-Conscious" },
-        { value: "tech_savvy", label: "Tech-Savvy" },
-        { value: "small_business_owners", label: "Small Business Owners" },
-        { value: "students", label: "Students" },
-        { value: "professionals", label: "Professionals" },
-        { value: "parents", label: "Parents" },
-        { value: "seniors", label: "Seniors" },
-        { value: "millennials", label: "Millennials" },
-        { value: "gen_z", label: "Gen Z" }
+        { value: "budget_conscious", label: "Budget-conscious" },
+        { value: "luxury", label: "Luxury" },
+        { value: "eco_conscious", label: "Eco-Conscious" }
     ],
     
     // Default form values
     DEFAULT_VALUES: {
         session_name: "",
         session_type: "market_research",
-        categories: ["general_consumers"],
+        categories: ["general_consumer"],
         number_of_participants: 10,
         session_duration: 60,
         incentive_amount: 50,
