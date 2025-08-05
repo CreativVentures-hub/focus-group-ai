@@ -74,6 +74,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize language
     initializeLanguage();
     
+    // Auto-refresh for development (only on localhost)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.log('Development mode detected - enabling auto-refresh');
+        
+        // Check for updates every 30 seconds
+        setInterval(() => {
+            fetch(window.location.href + '?t=' + Date.now(), { method: 'HEAD' })
+                .then(response => {
+                    if (response.headers.get('last-modified')) {
+                        const lastModified = new Date(response.headers.get('last-modified'));
+                        const currentTime = new Date();
+                        if (currentTime - lastModified < 60000) { // If file was modified in last minute
+                            console.log('Changes detected, refreshing...');
+                            window.location.reload();
+                        }
+                    }
+                })
+                .catch(() => {
+                    // Ignore errors
+                });
+        }, 30000);
+    }
+    
     // Test buttons removed - login screen bypassed
     debugButton.style.color = 'white';
     debugButton.style.border = 'none';
