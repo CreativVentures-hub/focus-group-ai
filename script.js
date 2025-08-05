@@ -426,17 +426,24 @@ document.addEventListener('DOMContentLoaded', function() {
     manualLoginButton.style.cursor = 'pointer';
     
     manualLoginButton.addEventListener('click', function() {
-        alert('Manual login button clicked!');
         console.log('=== MANUAL LOGIN TEST ===');
         console.log('Password input value:', passwordInput ? passwordInput.value : 'N/A');
         console.log('Expected password:', CONFIG.PASSWORD);
         
         // Force login regardless of password input
         console.log('Forcing login...');
+        alert('Forcing login...');
+        
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
+        alert('Session storage set');
+        
         showMainSection();
+        alert('Main section shown');
+        
         clearLoginForm();
-        console.log('Manual login completed!');
+        alert('Login form cleared');
+        
+        alert('Manual login completed! You should now see the main interface.');
         
         // Also try to fill the password field if it exists
         if (passwordInput) {
