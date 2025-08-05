@@ -1,6 +1,17 @@
 // Focus Group System JavaScript
 
 // Script loaded successfully
+console.log('=== SCRIPT LOADED ===');
+console.log('CONFIG object:', CONFIG);
+console.log('CONFIG.SESSION_TYPES:', CONFIG && CONFIG.SESSION_TYPES);
+
+// Test if DOM is ready
+if (document.readyState === 'loading') {
+    console.log('DOM still loading...');
+} else {
+    console.log('DOM ready!');
+}
+
 alert('Script loaded! CONFIG.SESSION_TYPES length: ' + (CONFIG && CONFIG.SESSION_TYPES ? CONFIG.SESSION_TYPES.length : 'undefined'));
 
 // Global error handler
@@ -12,6 +23,13 @@ window.addEventListener('error', function(e) {
         lineno: e.lineno,
         colno: e.colno
     });
+    alert('JavaScript Error: ' + e.message + ' at line ' + e.lineno);
+});
+
+// Also catch unhandled promise rejections
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('Unhandled promise rejection:', e.reason);
+    alert('Unhandled Promise Error: ' + e.reason);
 });
 
 // DOM Elements
@@ -80,6 +98,14 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('=== MANUAL DROPDOWN TEST ===');
         const dropdown = document.getElementById('sessionType');
         console.log('Dropdown element:', dropdown);
+        
+        // Test all form elements
+        console.log('All form elements:');
+        console.log('- sessionType:', document.getElementById('sessionType'));
+        console.log('- sessionName:', document.getElementById('sessionName'));
+        console.log('- numberOfParticipants:', document.getElementById('numberOfParticipants'));
+        console.log('- openCategoryModal:', document.getElementById('openCategoryModal'));
+        console.log('- openGenderModal:', document.getElementById('openGenderModal'));
         
         if (dropdown && dropdown.options.length <= 1) {
             console.log('Dropdown is empty, manually populating...');
