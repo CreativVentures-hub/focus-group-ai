@@ -1471,72 +1471,68 @@ function populateCategoryTabs() {
 function populateCategoryGroups() {
     categoryList.innerHTML = '';
 
-    Object.entries(CONFIG.PARTICIPANT_CATEGORIES).forEach(([groupName, categories], index) => {
-        // Create group header
-        const groupHeader = document.createElement('div');
-        groupHeader.className = 'category-group-header';
-        groupHeader.textContent = groupName;
-        groupHeader.dataset.group = groupName;
-        categoryList.appendChild(groupHeader);
+    // Since PARTICIPANT_CATEGORIES is an array, we'll create a single group
+    const groupName = 'All Categories';
+    
+    // Create group header
+    const groupHeader = document.createElement('div');
+    groupHeader.className = 'category-group-header';
+    groupHeader.textContent = groupName;
+    groupHeader.dataset.group = groupName;
+    categoryList.appendChild(groupHeader);
 
-        // Create group container
-        const groupContainer = document.createElement('div');
-        groupContainer.className = 'category-group';
-        groupContainer.dataset.group = groupName;
-        
-        // Hide all groups except the first one initially
-        if (index > 0) {
-            groupContainer.style.display = 'none';
-            groupHeader.style.display = 'none';
-        }
+    // Create group container
+    const groupContainer = document.createElement('div');
+    groupContainer.className = 'category-group';
+    groupContainer.dataset.group = groupName;
 
-        categories.forEach(category => {
-            const checkboxContainer = document.createElement('div');
-            checkboxContainer.className = 'category-checkbox';
-            checkboxContainer.dataset.category = category;
-            checkboxContainer.dataset.group = groupName;
+    // Process each category in the array
+    CONFIG.PARTICIPANT_CATEGORIES.forEach(category => {
+        const checkboxContainer = document.createElement('div');
+        checkboxContainer.className = 'category-checkbox';
+        checkboxContainer.dataset.category = category.label;
+        checkboxContainer.dataset.group = groupName;
 
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.id = `category-${category.replace(/\s+/g, '-').toLowerCase()}`;
-            checkbox.dataset.category = category;
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `category-${category.value}`;
+        checkbox.dataset.category = category.label;
 
-            const label = document.createElement('label');
-            label.htmlFor = checkbox.id;
-            label.textContent = category;
+        const label = document.createElement('label');
+        label.htmlFor = checkbox.id;
+        label.textContent = category.label;
 
-            checkboxContainer.appendChild(checkbox);
-            checkboxContainer.appendChild(label);
+        checkboxContainer.appendChild(checkbox);
+        checkboxContainer.appendChild(label);
 
-            // Handle checkbox change
-            checkbox.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    checkboxContainer.classList.add('selected');
-                } else {
-                    checkboxContainer.classList.remove('selected');
-                }
-            });
-
-            // Handle container click
-            checkboxContainer.addEventListener('click', (e) => {
-                // Prevent the checkbox from being clicked twice
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Toggle the checkbox
-                checkbox.checked = !checkbox.checked;
-                if (checkbox.checked) {
-                    checkboxContainer.classList.add('selected');
-                } else {
-                    checkboxContainer.classList.remove('selected');
-                }
-            });
-
-            groupContainer.appendChild(checkboxContainer);
+        // Handle checkbox change
+        checkbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                checkboxContainer.classList.add('selected');
+            } else {
+                checkboxContainer.classList.remove('selected');
+            }
         });
 
-        categoryList.appendChild(groupContainer);
+        // Handle container click
+        checkboxContainer.addEventListener('click', (e) => {
+            // Prevent the checkbox from being clicked twice
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Toggle the checkbox
+            checkbox.checked = !checkbox.checked;
+            if (checkbox.checked) {
+                checkboxContainer.classList.add('selected');
+            } else {
+                checkboxContainer.classList.remove('selected');
+            }
+        });
+
+        groupContainer.appendChild(checkboxContainer);
     });
+
+    categoryList.appendChild(groupContainer);
 }
 
 function switchToTab(groupName) {
