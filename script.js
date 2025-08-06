@@ -16,54 +16,94 @@ window.addEventListener('error', function(e) {
 
 // Global login function for onclick handler
 window.handleLoginClick = function(event) {
-    event.preventDefault();
-    event.stopPropagation();
+    console.log('=== GLOBAL LOGIN FUNCTION START ===');
     
-    console.log('Global login function called!');
-    
-    const passwordInput = document.getElementById('passwordInput');
-    if (!passwordInput) {
-        console.error('Password input not found in global function');
-        alert('Error: Password input not found');
+    try {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        console.log('Global login function called!');
+        console.log('Event type:', event.type);
+        console.log('Event target:', event.target);
+        
+        // Check if CONFIG is available
+        if (typeof CONFIG === 'undefined') {
+            console.error('CONFIG is not defined!');
+            alert('Error: Configuration not loaded. Please refresh the page.');
+            return false;
+        }
+        
+        console.log('CONFIG.PASSWORD:', CONFIG.PASSWORD);
+        
+        const passwordInput = document.getElementById('passwordInput');
+        console.log('passwordInput element:', passwordInput);
+        
+        if (!passwordInput) {
+            console.error('Password input not found in global function');
+            alert('Error: Password input not found. Please refresh the page.');
+            return false;
+        }
+        
+        const password = passwordInput.value.trim();
+        console.log('Password from global function:', password ? '***' : 'empty');
+        console.log('Password length:', password.length);
+        console.log('Expected password:', CONFIG.PASSWORD);
+        console.log('Passwords match:', password === CONFIG.PASSWORD);
+        
+        if (password === CONFIG.PASSWORD) {
+            console.log('Password correct in global function!');
+            sessionStorage.setItem('focusGroupLoggedIn', 'true');
+            
+            // Show main section
+            const loginSection = document.getElementById('loginSection');
+            const mainSection = document.getElementById('mainSection');
+            
+            console.log('loginSection:', loginSection);
+            console.log('mainSection:', mainSection);
+            
+            if (loginSection && mainSection) {
+                loginSection.style.display = 'none';
+                mainSection.style.display = 'block';
+                console.log('Sections updated successfully');
+                
+                // Initialize the rest of the app
+                if (typeof populateDropdowns === 'function') {
+                    console.log('Calling populateDropdowns...');
+                    populateDropdowns();
+                } else {
+                    console.log('populateDropdowns function not available');
+                }
+                
+                if (typeof clearLoginForm === 'function') {
+                    console.log('Calling clearLoginForm...');
+                    clearLoginForm();
+                } else {
+                    console.log('clearLoginForm function not available');
+                }
+            } else {
+                console.error('Login or main section not found');
+            }
+        } else {
+            console.log('Password incorrect in global function!');
+            const loginError = document.getElementById('loginError');
+            console.log('loginError element:', loginError);
+            
+            if (loginError) {
+                loginError.style.display = 'block';
+                setTimeout(() => {
+                    loginError.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        console.log('=== GLOBAL LOGIN FUNCTION END ===');
+        return false;
+        
+    } catch (error) {
+        console.error('Error in global login function:', error);
+        alert('Login error: ' + error.message);
         return false;
     }
-    
-    const password = passwordInput.value.trim();
-    console.log('Password from global function:', password ? '***' : 'empty');
-    console.log('Expected password:', CONFIG.PASSWORD);
-    
-    if (password === CONFIG.PASSWORD) {
-        console.log('Password correct in global function!');
-        sessionStorage.setItem('focusGroupLoggedIn', 'true');
-        
-        // Show main section
-        const loginSection = document.getElementById('loginSection');
-        const mainSection = document.getElementById('mainSection');
-        
-        if (loginSection && mainSection) {
-            loginSection.style.display = 'none';
-            mainSection.style.display = 'block';
-            
-            // Initialize the rest of the app
-            if (typeof populateDropdowns === 'function') {
-                populateDropdowns();
-            }
-            if (typeof clearLoginForm === 'function') {
-                clearLoginForm();
-            }
-        }
-    } else {
-        console.log('Password incorrect in global function!');
-        const loginError = document.getElementById('loginError');
-        if (loginError) {
-            loginError.style.display = 'block';
-            setTimeout(() => {
-                loginError.style.display = 'none';
-            }, 3000);
-        }
-    }
-    
-    return false;
 };
 
 // Also catch unhandled promise rejections
