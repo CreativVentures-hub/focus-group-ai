@@ -949,14 +949,22 @@ async function handleFocusGroupForm(e) {
         }
         
         console.log('Response status:', response.status);
+        console.log('Response status text:', response.statusText);
         console.log('Response headers:', response.headers);
         
         // Check response headers first to determine how to handle the response
         const contentType = response.headers.get('content-type');
         const contentDisposition = response.headers.get('content-disposition');
+        const contentLength = response.headers.get('content-length');
         
         console.log('Content-Type:', contentType);
         console.log('Content-Disposition:', contentDisposition);
+        console.log('Content-Length:', contentLength);
+        
+        // Check if response is empty
+        if (contentLength === '0' || contentLength === null) {
+            console.log('Warning: Response appears to be empty');
+        }
         
         // Determine if this is a file download based on headers
         const isFileDownload = contentType && contentType.includes('text/plain') && 
@@ -1021,19 +1029,32 @@ async function handleFocusGroupForm(e) {
                 // Try to read as text for error diagnosis
                 try {
                     const responseText = await response.text();
-                    console.log('Response text:', responseText);
+                    console.log('Response text length:', responseText.length);
+                    console.log('Response text (first 500 chars):', responseText.substring(0, 500));
                     
                     hideLoadingScreen();
                     
-                    if (responseText.includes('html') || responseText.includes('<!DOCTYPE')) {
+                    if (responseText.length === 0) {
+                        showErrorScreen(`Webhook returned an empty response. This might indicate:\n\n• The n8n workflow is still processing\n• The webhook is not configured correctly\n• The CORS proxy is not forwarding the response properly\n\nPlease try again or use the local server for testing.`);
+                    } else if (responseText.includes('html') || responseText.includes('<!DOCTYPE')) {
                         showErrorScreen(`Webhook returned HTML instead of JSON. This usually means:\n\n• The webhook URL is incorrect\n• The n8n workflow is not active\n• The server is returning an error page\n\nResponse: ${responseText.substring(0, 200)}...`);
                     } else {
                         showErrorScreen(`Webhook returned invalid JSON. Response: ${responseText.substring(0, 200)}...`);
                     }
                 } catch (textError) {
                     console.error('Error reading response as text:', textError);
+                    console.log('Response status:', response.status);
+                    console.log('Response status text:', response.statusText);
+                    console.log('Response headers:', response.headers);
+                    
                     hideLoadingScreen();
-                    showErrorScreen(`Unable to read response content. Status: ${response.status}, StatusText: ${response.statusText}`);
+                    
+                    // Check if response is empty or has issues
+                    if (response.status === 200) {
+                        showErrorScreen(`Received 200 OK but couldn't read response content. This might be due to:\n\n• CORS proxy not forwarding the response properly\n• Empty response from the webhook\n• Response encoding issues\n\nPlease try using the local server for more reliable testing:\n1. Run .\\start-cors-server.bat\n2. Open http://localhost:8000\n3. Try submitting the form again`);
+                    } else {
+                        showErrorScreen(`Unable to read response content. Status: ${response.status}, StatusText: ${response.statusText}`);
+                    }
                 }
             }
         }
