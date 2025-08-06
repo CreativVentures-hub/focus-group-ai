@@ -876,9 +876,11 @@ async function handleFocusGroupForm(e) {
     
     try {
             // Use CORS proxy if enabled
-            const webhookUrl = CONFIG.USE_CORS_PROXY ? 
-                CONFIG.CORS_PROXY_URL + CONFIG.WEBHOOK_URL : 
-                CONFIG.WEBHOOK_URL;
+            let webhookUrl = CONFIG.WEBHOOK_URL;
+            if (CONFIG.USE_CORS_PROXY) {
+                // Try the first CORS proxy
+                webhookUrl = CONFIG.CORS_PROXY_URLS[0] + CONFIG.WEBHOOK_URL;
+            }
             
             console.log('Sending request to:', webhookUrl);
             console.log('Request data:', webhookData);
@@ -987,6 +989,103 @@ async function handleFocusGroupForm(e) {
         
     } catch (error) {
         console.error('Error starting focus group:', error);
+        
+        // If CORS proxy is enabled and we got a 403, try alternative proxies
+        if (CONFIG.USE_CORS_PROXY && error.message.includes('403')) {
+            console.log('CORS proxy returned 403, trying alternative proxies...');
+            
+            // Try alternative CORS proxies
+            for (let i = 1; i < CONFIG.CORS_PROXY_URLS.length; i++) {
+                try {
+                    const alternativeUrl = CONFIG.CORS_PROXY_URLS[i] + CONFIG.WEBHOOK_URL;
+                    console.log(`Trying alternative CORS proxy ${i + 1}:`, alternativeUrl);
+                    
+                    const response = await fetch(alternativeUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(webhookData),
+                        signal: AbortSignal.timeout(300000),
+                        mode: 'cors',
+                        credentials: 'omit'
+                    });
+                    
+                    // If we get here, the alternative proxy worked
+                    console.log('Alternative CORS proxy worked!');
+                    
+                    // Process the response (same logic as above)
+                    const contentType = response.headers.get('content-type');
+                    const contentDisposition = response.headers.get('content-disposition');
+                    
+                    console.log('Content-Type:', contentType);
+                    console.log('Content-Disposition:', contentDisposition);
+                    
+                    const isFileDownload = contentType && contentType.includes('text/plain') && 
+                                          contentDisposition && contentDisposition.includes('attachment');
+                    
+                    if (isFileDownload) {
+                        try {
+                            const blob = await response.blob();
+                            const filename = getFilenameFromDisposition(contentDisposition) || `focus-group-${webhookData.session_name}-${Date.now()}.txt`;
+                            
+                            const questions = sessionSpecificData.questions || [];
+                            if (questions.length > 0) {
+                                saveQuestions(sessionType, questions);
+                            }
+                            
+                            hideLoadingScreen();
+                            showFileDownloadScreen({
+                                filename: filename,
+                                blob: blob,
+                                sessionName: webhookData.session_name,
+                                categories: webhookData.categories,
+                                totalCount: webhookData.number_of_participants
+                            });
+                            return; // Success, exit the function
+                        } catch (blobError) {
+                            console.error('Error reading response as blob:', blobError);
+                            continue; // Try next proxy
+                        }
+                    } else {
+                        try {
+                            const result = await response.json();
+                            console.log('Response data:', result);
+                            
+                            hideLoadingScreen();
+                            
+                            if (response.ok) {
+                                const questions = sessionSpecificData.questions || [];
+                                if (questions.length > 0) {
+                                    saveQuestions(sessionType, questions);
+                                }
+                                
+                                showResponseScreen({
+                                    success: true,
+                                    message: `Focus group "${webhookData.session_name}" started successfully!`,
+                                    categories: webhookData.categories,
+                                    total_count: webhookData.number_of_participants,
+                                    existing_count: 0,
+                                    created_count: webhookData.number_of_participants
+                                });
+                                return; // Success, exit the function
+                            } else {
+                                showErrorScreen(result.message || `HTTP ${response.status}: ${response.statusText}`);
+                                return; // Exit the function
+                            }
+                        } catch (jsonError) {
+                            console.error('JSON parsing error with alternative proxy:', jsonError);
+                            continue; // Try next proxy
+                        }
+                    }
+                } catch (proxyError) {
+                    console.error(`Alternative CORS proxy ${i + 1} failed:`, proxyError);
+                    continue; // Try next proxy
+                }
+            }
+        }
+        
+        // If we get here, all proxies failed or there was another error
         hideLoadingScreen();
         
         // Provide more specific error messages
