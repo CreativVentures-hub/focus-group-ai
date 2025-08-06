@@ -1051,7 +1051,7 @@ async function handleFocusGroupForm(e) {
                     
                     // Check if response is empty or has issues
                     if (response.status === 200) {
-                        showErrorScreen(`Received 200 OK but couldn't read response content.\n\nThis is expected when accessing from GitHub Pages due to CORS restrictions. For reliable testing:\n\n1. Download the files to your computer\n2. Run .\\start-cors-server.bat\n3. Open http://localhost:8000\n4. Try submitting the form again\n\nThe local server bypasses CORS restrictions and provides reliable webhook connectivity.`);
+                        showErrorScreen(`Received 200 OK but couldn't read response content.\n\nThis might be a temporary issue with the CORS proxy. Please try:\n\n1. Refreshing the page and trying again\n2. Waiting a few minutes and trying again\n3. Using a different browser\n\nIf the issue persists, the system will try alternative proxies automatically.`);
                     } else {
                         showErrorScreen(`Unable to read response content. Status: ${response.status}, StatusText: ${response.statusText}`);
                     }
@@ -1076,20 +1076,20 @@ async function handleFocusGroupForm(e) {
                           '3. Try submitting the form again';
         } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
             errorMessage += 'Unable to connect to the webhook due to CORS restrictions.\n\n' +
-                          'This is expected when accessing from GitHub Pages. For reliable testing:\n\n' +
-                          '1. Download the files to your computer\n' +
-                          '2. Run .\\start-cors-server.bat\n' +
-                          '3. Open http://localhost:8000\n' +
-                          '4. Try submitting the form again\n\n' +
-                          'The local server bypasses CORS restrictions and provides reliable webhook connectivity.';
+                          'The system is trying multiple CORS proxies to resolve this issue.\n\n' +
+                          'If this continues, please try:\n' +
+                          '1. Refreshing the page and trying again\n' +
+                          '2. Using a different browser\n' +
+                          '3. Checking your internet connection\n\n' +
+                          'For guaranteed functionality, you can also download the files and run locally.';
         } else if (error.message.includes('Failed to fetch')) {
             errorMessage += 'Failed to fetch from webhook due to CORS restrictions.\n\n' +
-                          'This is expected when accessing from GitHub Pages. For reliable testing:\n\n' +
-                          '1. Download the files to your computer\n' +
-                          '2. Run .\\start-cors-server.bat\n' +
-                          '3. Open http://localhost:8000\n' +
-                          '4. Try submitting the form again\n\n' +
-                          'The local server bypasses CORS restrictions and provides reliable webhook connectivity.';
+                          'The system is trying multiple CORS proxies to resolve this issue.\n\n' +
+                          'If this continues, please try:\n' +
+                          '1. Refreshing the page and trying again\n' +
+                          '2. Using a different browser\n' +
+                          '3. Checking your internet connection\n\n' +
+                          'For guaranteed functionality, you can also download the files and run locally.';
         } else {
             errorMessage += error.message;
         }

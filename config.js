@@ -7,13 +7,16 @@ const CONFIG = {
     
     // CORS Proxy URLs (multiple options for redundancy)
     CORS_PROXY_URLS: [
-        "https://cors-anywhere.herokuapp.com/",
         "https://api.allorigins.win/raw?url=",
-        "https://thingproxy.freeboard.io/fetch/"
+        "https://thingproxy.freeboard.io/fetch/",
+        "https://cors-anywhere.herokuapp.com/",
+        "https://cors.bridged.cc/",
+        "https://cors.io/?",
+        "https://api.codetabs.com/v1/proxy?quest="
     ],
     
-    // Use CORS proxy for development (disabled due to unreliable proxy responses)
-    USE_CORS_PROXY: false,
+    // Use CORS proxy for development (enabled for GitHub Pages)
+    USE_CORS_PROXY: true,
     
     // Production settings
     IS_PRODUCTION: true, // Set to true when deployed to live server
