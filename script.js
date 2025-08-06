@@ -251,21 +251,12 @@ function handleSessionTypeChange() {
     }
 }
 
-async function handleFocusGroupForm(e) {
+function handleFocusGroupForm(e) {
     e.preventDefault();
-    
-    console.log('Form submission started');
     
     const formData = new FormData(focusGroupForm);
     const selectedCategories = getSelectedCategories();
     const userEmail = formData.get('userEmail');
-    
-    console.log('Form data collected:', {
-        userEmail: userEmail,
-        selectedCategories: selectedCategories,
-        sessionType: formData.get('sessionType'),
-        sessionName: formData.get('sessionName')
-    });
     
     // Validate required fields
     if (selectedCategories.length === 0) {
@@ -367,93 +358,36 @@ async function handleFocusGroupForm(e) {
         source: 'focus_group_ui'
     };
     
-    console.log('Webhook data prepared:', webhookData);
-    
     // Validate webhook data before sending
     const validationResult = validateWebhookData(webhookData);
     if (!validationResult.isValid) {
-        console.log('Validation failed:', validationResult.message);
         showFormError(focusGroupForm, validationResult.message);
         return;
     }
     
-    console.log('Validation passed, sending webhook...');
-    
-    try {
-        // Send to n8n webhook
-        const response = await fetch(CONFIG.WEBHOOK_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(webhookData)
-        });
-        
-        console.log('Webhook response received:', response.status, response.statusText);
-        
-        if (response.ok) {
-            // Show success modal
-            console.log('Webhook successful, showing success modal');
-            showSuccessModal(userEmail);
-        } else {
-            // Try to get more detailed error information
-            let errorMessage = `Server Error: ${response.status} ${response.statusText}`;
-            
-            try {
-                const errorData = await response.text();
-                
-                if (errorData) {
-                    if (errorData.includes('html') || errorData.includes('<!DOCTYPE')) {
-                        errorMessage = `Server Error (${response.status}): The n8n workflow may be experiencing issues. Please try again in a few minutes.`;
-                    } else {
-                        errorMessage = `Server Error (${response.status}): ${errorData.substring(0, 200)}...`;
-                    }
-                }
-            } catch (textError) {
-                console.error('Could not read error response:', textError);
-            }
-            
-            // For email-based system, show success modal even on server errors
-            // since the user will receive an email when the workflow completes
-            console.log('Server error occurred, but showing success modal for email approach');
-            showSuccessModal(userEmail);
-            
-            // Also show a warning about the server issue
-            setTimeout(() => {
-                showFormError(focusGroupForm, `Note: ${errorMessage} - but your request has been queued and you will receive an email when complete.`);
-            }, 1000);
-        }
-        
-    } catch (error) {
+    // Send to n8n webhook (fire and forget)
+    fetch(CONFIG.WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookData)
+    }).catch(error => {
         console.error('Error sending webhook:', error);
-        
-        // For email-based system, show success modal even on network errors
-        // since the user will receive an email when the workflow completes
-        console.log('Network error occurred, but showing success modal for email approach');
-        showSuccessModal(userEmail);
-        
-        // Also show a warning about the network issue
-        setTimeout(() => {
-            showFormError(focusGroupForm, 'Note: Network connection issue detected, but your request has been queued. You will receive an email when the focus group is ready.');
-        }, 1000);
-    }
+        // Don't show error to user - just log it
+    });
+    
+    // Show success modal immediately after sending
+    showSuccessModal(userEmail);
 }
 
 function showSuccessModal(email) {
-    console.log('showSuccessModal called with email:', email);
-    console.log('userEmailDisplay element:', userEmailDisplay);
-    console.log('successModal element:', successModal);
-    
     if (userEmailDisplay) {
         userEmailDisplay.textContent = email;
-        console.log('Set email display to:', email);
-    } else {
-        console.error('userEmailDisplay element not found!');
     }
     
     if (successModal) {
         successModal.style.display = 'flex';
-        console.log('Success modal displayed');
     } else {
         console.error('Success modal element not found!');
     }
