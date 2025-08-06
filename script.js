@@ -63,7 +63,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize language
     initializeLanguage();
     
-
+    // Show GitHub Pages notice if on GitHub Pages
+    if (window.location.hostname.includes('github.io')) {
+        showGitHubPagesNotice();
+    }
     
     // Auto-refresh for development (only on localhost)
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -1076,20 +1079,20 @@ async function handleFocusGroupForm(e) {
                           '3. Try submitting the form again';
         } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
             errorMessage += 'Unable to connect to the webhook due to CORS restrictions.\n\n' +
-                          'The system is trying multiple CORS proxies to resolve this issue.\n\n' +
-                          'If this continues, please try:\n' +
-                          '1. Refreshing the page and trying again\n' +
-                          '2. Using a different browser\n' +
-                          '3. Checking your internet connection\n\n' +
-                          'For guaranteed functionality, you can also download the files and run locally.';
+                          'This is a common issue with GitHub Pages. For immediate access:\n\n' +
+                          '1. Download the files from: https://github.com/CreativVentures-hub/focus-group-ai\n' +
+                          '2. Extract the ZIP file to your computer\n' +
+                          '3. Double-click "start-cors-server.bat"\n' +
+                          '4. Open http://localhost:8000 in your browser\n\n' +
+                          'The local version will work perfectly with your n8n webhook!';
         } else if (error.message.includes('Failed to fetch')) {
             errorMessage += 'Failed to fetch from webhook due to CORS restrictions.\n\n' +
-                          'The system is trying multiple CORS proxies to resolve this issue.\n\n' +
-                          'If this continues, please try:\n' +
-                          '1. Refreshing the page and trying again\n' +
-                          '2. Using a different browser\n' +
-                          '3. Checking your internet connection\n\n' +
-                          'For guaranteed functionality, you can also download the files and run locally.';
+                          'This is a common issue with GitHub Pages. For immediate access:\n\n' +
+                          '1. Download the files from: https://github.com/CreativVentures-hub/focus-group-ai\n' +
+                          '2. Extract the ZIP file to your computer\n' +
+                          '3. Double-click "start-cors-server.bat"\n' +
+                          '4. Open http://localhost:8000 in your browser\n\n' +
+                          'The local version will work perfectly with your n8n webhook!';
         } else {
             errorMessage += error.message;
         }
@@ -2704,5 +2707,20 @@ function initializeSlider() {
             slider: !!slider,
             valueDisplay: !!valueDisplay
         });
+    }
+}
+
+// GitHub Pages Notice Functions
+function showGitHubPagesNotice() {
+    const notice = document.getElementById('githubPagesNotice');
+    if (notice) {
+        notice.style.display = 'block';
+    }
+}
+
+function hideGitHubPagesNotice() {
+    const notice = document.getElementById('githubPagesNotice');
+    if (notice) {
+        notice.style.display = 'none';
     }
 }
