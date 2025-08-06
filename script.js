@@ -1280,6 +1280,7 @@ async function handleFocusGroupForm(e) {
                     }
                 }
             }
+        }
         
     } catch (error) {
         console.error('Error starting focus group:', error);
