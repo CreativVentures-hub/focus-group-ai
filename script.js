@@ -54,10 +54,10 @@ const numberOfParticipantsValue = document.getElementById('numberOfParticipantsV
 let currentLanguage = 'en';
 const languageSelect = document.getElementById('languageSelect');
 
-    // Initialize the application
-    document.addEventListener('DOMContentLoaded', function() {
-        initializeApp();
-        setupEventListeners();
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+    setupEventListeners();
         // Don't populate dropdowns yet - wait for login
     
     // Initialize language
@@ -100,12 +100,12 @@ function initializeApp() {
 function setupEventListeners() {
     // Login functionality
     if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
+    loginForm.addEventListener('submit', handleLogin);
     }
     
     // Logout button
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', handleLogout);
+    logoutBtn.addEventListener('click', handleLogout);
     }
     
     // Form submissions
@@ -267,18 +267,115 @@ function initializeQuestions(containerId, maxQuestions) {
     // Clear existing questions
     container.innerHTML = '';
     
-    // Create initial questions
-    for (let i = 1; i <= maxQuestions; i++) {
-        addQuestion(container, i);
+    // Get saved questions for this session type
+    const sessionType = getSessionTypeFromContainerId(containerId);
+    const savedQuestions = getSavedQuestions(sessionType);
+    
+    if (savedQuestions && savedQuestions.length > 0) {
+        // Use saved questions
+        savedQuestions.forEach((question, index) => {
+            addQuestion(container, index + 1, question.text);
+        });
+        
+        // Add additional empty questions if needed
+        for (let i = savedQuestions.length; i < maxQuestions; i++) {
+            addQuestion(container, i + 1);
+        }
+        
+        // Show notification that saved questions were loaded
+        showSavedQuestionsNotification(sessionType, savedQuestions.length);
+    } else {
+        // Create initial empty questions
+        for (let i = 1; i <= maxQuestions; i++) {
+            addQuestion(container, i);
+        }
     }
 }
 
-function addQuestion(container, questionNumber) {
+function getSessionTypeFromContainerId(containerId) {
+    switch (containerId) {
+        case 'marketQuestions':
+            return 'market_research';
+        case 'productQuestions':
+            return 'product_research';
+        case 'brandQuestions':
+            return 'brand_perception';
+        default:
+            return 'market_research';
+    }
+}
+
+function getSavedQuestions(sessionType) {
+    const saved = localStorage.getItem(`focus_group_questions_${sessionType}`);
+    return saved ? JSON.parse(saved) : [];
+}
+
+function saveQuestions(sessionType, questions) {
+    localStorage.setItem(`focus_group_questions_${sessionType}`, JSON.stringify(questions));
+}
+
+function clearSavedQuestions(sessionType) {
+    localStorage.removeItem(`focus_group_questions_${sessionType}`);
+}
+
+function clearAllSavedQuestions() {
+    localStorage.removeItem('focus_group_questions_market_research');
+    localStorage.removeItem('focus_group_questions_product_research');
+    localStorage.removeItem('focus_group_questions_brand_perception');
+}
+
+function showSavedQuestionsNotification(sessionType, questionCount) {
+    const sessionTypeLabels = {
+        'market_research': 'Market Research',
+        'product_research': 'Product Research',
+        'brand_perception': 'Brand Perception'
+    };
+    
+    const label = sessionTypeLabels[sessionType] || sessionType;
+    
+    // Create a temporary notification
+    const notification = document.createElement('div');
+    notification.className = 'saved-questions-notification';
+    notification.innerHTML = `
+        <i class="fas fa-save"></i>
+        Loaded ${questionCount} saved questions from previous ${label} session
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-size: 14px;
+        max-width: 300px;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+function addQuestion(container, questionNumber, questionText = '') {
     const questionItem = document.createElement('div');
     questionItem.className = 'question-item';
     questionItem.innerHTML = `
         <div class="question-number">${questionNumber}</div>
-        <textarea class="question-input" name="question_${questionNumber}" placeholder="Enter question ${questionNumber}..." required></textarea>
+        <textarea class="question-input" name="question_${questionNumber}" placeholder="Enter question ${questionNumber}..." required>${questionText}</textarea>
         ${questionNumber > 1 ? '<button type="button" class="remove-question-btn" onclick="removeQuestion(this)"><i class="fas fa-times"></i></button>' : ''}
     `;
     container.appendChild(questionItem);
@@ -777,7 +874,7 @@ async function handleFocusGroupForm(e) {
     // Show loading screen
     showLoadingScreen(selectedCategories, formData.get('sessionType'), formData.get('sessionName'));
     
-            try {
+    try {
             // Use CORS proxy if enabled
             const webhookUrl = CONFIG.USE_CORS_PROXY ? 
                 CONFIG.CORS_PROXY_URL + CONFIG.WEBHOOK_URL : 
@@ -787,16 +884,16 @@ async function handleFocusGroupForm(e) {
             console.log('Request data:', webhookData);
             
             const response = await fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
                 body: JSON.stringify(webhookData),
                 // Add timeout and CORS settings
                 signal: AbortSignal.timeout(300000), // 5 minute timeout (300 seconds)
                 mode: 'cors', // Enable CORS
                 credentials: 'omit' // Don't send cookies
-            });
+        });
         
         console.log('Response status:', response.status);
         console.log('Response headers:', response.headers);
@@ -810,6 +907,12 @@ async function handleFocusGroupForm(e) {
             const blob = await response.blob();
             const filename = getFilenameFromDisposition(contentDisposition) || `focus-group-${webhookData.session_name}-${Date.now()}.txt`;
             
+            // Save questions for future use
+            const questions = sessionSpecificData.questions || [];
+            if (questions.length > 0) {
+                saveQuestions(sessionType, questions);
+            }
+            
             hideLoadingScreen();
             showFileDownloadScreen({
                 filename: filename,
@@ -821,22 +924,28 @@ async function handleFocusGroupForm(e) {
         } else {
             // Handle JSON response (existing behavior)
             try {
-                const result = await response.json();
-                console.log('Response data:', result);
-                
-                hideLoadingScreen();
-                
-                if (response.ok) {
-                    showResponseScreen({
-                        success: true,
-                        message: `Focus group "${webhookData.session_name}" started successfully!`,
-                        categories: webhookData.categories,
-                        total_count: webhookData.number_of_participants,
-                        existing_count: 0,
-                        created_count: webhookData.number_of_participants
-                    });
-                } else {
-                    showErrorScreen(result.message || `HTTP ${response.status}: ${response.statusText}`);
+        const result = await response.json();
+        console.log('Response data:', result);
+        
+        hideLoadingScreen();
+        
+        if (response.ok) {
+            // Save questions for future use
+            const questions = sessionSpecificData.questions || [];
+            if (questions.length > 0) {
+                saveQuestions(sessionType, questions);
+            }
+            
+            showResponseScreen({
+                success: true,
+                message: `Focus group "${webhookData.session_name}" started successfully!`,
+                categories: webhookData.categories,
+                total_count: webhookData.number_of_participants,
+                existing_count: 0,
+                created_count: webhookData.number_of_participants
+            });
+        } else {
+            showErrorScreen(result.message || `HTTP ${response.status}: ${response.statusText}`);
                 }
             } catch (jsonError) {
                 console.error('JSON parsing error:', jsonError);
@@ -890,14 +999,14 @@ function showMainSection() {
     console.log('mainSection element:', mainSection);
     
     if (loginSection && mainSection) {
-        loginSection.style.display = 'none';
-        mainSection.style.display = 'block';
+    loginSection.style.display = 'none';
+    mainSection.style.display = 'block';
         console.log('Sections updated successfully');
-        
-        // Re-initialize slider after showing main section
-        setTimeout(() => {
-            initializeSlider();
-        }, 100);
+    
+    // Re-initialize slider after showing main section
+    setTimeout(() => {
+        initializeSlider();
+    }, 100);
     } else {
         console.error('Section elements not found!');
     }
@@ -1448,47 +1557,47 @@ function populateCategoryGroups() {
 
     // Process product categories
     CONFIG.PRODUCT_CATEGORIES.forEach(category => {
-        const checkboxContainer = document.createElement('div');
-        checkboxContainer.className = 'category-checkbox';
+            const checkboxContainer = document.createElement('div');
+            checkboxContainer.className = 'category-checkbox';
         checkboxContainer.dataset.category = category.label;
         checkboxContainer.dataset.group = 'product_categories';
 
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
         checkbox.id = `product-${category.value}`;
         checkbox.dataset.category = category.label;
 
-        const label = document.createElement('label');
-        label.htmlFor = checkbox.id;
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
         label.textContent = category.label;
 
-        checkboxContainer.appendChild(checkbox);
-        checkboxContainer.appendChild(label);
+            checkboxContainer.appendChild(checkbox);
+            checkboxContainer.appendChild(label);
 
-        // Handle checkbox change
-        checkbox.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                checkboxContainer.classList.add('selected');
-            } else {
-                checkboxContainer.classList.remove('selected');
-            }
-        });
+            // Handle checkbox change
+            checkbox.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    checkboxContainer.classList.add('selected');
+                } else {
+                    checkboxContainer.classList.remove('selected');
+                }
+            });
 
-        // Handle container click
-        checkboxContainer.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            checkbox.checked = !checkbox.checked;
-            if (checkbox.checked) {
-                checkboxContainer.classList.add('selected');
-            } else {
-                checkboxContainer.classList.remove('selected');
-            }
-        });
+            // Handle container click
+            checkboxContainer.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                checkbox.checked = !checkbox.checked;
+                if (checkbox.checked) {
+                    checkboxContainer.classList.add('selected');
+                } else {
+                    checkboxContainer.classList.remove('selected');
+                }
+            });
 
         productCategoriesContainer.appendChild(checkboxContainer);
-    });
+        });
 
     categoryList.appendChild(productCategoriesContainer);
 }
