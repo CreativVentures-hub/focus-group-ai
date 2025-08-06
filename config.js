@@ -214,15 +214,40 @@ const CONFIG = {
             describeProduct: "Describe the product...",
             productCategory: "Product Category:",
             productCategoryExample: "e.g., Electronics, Fashion, Food...",
-            startFocusGroup: "Start Focus Group",
-            selectCategories: "Select Categories",
-            selectGender: "Select Gender",
-            selectAgeRange: "Select Age Range",
-            selectIncomeRange: "Select Income Range",
-            selectMaritalStatus: "Select Marital Status",
-            selectChildrenStatus: "Select Children Status",
-            selectEducationLevel: "Select Education Level",
-            selectRace: "Select Race"
+                    startFocusGroup: "Start Focus Group",
+        selectCategories: "Select Categories",
+        selectGender: "Select Gender",
+        selectAgeRange: "Select Age Range",
+        selectIncomeRange: "Select Income Range",
+        selectMaritalStatus: "Select Marital Status",
+        selectChildrenStatus: "Select Children Status",
+        selectEducationLevel: "Select Education Level",
+        selectRace: "Select Race",
+        // Form labels
+        marketName: "Market Name:",
+        marketDescription: "Market Description:",
+        brandName: "Brand Name:",
+        brandDescription: "Brand Description:",
+        productImage: "Product Image:",
+        brandImage: "Brand Image:",
+        emailAddress: "Email Address:",
+        questions: "Questions (10 required):",
+        selectedCriteria: "Selected Criteria:",
+        // Placeholders
+        enterMarketName: "Enter market name...",
+        describeMarket: "Describe the market in detail...",
+        enterBrandName: "Enter brand name...",
+        describeBrand: "Describe the brand in detail...",
+        enterEmail: "Enter your email address...",
+        // Modal titles
+        buyingBehaviors: "Buying Behaviors",
+        productCategories: "Product Categories",
+        // Success modal
+        successTitle: "Focus Group Request Submitted!",
+        successMessage: "Your focus group request has been successfully submitted.",
+        emailNotice: "You will receive an email with your focus group results when they are ready.",
+        processingInfo: "Processing typically takes 5-10 minutes.",
+        gotIt: "Got it!"
         },
         "zh-cn": {
             focusGroupSystem: "焦点小组系统",
@@ -245,8 +270,33 @@ const CONFIG = {
             selectIncomeRange: "选择收入范围",
             selectMaritalStatus: "选择婚姻状况",
             selectChildrenStatus: "选择子女状况",
-            selectEducationLevel: "选择教育水平",
-            selectRace: "选择种族"
+                    selectEducationLevel: "选择教育水平",
+        selectRace: "选择种族",
+        // Form labels
+        marketName: "市场名称:",
+        marketDescription: "市场描述:",
+        brandName: "品牌名称:",
+        brandDescription: "品牌描述:",
+        productImage: "产品图片:",
+        brandImage: "品牌图片:",
+        emailAddress: "邮箱地址:",
+        questions: "问题 (需要10个):",
+        selectedCriteria: "已选标准:",
+        // Placeholders
+        enterMarketName: "输入市场名称...",
+        describeMarket: "详细描述市场...",
+        enterBrandName: "输入品牌名称...",
+        describeBrand: "详细描述品牌...",
+        enterEmail: "输入您的邮箱地址...",
+        // Modal titles
+        buyingBehaviors: "购买行为",
+        productCategories: "产品类别",
+        // Success modal
+        successTitle: "焦点小组请求已提交!",
+        successMessage: "您的焦点小组请求已成功提交。",
+        emailNotice: "当结果准备好时，您将收到一封包含焦点小组结果的电子邮件。",
+        processingInfo: "处理通常需要5-10分钟。",
+        gotIt: "知道了!"
         },
         "zh-hk": {
             focusGroupSystem: "焦點小組系統",
@@ -269,8 +319,33 @@ const CONFIG = {
             selectIncomeRange: "選擇收入範圍",
             selectMaritalStatus: "選擇婚姻狀況",
             selectChildrenStatus: "選擇子女狀況",
-            selectEducationLevel: "選擇教育水平",
-            selectRace: "選擇種族"
+                    selectEducationLevel: "選擇教育水平",
+        selectRace: "選擇種族",
+        // Form labels
+        marketName: "市場名稱:",
+        marketDescription: "市場描述:",
+        brandName: "品牌名稱:",
+        brandDescription: "品牌描述:",
+        productImage: "產品圖片:",
+        brandImage: "品牌圖片:",
+        emailAddress: "郵箱地址:",
+        questions: "問題 (需要10個):",
+        selectedCriteria: "已選標準:",
+        // Placeholders
+        enterMarketName: "輸入市場名稱...",
+        describeMarket: "詳細描述市場...",
+        enterBrandName: "輸入品牌名稱...",
+        describeBrand: "詳細描述品牌...",
+        enterEmail: "輸入您的郵箱地址...",
+        // Modal titles
+        buyingBehaviors: "購買行為",
+        productCategories: "產品類別",
+        // Success modal
+        successTitle: "焦點小組請求已提交!",
+        successMessage: "您的焦點小組請求已成功提交。",
+        emailNotice: "當結果準備好時，您將收到一封包含焦點小組結果的電子郵件。",
+        processingInfo: "處理通常需要5-10分鐘。",
+        gotIt: "知道了!"
         }
     }
 };

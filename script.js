@@ -651,12 +651,14 @@ function setupCategoryModal() {
 function populateCategoryTabs() {
     if (!categoryTabs) return;
     
+    const translations = CONFIG.TRANSLATIONS[currentLanguage] || CONFIG.TRANSLATIONS.en;
+    
     categoryTabs.innerHTML = `
         <button class="category-tab active" onclick="switchToTab('buying_behaviors')">
-            <i class="fas fa-shopping-cart"></i> Buying Behaviors
+            <i class="fas fa-shopping-cart"></i> ${translations.buyingBehaviors}
         </button>
         <button class="category-tab" onclick="switchToTab('product_categories')">
-            <i class="fas fa-tags"></i> Product Categories
+            <i class="fas fa-tags"></i> ${translations.productCategories}
         </button>
     `;
 }
@@ -1013,38 +1015,128 @@ function updateLanguage() {
 }
 
 function updateFormTexts(translations) {
-    // Update form labels and placeholders
-    const elements = {
+    // Update form labels
+    const labelMappings = {
         'sessionType': translations.sessionType,
         'sessionName': translations.sessionName,
         'numberOfParticipants': translations.numberOfParticipants,
-        'userEmail': translations.userEmail
+        'productName': translations.productName,
+        'productDescription': translations.productDescription,
+        'productImage': translations.productImage,
+        'marketName': translations.marketName,
+        'marketDescription': translations.marketDescription,
+        'brandName': translations.brandName,
+        'brandDescription': translations.brandDescription,
+        'brandImage': translations.brandImage,
+        'userEmail': translations.emailAddress
     };
     
-    Object.entries(elements).forEach(([id, text]) => {
-        const element = document.getElementById(id);
-        if (element) {
-            if (element.tagName === 'INPUT' || element.tagName === 'SELECT') {
-                element.placeholder = text;
+    // Update labels by for attribute
+    Object.entries(labelMappings).forEach(([id, text]) => {
+        const label = document.querySelector(`label[for="${id}"]`);
+        if (label) {
+            // Preserve character count spans
+            const charCountSpan = label.querySelector('.char-count');
+            if (charCountSpan) {
+                label.innerHTML = text + ' ' + charCountSpan.outerHTML;
             } else {
-                element.textContent = text;
+                label.textContent = text;
             }
         }
     });
+    
+    // Update placeholders
+    const placeholderMappings = {
+        'sessionName': translations.enterSessionName,
+        'productName': translations.enterProductName,
+        'productDescription': translations.describeProduct,
+        'marketName': translations.enterMarketName,
+        'marketDescription': translations.describeMarket,
+        'brandName': translations.enterBrandName,
+        'brandDescription': translations.describeBrand,
+        'userEmail': translations.enterEmail
+    };
+    
+    Object.entries(placeholderMappings).forEach(([id, placeholder]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.placeholder = placeholder;
+        }
+    });
+    
+    // Update other text elements
+    const textElements = {
+        'selectedCriteriaTitle': translations.selectedCriteria,
+        'questionsLabel1': translations.questions,
+        'questionsLabel2': translations.questions,
+        'questionsLabel3': translations.questions
+    };
+    
+    // Find and update questions labels
+    const allLabels = document.querySelectorAll('label');
+    allLabels.forEach(label => {
+        if (label.textContent.includes('Questions')) {
+            label.textContent = translations.questions;
+        }
+    });
+    
+    // Update success modal texts
+    const successTitle = document.querySelector('#successModal h2');
+    if (successTitle) {
+        successTitle.textContent = translations.successTitle;
+    }
+    
+    const successMessage = document.querySelector('#successModal .success-message p');
+    if (successMessage) {
+        successMessage.textContent = translations.successMessage;
+    }
+    
+    const emailNotice = document.querySelector('#successModal .email-notice p');
+    if (emailNotice) {
+        emailNotice.textContent = translations.emailNotice;
+    }
+    
+    const processingInfo = document.querySelector('#successModal .processing-info p');
+    if (processingInfo) {
+        processingInfo.textContent = translations.processingInfo;
+    }
+    
+    const gotItButton = document.querySelector('#closeSuccessModalBtn');
+    if (gotItButton) {
+        gotItButton.textContent = translations.gotIt;
+    }
 }
 
 function updateButtonTexts(translations) {
     // Update button texts
-    const buttons = {
-        'startFocusGroup': translations.startFocusGroup,
-        'login': translations.login,
-        'logout': translations.logout
+    const buttonMappings = {
+        'startFocusGroupBtn': translations.startFocusGroup,
+        'logoutBtn': translations.logout,
+        'categoryButtonText': translations.selectCategories,
+        'genderButtonText': translations.selectGender,
+        'ageButtonText': translations.selectAgeRange,
+        'incomeButtonText': translations.selectIncomeRange,
+        'maritalButtonText': translations.selectMaritalStatus,
+        'childrenButtonText': translations.selectChildrenStatus,
+        'educationButtonText': translations.selectEducationLevel,
+        'raceButtonText': translations.selectRace
     };
     
-    Object.entries(buttons).forEach(([key, text]) => {
-        const button = document.querySelector(`[data-translate="${key}"]`);
-        if (button) {
-            button.textContent = text;
+    Object.entries(buttonMappings).forEach(([id, text]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = text;
         }
     });
+    
+    // Update modal tab titles
+    const buyingBehaviorsTab = document.querySelector('.category-tab[onclick*="buying_behaviors"]');
+    if (buyingBehaviorsTab) {
+        buyingBehaviorsTab.innerHTML = `<i class="fas fa-shopping-cart"></i> ${translations.buyingBehaviors}`;
+    }
+    
+    const productCategoriesTab = document.querySelector('.category-tab[onclick*="product_categories"]');
+    if (productCategoriesTab) {
+        productCategoriesTab.innerHTML = `<i class="fas fa-tags"></i> ${translations.productCategories}`;
+    }
 }
