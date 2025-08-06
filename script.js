@@ -469,15 +469,55 @@ function showFormError(form, message) {
 function populateDropdowns() {
     // Populate session types
     if (sessionTypeSelect) {
-        sessionTypeSelect.innerHTML = '<option value="">Select session type</option>';
+        const translations = CONFIG.TRANSLATIONS[currentLanguage] || CONFIG.TRANSLATIONS.en;
+        
+        sessionTypeSelect.innerHTML = `<option value="">${translations.selectSessionType}</option>`;
         
         CONFIG.SESSION_TYPES.forEach(type => {
             const option = document.createElement('option');
             option.value = type.value;
-            option.textContent = type.label;
+            
+            // Map session type values to translation keys
+            let translatedLabel = '';
+            switch (type.value) {
+                case 'market_research':
+                    translatedLabel = translations.marketResearch;
+                    break;
+                case 'product_research':
+                    translatedLabel = translations.productResearch;
+                    break;
+                case 'user_experience':
+                    translatedLabel = translations.userExperience;
+                    break;
+                case 'customer_feedback':
+                    translatedLabel = translations.customerFeedback;
+                    break;
+                case 'brand_perception':
+                    translatedLabel = translations.brandPerception;
+                    break;
+                case 'competitive_analysis':
+                    translatedLabel = translations.competitiveAnalysis;
+                    break;
+                case 'advertising_testing':
+                    translatedLabel = translations.advertisingTesting;
+                    break;
+                case 'pricing_research':
+                    translatedLabel = translations.pricingResearch;
+                    break;
+                case 'concept_validation':
+                    translatedLabel = translations.conceptValidation;
+                    break;
+                case 'satisfaction_survey':
+                    translatedLabel = translations.satisfactionSurvey;
+                    break;
+                default:
+                    translatedLabel = type.label;
+            }
+            
+            option.textContent = translatedLabel;
             if (type.disabled) {
                 option.disabled = true;
-                option.textContent += ' (Coming Soon)';
+                option.textContent += ` (${translations.comingSoon})`;
             }
             sessionTypeSelect.appendChild(option);
         });
@@ -1014,6 +1054,7 @@ function updateLanguage() {
     const translations = CONFIG.TRANSLATIONS[currentLanguage] || CONFIG.TRANSLATIONS.en;
     updateFormTexts(translations);
     updateButtonTexts(translations);
+    populateDropdowns(); // Repopulate dropdowns with new language
 }
 
 function updateFormTexts(translations) {

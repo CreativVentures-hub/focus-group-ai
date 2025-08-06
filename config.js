@@ -267,7 +267,19 @@ const CONFIG = {
         impulseBuyer: "Impulse Buyer",
         researchHeavy: "Research Heavy",
         brandLoyal: "Brand Loyal",
-        dealSeekers: "Deal Seekers"
+        dealSeekers: "Deal Seekers",
+        // Session type options
+        marketResearch: "Market Research",
+        productResearch: "Product Research",
+        userExperience: "User Experience",
+        customerFeedback: "Customer Feedback",
+        brandPerception: "Brand Perception",
+        competitiveAnalysis: "Competitive Analysis",
+        advertisingTesting: "Advertising Testing",
+        pricingResearch: "Pricing Research",
+        conceptValidation: "Concept Validation",
+        satisfactionSurvey: "Satisfaction Survey",
+        comingSoon: "Coming Soon"
         },
         "zh-cn": {
             focusGroupSystem: "焦点小组系统",
@@ -336,7 +348,19 @@ const CONFIG = {
         impulseBuyer: "冲动购买",
         researchHeavy: "重度研究",
         brandLoyal: "品牌忠诚",
-        dealSeekers: "优惠寻求者"
+        dealSeekers: "优惠寻求者",
+        // Session type options
+        marketResearch: "市场研究",
+        productResearch: "产品研究",
+        userExperience: "用户体验",
+        customerFeedback: "客户反馈",
+        brandPerception: "品牌认知",
+        competitiveAnalysis: "竞争分析",
+        advertisingTesting: "广告测试",
+        pricingResearch: "定价研究",
+        conceptValidation: "概念验证",
+        satisfactionSurvey: "满意度调查",
+        comingSoon: "即将推出"
         },
         "zh-hk": {
             focusGroupSystem: "焦點小組系統",
@@ -405,7 +429,19 @@ const CONFIG = {
         impulseBuyer: "衝動購買",
         researchHeavy: "重度研究",
         brandLoyal: "品牌忠誠",
-        dealSeekers: "優惠尋求者"
+        dealSeekers: "優惠尋求者",
+        // Session type options
+        marketResearch: "市場研究",
+        productResearch: "產品研究",
+        userExperience: "用戶體驗",
+        customerFeedback: "客戶反饋",
+        brandPerception: "品牌認知",
+        competitiveAnalysis: "競爭分析",
+        advertisingTesting: "廣告測試",
+        pricingResearch: "定價研究",
+        conceptValidation: "概念驗證",
+        satisfactionSurvey: "滿意度調查",
+        comingSoon: "即將推出"
         }
     }
 };
