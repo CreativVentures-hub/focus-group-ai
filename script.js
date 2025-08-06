@@ -900,7 +900,7 @@ async function handleFocusGroupForm(e) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(webhookData),
-                signal: AbortSignal.timeout(300000), // 5 minute timeout
+                signal: AbortSignal.timeout(600000), // 10 minute timeout for long workflows
                 mode: 'cors',
                 credentials: 'omit'
             });
@@ -932,7 +932,7 @@ async function handleFocusGroupForm(e) {
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify(webhookData),
-                            signal: AbortSignal.timeout(300000), // 5 minute timeout
+                            signal: AbortSignal.timeout(600000), // 10 minute timeout for long workflows
                             mode: 'cors',
                             credentials: 'omit'
                         });
@@ -1073,12 +1073,18 @@ async function handleFocusGroupForm(e) {
                     
                     hideLoadingScreen();
                     
-                    // Check if response is empty or has issues
-                    if (response.status === 200) {
-                        showErrorScreen(`Received 200 OK but couldn't read response content.\n\nThis might be a temporary issue. Please try:\n\n1. Refreshing the page and trying again\n2. Waiting a few minutes and trying again\n3. Using a different browser\n\nIf the issue persists, you can also use the local version for testing.`);
-                    } else {
-                        showErrorScreen(`Unable to read response content. Status: ${response.status}, StatusText: ${response.statusText}`);
-                    }
+                            // Check if response is empty or has issues
+        if (response.status === 200) {
+            showErrorScreen(`Received 200 OK but couldn't read response content.\n\nThis might be a temporary issue. Please try:\n\n1. Refreshing the page and trying again\n2. Waiting a few minutes and trying again\n3. Using a different browser\n\nIf the issue persists, you can also use the local version for testing.`);
+        } else if (response.status === 504) {
+            showErrorScreen(`Gateway Timeout (504): The n8n workflow is taking longer than expected.\n\nThis is normal for AI-powered workflows. The system will automatically retry with a longer timeout.\n\nPlease wait while we process your request...`);
+            
+            // Start polling for completion
+            const sessionId = generateSessionId();
+            pollWorkflowStatus(sessionId);
+        } else {
+            showErrorScreen(`Unable to read response content. Status: ${response.status}, StatusText: ${response.statusText}`);
+        }
                 }
             }
         }
@@ -2835,6 +2841,11 @@ async function downloadGeneratedFile(downloadUrl, filename) {
         console.error('Error downloading file:', error);
         showErrorScreen(`Error downloading report: ${error.message}`);
     }
+}
+
+// Generate a unique session ID for tracking
+function generateSessionId() {
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
 // Update loading screen with progress
