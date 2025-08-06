@@ -8,8 +8,8 @@ const CONFIG = {
     // CORS Proxy URL (disabled in production)
     CORS_PROXY_URL: "https://cors-anywhere.herokuapp.com/",
     
-    // Use CORS proxy for development (disabled in production)
-    USE_CORS_PROXY: false,
+    // Use CORS proxy for development (enabled for GitHub Pages)
+    USE_CORS_PROXY: true,
     
     // Production settings
     IS_PRODUCTION: true, // Set to true when deployed to live server
