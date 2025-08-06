@@ -725,21 +725,21 @@ async function handleFocusGroupForm(e) {
     let sessionSpecificData = {};
     
     switch (sessionType) {
-        case 'Product Research':
+        case 'product_research':
             sessionSpecificData = {
                 product_name: formData.get('productName') || '',
                 product_description: formData.get('productDescription') || '',
                 questions: collectQuestions('productQuestions')
             };
             break;
-        case 'Market Research':
+        case 'market_research':
             sessionSpecificData = {
                 market_name: formData.get('marketName') || '',
                 market_description: formData.get('marketDescription') || '',
                 questions: collectQuestions('marketQuestions')
             };
             break;
-        case 'Brand Perception':
+        case 'brand_perception':
             sessionSpecificData = {
                 brand_name: formData.get('brandName') || '',
                 brand_description: formData.get('brandDescription') || '',
