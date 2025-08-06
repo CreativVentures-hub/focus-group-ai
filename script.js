@@ -337,7 +337,9 @@ function setupQuestionsFileUpload() {
     
     Object.entries(uploadButtons).forEach(([buttonId, containerId]) => {
         const button = document.getElementById(buttonId);
-        const fileInput = document.getElementById(buttonId.replace('upload', '') + 'File');
+        // Fix the file input ID construction
+        const fileInputId = buttonId.replace('upload', '').toLowerCase() + 'File';
+        const fileInput = document.getElementById(fileInputId);
         
         if (button && fileInput) {
             button.addEventListener('click', () => {
@@ -347,6 +349,8 @@ function setupQuestionsFileUpload() {
             fileInput.addEventListener('change', (e) => {
                 handleQuestionsFileUpload(e, containerId);
             });
+        } else {
+            console.log('Missing elements:', { button: !!button, fileInput: !!fileInput, fileInputId });
         }
     });
 }
