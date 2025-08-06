@@ -883,61 +883,15 @@ async function handleFocusGroupForm(e) {
     showLoadingScreen(selectedCategories, formData.get('sessionType'), formData.get('sessionName'));
     
     try {
-        // Try multiple CORS proxies if enabled, or direct connection if not
+        // Try direct connection first, then fall back to CORS proxies if needed
         let response = null;
         let lastError = null;
+        let usedProxy = false;
         
-        if (CONFIG.USE_CORS_PROXY) {
-            // Try each CORS proxy in sequence
-            for (let i = 0; i < CONFIG.CORS_PROXY_URLS.length; i++) {
-                try {
-                    const webhookUrl = CONFIG.CORS_PROXY_URLS[i] + CONFIG.WEBHOOK_URL;
-                    console.log(`Trying CORS proxy ${i + 1}:`, webhookUrl);
-                    console.log('Request data:', webhookData);
-                    
-                    response = await fetch(webhookUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(webhookData),
-                        signal: AbortSignal.timeout(300000), // 5 minute timeout
-                        mode: 'cors',
-                        credentials: 'omit'
-                    });
-                    
-                    console.log(`CORS proxy ${i + 1} response status:`, response.status);
-                    
-                    // If we get a 403, try the next proxy
-                    if (response.status === 403) {
-                        console.log(`CORS proxy ${i + 1} returned 403, trying next...`);
-                        continue;
-                    }
-                    
-                    // If we get here, the proxy worked
-                    console.log(`CORS proxy ${i + 1} worked!`);
-                    break;
-                    
-                } catch (proxyError) {
-                    console.error(`CORS proxy ${i + 1} failed:`, proxyError);
-                    lastError = proxyError;
-                    
-                    // If this is the last proxy, throw the error
-                    if (i === CONFIG.CORS_PROXY_URLS.length - 1) {
-                        throw proxyError;
-                    }
-                    continue;
-                }
-            }
-            
-            // If all proxies failed with 403, throw a specific error
-            if (response && response.status === 403) {
-                throw new Error('All CORS proxies returned 403 Forbidden. Please use the local server for testing.');
-            }
-        } else {
-            // Direct connection without CORS proxy
+        // First, try direct connection
+        try {
             const webhookUrl = CONFIG.WEBHOOK_URL;
-            console.log('Sending direct request to:', webhookUrl);
+            console.log('Trying direct connection to:', webhookUrl);
             console.log('Request data:', webhookData);
             
             response = await fetch(webhookUrl, {
@@ -950,6 +904,72 @@ async function handleFocusGroupForm(e) {
                 mode: 'cors',
                 credentials: 'omit'
             });
+            
+            console.log('Direct connection response status:', response.status);
+            
+            // If direct connection worked, use it
+            if (response.ok) {
+                console.log('Direct connection successful!');
+            } else {
+                throw new Error(`Direct connection failed with status: ${response.status}`);
+            }
+            
+        } catch (directError) {
+            console.log('Direct connection failed, trying CORS proxies...');
+            lastError = directError;
+            
+            // If direct connection failed and CORS proxy is enabled, try proxies
+            if (CONFIG.USE_CORS_PROXY) {
+                // Try each CORS proxy in sequence
+                for (let i = 0; i < CONFIG.CORS_PROXY_URLS.length; i++) {
+                    try {
+                        const webhookUrl = CONFIG.CORS_PROXY_URLS[i] + CONFIG.WEBHOOK_URL;
+                        console.log(`Trying CORS proxy ${i + 1}:`, webhookUrl);
+                        
+                        response = await fetch(webhookUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(webhookData),
+                            signal: AbortSignal.timeout(300000), // 5 minute timeout
+                            mode: 'cors',
+                            credentials: 'omit'
+                        });
+                        
+                        console.log(`CORS proxy ${i + 1} response status:`, response.status);
+                        
+                        // If we get a 403, try the next proxy
+                        if (response.status === 403) {
+                            console.log(`CORS proxy ${i + 1} returned 403, trying next...`);
+                            continue;
+                        }
+                        
+                        // If we get here, the proxy worked
+                        console.log(`CORS proxy ${i + 1} worked!`);
+                        usedProxy = true;
+                        break;
+                        
+                    } catch (proxyError) {
+                        console.error(`CORS proxy ${i + 1} failed:`, proxyError);
+                        lastError = proxyError;
+                        
+                        // If this is the last proxy, throw the error
+                        if (i === CONFIG.CORS_PROXY_URLS.length - 1) {
+                            throw proxyError;
+                        }
+                        continue;
+                    }
+                }
+                
+                // If all proxies failed with 403, throw a specific error
+                if (response && response.status === 403) {
+                    throw new Error('All CORS proxies returned 403 Forbidden. Please use the local server for testing.');
+                }
+            } else {
+                // If CORS proxy is disabled, throw the direct connection error
+                throw directError;
+            }
         }
         
         console.log('Response status:', response.status);
@@ -1079,15 +1099,19 @@ async function handleFocusGroupForm(e) {
                           '2. Open http://localhost:8000\n' +
                           '3. Try submitting the form again';
         } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            errorMessage += 'Unable to connect to the webhook. This might be due to:\n\n' +
+            errorMessage += 'Unable to connect to the webhook. The system tried both direct connection and CORS proxies.\n\n' +
+                          'This might be due to:\n' +
                           '• Network connectivity issues\n' +
                           '• n8n webhook is not active\n' +
+                          '• CORS headers not properly configured\n' +
                           '• Temporary server issues\n\n' +
                           'Please try again in a few moments. If the issue persists, you can also use the local version for testing.';
         } else if (error.message.includes('Failed to fetch')) {
-            errorMessage += 'Failed to fetch from webhook. This might be due to:\n\n' +
+            errorMessage += 'Failed to fetch from webhook. The system tried both direct connection and CORS proxies.\n\n' +
+                          'This might be due to:\n' +
                           '• Network connectivity issues\n' +
                           '• n8n webhook is not active\n' +
+                          '• CORS headers not properly configured\n' +
                           '• Temporary server issues\n\n' +
                           'Please try again in a few moments. If the issue persists, you can also use the local version for testing.';
         } else {

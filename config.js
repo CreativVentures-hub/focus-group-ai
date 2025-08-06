@@ -14,11 +14,15 @@ const CONFIG = {
         "https://cors-anywhere.herokuapp.com/",
         "https://cors.io/?",
         "https://jsonp.afeld.me/?url=",
-        "https://api.codetabs.com/v1/proxy?quest="
+        "https://api.codetabs.com/v1/proxy?quest=",
+        "https://corsproxy.io/?",
+        "https://api.codetabs.com/v1/proxy?quest=",
+        "https://cors-anywhere.herokuapp.com/",
+        "https://cors.io/?"
     ],
     
-    // Use CORS proxy for development (disabled - n8n webhook now has CORS headers)
-    USE_CORS_PROXY: false,
+    // Use CORS proxy for development (will try direct first, then fallback to proxy)
+    USE_CORS_PROXY: true,
     
     // Production settings
     IS_PRODUCTION: true, // Set to true when deployed to live server
