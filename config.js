@@ -17,7 +17,7 @@ const CONFIG = {
         "https://api.codetabs.com/v1/proxy?quest="
     ],
     
-    // Use CORS proxy for development (disabled due to POST body forwarding issues)
+    // Use CORS proxy for development (disabled - n8n webhook now has CORS headers)
     USE_CORS_PROXY: false,
     
     // Production settings

@@ -1055,7 +1055,7 @@ async function handleFocusGroupForm(e) {
                     
                     // Check if response is empty or has issues
                     if (response.status === 200) {
-                        showErrorScreen(`Received 200 OK but couldn't read response content.\n\nThis might be a temporary issue with the CORS proxy. Please try:\n\n1. Refreshing the page and trying again\n2. Waiting a few minutes and trying again\n3. Using a different browser\n\nIf the issue persists, the system will try alternative proxies automatically.`);
+                        showErrorScreen(`Received 200 OK but couldn't read response content.\n\nThis might be a temporary issue. Please try:\n\n1. Refreshing the page and trying again\n2. Waiting a few minutes and trying again\n3. Using a different browser\n\nIf the issue persists, you can also use the local version for testing.`);
                     } else {
                         showErrorScreen(`Unable to read response content. Status: ${response.status}, StatusText: ${response.statusText}`);
                     }
@@ -1079,23 +1079,17 @@ async function handleFocusGroupForm(e) {
                           '2. Open http://localhost:8000\n' +
                           '3. Try submitting the form again';
         } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            errorMessage += 'Unable to connect to the webhook due to CORS restrictions.\n\n' +
-                          'CORS proxies cannot properly forward POST requests with form data to n8n.\n\n' +
-                          'For immediate access:\n\n' +
-                          '1. Download the files from: https://github.com/CreativVentures-hub/focus-group-ai\n' +
-                          '2. Extract the ZIP file to your computer\n' +
-                          '3. Double-click "start-cors-server.bat"\n' +
-                          '4. Open http://localhost:8000 in your browser\n\n' +
-                          'The local version will work perfectly with your n8n webhook!';
+            errorMessage += 'Unable to connect to the webhook. This might be due to:\n\n' +
+                          '• Network connectivity issues\n' +
+                          '• n8n webhook is not active\n' +
+                          '• Temporary server issues\n\n' +
+                          'Please try again in a few moments. If the issue persists, you can also use the local version for testing.';
         } else if (error.message.includes('Failed to fetch')) {
-            errorMessage += 'Failed to fetch from webhook due to CORS restrictions.\n\n' +
-                          'CORS proxies cannot properly forward POST requests with form data to n8n.\n\n' +
-                          'For immediate access:\n\n' +
-                          '1. Download the files from: https://github.com/CreativVentures-hub/focus-group-ai\n' +
-                          '2. Extract the ZIP file to your computer\n' +
-                          '3. Double-click "start-cors-server.bat"\n' +
-                          '4. Open http://localhost:8000 in your browser\n\n' +
-                          'The local version will work perfectly with your n8n webhook!';
+            errorMessage += 'Failed to fetch from webhook. This might be due to:\n\n' +
+                          '• Network connectivity issues\n' +
+                          '• n8n webhook is not active\n' +
+                          '• Temporary server issues\n\n' +
+                          'Please try again in a few moments. If the issue persists, you can also use the local version for testing.';
         } else {
             errorMessage += error.message;
         }
