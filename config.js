@@ -17,7 +17,7 @@ const CONFIG = {
         "https://api.codetabs.com/v1/proxy?quest="
     ],
     
-    // Use CORS proxy for development (disabled due to unreliable proxy responses)
+    // Use CORS proxy for development (disabled due to POST body forwarding issues)
     USE_CORS_PROXY: false,
     
     // Production settings

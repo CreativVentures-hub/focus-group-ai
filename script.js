@@ -877,6 +877,7 @@ async function handleFocusGroupForm(e) {
     };
     
     console.log('Focus group data to be sent:', webhookData);
+    console.log('Webhook data JSON string:', JSON.stringify(webhookData, null, 2));
     
     // Show loading screen
     showLoadingScreen(selectedCategories, formData.get('sessionType'), formData.get('sessionName'));
@@ -1079,7 +1080,8 @@ async function handleFocusGroupForm(e) {
                           '3. Try submitting the form again';
         } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
             errorMessage += 'Unable to connect to the webhook due to CORS restrictions.\n\n' +
-                          'This is a common issue with GitHub Pages. For immediate access:\n\n' +
+                          'CORS proxies cannot properly forward POST requests with form data to n8n.\n\n' +
+                          'For immediate access:\n\n' +
                           '1. Download the files from: https://github.com/CreativVentures-hub/focus-group-ai\n' +
                           '2. Extract the ZIP file to your computer\n' +
                           '3. Double-click "start-cors-server.bat"\n' +
@@ -1087,7 +1089,8 @@ async function handleFocusGroupForm(e) {
                           'The local version will work perfectly with your n8n webhook!';
         } else if (error.message.includes('Failed to fetch')) {
             errorMessage += 'Failed to fetch from webhook due to CORS restrictions.\n\n' +
-                          'This is a common issue with GitHub Pages. For immediate access:\n\n' +
+                          'CORS proxies cannot properly forward POST requests with form data to n8n.\n\n' +
+                          'For immediate access:\n\n' +
                           '1. Download the files from: https://github.com/CreativVentures-hub/focus-group-ai\n' +
                           '2. Extract the ZIP file to your computer\n' +
                           '3. Double-click "start-cors-server.bat"\n' +
