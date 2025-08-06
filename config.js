@@ -252,7 +252,22 @@ const CONFIG = {
         // Demographic options
         any: "Any",
         male: "Male",
-        female: "Female"
+        female: "Female",
+        // Modal content
+        selectParticipantCategories: "Select Participant Categories",
+        searchCategories: "Search categories...",
+        clearAll: "Clear All",
+        applySelection: "Apply Selection",
+        // Category names
+        general: "General",
+        online: "Online",
+        budgetConscious: "Budget-Conscious",
+        luxury: "Luxury",
+        ecoConscious: "Eco-Conscious",
+        impulseBuyer: "Impulse Buyer",
+        researchHeavy: "Research Heavy",
+        brandLoyal: "Brand Loyal",
+        dealSeekers: "Deal Seekers"
         },
         "zh-cn": {
             focusGroupSystem: "焦点小组系统",
@@ -306,7 +321,22 @@ const CONFIG = {
         // Demographic options
         any: "任何",
         male: "男性",
-        female: "女性"
+        female: "女性",
+        // Modal content
+        selectParticipantCategories: "选择参与者类别",
+        searchCategories: "搜索类别...",
+        clearAll: "清除全部",
+        applySelection: "应用选择",
+        // Category names
+        general: "通用",
+        online: "在线",
+        budgetConscious: "预算意识",
+        luxury: "奢侈品",
+        ecoConscious: "环保意识",
+        impulseBuyer: "冲动购买",
+        researchHeavy: "重度研究",
+        brandLoyal: "品牌忠诚",
+        dealSeekers: "优惠寻求者"
         },
         "zh-hk": {
             focusGroupSystem: "焦點小組系統",
@@ -360,7 +390,22 @@ const CONFIG = {
         // Demographic options
         any: "任何",
         male: "男性",
-        female: "女性"
+        female: "女性",
+        // Modal content
+        selectParticipantCategories: "選擇參與者類別",
+        searchCategories: "搜索類別...",
+        clearAll: "清除全部",
+        applySelection: "應用選擇",
+        // Category names
+        general: "通用",
+        online: "在線",
+        budgetConscious: "預算意識",
+        luxury: "奢侈品",
+        ecoConscious: "環保意識",
+        impulseBuyer: "衝動購買",
+        researchHeavy: "重度研究",
+        brandLoyal: "品牌忠誠",
+        dealSeekers: "優惠尋求者"
         }
     }
 };

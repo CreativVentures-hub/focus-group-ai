@@ -1110,6 +1110,9 @@ function updateFormTexts(translations) {
     
     // Update demographic options
     updateDemographicOptions(translations);
+    
+    // Update modal content
+    updateModalContent(translations);
 }
 
 function updateDemographicOptions(translations) {
@@ -1131,6 +1134,69 @@ function updateDemographicOptions(translations) {
     if (femaleLabel) {
         femaleLabel.textContent = translations.female;
     }
+}
+
+function updateModalContent(translations) {
+    // Update modal titles
+    const modalTitles = document.querySelectorAll('h3');
+    modalTitles.forEach(title => {
+        if (title.textContent === 'Select Participant Categories') {
+            title.textContent = translations.selectParticipantCategories;
+        }
+    });
+    
+    // Update search placeholders
+    const searchInputs = document.querySelectorAll('input[placeholder*="Search"]');
+    searchInputs.forEach(input => {
+        if (input.placeholder.includes('Search categories')) {
+            input.placeholder = translations.searchCategories;
+        }
+    });
+    
+    // Update Clear All buttons
+    const clearAllButtons = document.querySelectorAll('button[id*="clearAll"]');
+    clearAllButtons.forEach(button => {
+        const icon = button.querySelector('i');
+        if (icon && button.textContent.includes('Clear All')) {
+            button.innerHTML = `<i class="${icon.className}"></i> ${translations.clearAll}`;
+        }
+    });
+    
+    // Update Apply Selection buttons
+    const applyButtons = document.querySelectorAll('button[id*="apply"]');
+    applyButtons.forEach(button => {
+        const icon = button.querySelector('i');
+        if (icon && button.textContent.includes('Apply Selection')) {
+            button.innerHTML = `<i class="${icon.className}"></i> ${translations.applySelection}`;
+        }
+    });
+    
+    // Update category labels
+    updateCategoryLabels(translations);
+}
+
+function updateCategoryLabels(translations) {
+    // Update buying behavior category labels
+    const categoryMappings = {
+        'General': translations.general,
+        'Online': translations.online,
+        'Budget-Conscious': translations.budgetConscious,
+        'Luxury': translations.luxury,
+        'Eco-Conscious': translations.ecoConscious,
+        'Impulse Buyer': translations.impulseBuyer,
+        'Research Heavy': translations.researchHeavy,
+        'Brand Loyal': translations.brandLoyal,
+        'Deal Seekers': translations.dealSeekers
+    };
+    
+    // Update all category labels in modals
+    const categoryLabels = document.querySelectorAll('.category-checkbox label');
+    categoryLabels.forEach(label => {
+        const englishText = label.textContent;
+        if (categoryMappings[englishText]) {
+            label.textContent = categoryMappings[englishText];
+        }
+    });
 }
 
 function updateButtonTexts(translations) {
