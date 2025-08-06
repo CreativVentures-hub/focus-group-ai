@@ -882,6 +882,19 @@ async function handleFocusGroupForm(e) {
     // Show loading screen
     showLoadingScreen(selectedCategories, formData.get('sessionType'), formData.get('sessionName'));
     
+    // Start 5-minute timeout countdown
+    const timeoutDuration = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const timeoutId = setTimeout(() => {
+        hideLoadingScreen();
+        showErrorScreen(`Request timed out after 5 minutes.\n\nThis might be due to:\n• High server load\n• Complex AI processing\n• Network issues\n\nPlease try again in a few minutes.`);
+    }, timeoutDuration);
+    
+    // Store timeout ID for cleanup
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.dataset.timeoutId = timeoutId;
+    }
+    
     try {
         // Try direct connection first, then fall back to CORS proxies if needed
         let response = null;
@@ -2171,6 +2184,12 @@ function showLoadingScreen(selectedCategories = [], sessionType = '', sessionNam
                 <span class="loading-progress-text">0% Complete</span>
             </div>
             
+            <!-- Countdown Timer -->
+            <div class="countdown-timer">
+                <i class="fas fa-clock"></i>
+                <span id="countdownText">Time remaining: 5:00</span>
+            </div>
+            
             <div class="processing-time-notice">
                 <p>This process can take up to 4 minutes. Please don't close this window.</p>
             </div>
@@ -2208,6 +2227,9 @@ function showLoadingScreen(selectedCategories = [], sessionType = '', sessionNam
     
     // Store interval ID for cleanup
     loadingOverlay.dataset.messageInterval = messageInterval;
+    
+    // Start countdown timer
+    startCountdownTimer(300); // 5 minutes = 300 seconds
 }
 
 function hideLoadingScreen() {
@@ -2218,6 +2240,19 @@ function hideLoadingScreen() {
         if (intervalId) {
             clearInterval(parseInt(intervalId));
         }
+        
+        // Clear the timeout if it exists
+        const timeoutId = loadingOverlay.dataset.timeoutId;
+        if (timeoutId) {
+            clearTimeout(parseInt(timeoutId));
+        }
+        
+        // Clear the countdown interval if it exists
+        const countdownInterval = loadingOverlay.dataset.countdownInterval;
+        if (countdownInterval) {
+            clearInterval(parseInt(countdownInterval));
+        }
+        
         loadingOverlay.remove();
     }
 }
@@ -2846,6 +2881,41 @@ async function downloadGeneratedFile(downloadUrl, filename) {
 // Generate a unique session ID for tracking
 function generateSessionId() {
     return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Start countdown timer
+function startCountdownTimer(seconds) {
+    const countdownElement = document.getElementById('countdownText');
+    if (!countdownElement) return;
+    
+    const countdownInterval = setInterval(() => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        
+        countdownElement.textContent = `Time remaining: ${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        
+        // Change color when time is running low
+        if (seconds <= 60) {
+            countdownElement.style.color = '#ff6b6b';
+            countdownElement.style.fontWeight = 'bold';
+        } else if (seconds <= 120) {
+            countdownElement.style.color = '#ffa726';
+        }
+        
+        if (seconds <= 0) {
+            clearInterval(countdownInterval);
+            countdownElement.textContent = 'Time expired';
+            countdownElement.style.color = '#ff6b6b';
+        }
+        
+        seconds--;
+    }, 1000);
+    
+    // Store interval ID for cleanup
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.dataset.countdownInterval = countdownInterval;
+    }
 }
 
 // Update loading screen with progress

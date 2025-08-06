@@ -1608,6 +1608,34 @@ textarea:focus {
     z-index: 1;
 }
 
+/* Countdown Timer Styles */
+.countdown-timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 15px auto;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-width: 200px;
+}
+
+.countdown-timer i {
+    color: #ffd700;
+    font-size: 14px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.countdown-timer span {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
 /* Processing Time Notice Styles */
 .processing-time-notice {
     margin-top: clamp(2rem, 5vw, 3rem);
