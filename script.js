@@ -84,10 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize language
     initializeLanguage();
     
-    // Show GitHub Pages notice if on GitHub Pages
-    if (window.location.hostname.includes('github.io')) {
-        showGitHubPagesNotice();
-    }
+
 });
 
 function initializeDOMElements() {
@@ -1046,22 +1043,7 @@ function updateButtonTexts(translations) {
     });
 }
 
-function showGitHubPagesNotice() {
-    // Show notice about GitHub Pages limitations
-    const notice = document.createElement('div');
-    notice.className = 'notice-banner';
-    notice.innerHTML = `
-        <div class="notice-content">
-            <i class="fas fa-info-circle"></i>
-            <span>This is a live demo. For full functionality, download and run locally.</span>
-            <button class="notice-close" onclick="this.parentElement.parentElement.remove()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-    
-    document.body.insertBefore(notice, document.body.firstChild);
-}
+
 
 
 
