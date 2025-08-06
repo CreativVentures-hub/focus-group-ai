@@ -5,24 +5,7 @@ const CONFIG = {
     // Webhook URL for creating focus groups (no longer creating participants)
     WEBHOOK_URL: "https://creativventures.app.n8n.cloud/webhook/focus-group-ai",
     
-    // CORS Proxy URLs (multiple options for redundancy)
-    CORS_PROXY_URLS: [
-        "https://api.allorigins.win/raw?url=",
-        "https://thingproxy.freeboard.io/fetch/",
-        "https://cors.bridged.cc/",
-        "https://api.codetabs.com/v1/proxy?quest=",
-        "https://cors-anywhere.herokuapp.com/",
-        "https://cors.io/?",
-        "https://jsonp.afeld.me/?url=",
-        "https://api.codetabs.com/v1/proxy?quest=",
-        "https://corsproxy.io/?",
-        "https://api.codetabs.com/v1/proxy?quest=",
-        "https://cors-anywhere.herokuapp.com/",
-        "https://cors.io/?"
-    ],
-    
-    // Use CORS proxy for development (GitHub Pages requires proxy for reliable connections)
-    USE_CORS_PROXY: true,
+
     
     // Production settings
     IS_PRODUCTION: true, // Set to true when deployed to live server

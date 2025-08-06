@@ -1042,13 +1042,3 @@ function updateButtonTexts(translations) {
         }
     });
 }
-
-
-
-
-
-
-
-
-
-
