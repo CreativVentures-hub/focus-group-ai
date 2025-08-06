@@ -385,6 +385,19 @@ async function handleFocusGroupForm(e) {
     };
     
     console.log('Sending webhook data:', webhookData);
+    console.log('Webhook URL:', CONFIG.WEBHOOK_URL);
+    
+    // Validate webhook data before sending
+    const validationResult = validateWebhookData(webhookData);
+    if (!validationResult.isValid) {
+        showFormError(focusGroupForm, validationResult.message);
+        return;
+    }
+    
+    // Log the JSON string being sent
+    const jsonData = JSON.stringify(webhookData, null, 2);
+    console.log('JSON data being sent:', jsonData);
+    console.log('Data size:', jsonData.length, 'characters');
     
     try {
         // Send to n8n webhook
@@ -402,7 +415,25 @@ async function handleFocusGroupForm(e) {
             // Show success modal
             showSuccessModal(userEmail);
         } else {
-            showFormError(focusGroupForm, `Error: ${response.status} ${response.statusText}`);
+            // Try to get more detailed error information
+            let errorMessage = `Server Error: ${response.status} ${response.statusText}`;
+            
+            try {
+                const errorData = await response.text();
+                console.log('Error response body:', errorData);
+                
+                if (errorData) {
+                    if (errorData.includes('html') || errorData.includes('<!DOCTYPE')) {
+                        errorMessage = `Server Error (${response.status}): The n8n workflow may be experiencing issues. Please try again in a few minutes.`;
+                    } else {
+                        errorMessage = `Server Error (${response.status}): ${errorData.substring(0, 200)}...`;
+                    }
+                }
+            } catch (textError) {
+                console.error('Could not read error response:', textError);
+            }
+            
+            showFormError(focusGroupForm, errorMessage);
         }
         
     } catch (error) {
@@ -523,6 +554,59 @@ function populateDropdowns() {
 
 function getSelectedCategories() {
     return window.selectedCategories || [];
+}
+
+function validateWebhookData(data) {
+    const errors = [];
+    
+    // Check required fields
+    if (!data.session_type) errors.push('Session type is required');
+    if (!data.session_name) errors.push('Session name is required');
+    if (!data.user_email) errors.push('Email address is required');
+    if (!data.number_of_participants) errors.push('Number of participants is required');
+    
+    // Check email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (data.user_email && !emailRegex.test(data.user_email)) {
+        errors.push('Please enter a valid email address');
+    }
+    
+    // Check categories
+    if (!data.categories || data.categories.length === 0) {
+        errors.push('Please select at least one participant category');
+    }
+    
+    // Check session-specific data
+    if (data.session_type === 'market_research') {
+        if (!data.market_name) errors.push('Market name is required');
+        if (!data.market_description) errors.push('Market description is required');
+        if (!data.questions || data.questions.length === 0) errors.push('At least one question is required');
+    } else if (data.session_type === 'product_research') {
+        if (!data.product_name) errors.push('Product name is required');
+        if (!data.product_description) errors.push('Product description is required');
+        if (!data.questions || data.questions.length === 0) errors.push('At least one question is required');
+    } else if (data.session_type === 'brand_perception') {
+        if (!data.brand_name) errors.push('Brand name is required');
+        if (!data.brand_description) errors.push('Brand description is required');
+        if (!data.questions || data.questions.length === 0) errors.push('At least one question is required');
+    }
+    
+    // Check questions
+    if (data.questions) {
+        const validQuestions = data.questions.filter(q => q.text && q.text.trim().length > 0);
+        if (validQuestions.length === 0) {
+            errors.push('Please enter at least one question');
+        }
+    }
+    
+    if (errors.length > 0) {
+        return {
+            isValid: false,
+            message: 'Please fix the following errors:\n• ' + errors.join('\n• ')
+        };
+    }
+    
+    return { isValid: true };
 }
 
 function collectQuestions(containerId) {
