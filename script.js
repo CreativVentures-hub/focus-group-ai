@@ -896,21 +896,25 @@ async function handleFocusGroupForm(e) {
     }
     
     try {
-        // Try direct connection first, then fall back to CORS proxies if needed
+        // Try multiple approaches to ensure data gets through
         let response = null;
         let lastError = null;
         let usedProxy = false;
         
-        // First, try direct connection
+        // Approach 1: Direct connection with enhanced headers
         try {
             const webhookUrl = CONFIG.WEBHOOK_URL;
             console.log('Trying direct connection to:', webhookUrl);
             console.log('Request data:', webhookData);
+            console.log('Request body length:', JSON.stringify(webhookData).length);
+            console.log('Request body preview:', JSON.stringify(webhookData).substring(0, 200) + '...');
             
             response = await fetch(webhookUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json, text/plain, */*',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify(webhookData),
                 signal: AbortSignal.timeout(600000), // 10 minute timeout for long workflows
@@ -928,60 +932,90 @@ async function handleFocusGroupForm(e) {
             }
             
         } catch (directError) {
-            console.log('Direct connection failed, trying CORS proxies...');
+            console.log('Direct connection failed, trying alternative approaches...');
             lastError = directError;
             
-            // If direct connection failed and CORS proxy is enabled, try proxies
+            // Approach 2: Try with different CORS proxy that supports POST bodies
             if (CONFIG.USE_CORS_PROXY) {
-                // Try each CORS proxy in sequence
-                for (let i = 0; i < CONFIG.CORS_PROXY_URLS.length; i++) {
+                // Try specific proxies that are known to work with POST bodies
+                const postFriendlyProxies = [
+                    "https://api.allorigins.win/raw?url=",
+                    "https://thingproxy.freeboard.io/fetch/",
+                    "https://cors.bridged.cc/"
+                ];
+                
+                for (let i = 0; i < postFriendlyProxies.length; i++) {
                     try {
-                        const webhookUrl = CONFIG.CORS_PROXY_URLS[i] + CONFIG.WEBHOOK_URL;
-                        console.log(`Trying CORS proxy ${i + 1}:`, webhookUrl);
+                        const webhookUrl = postFriendlyProxies[i] + CONFIG.WEBHOOK_URL;
+                        console.log(`Trying POST-friendly proxy ${i + 1}:`, webhookUrl);
                         
                         response = await fetch(webhookUrl, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
+                                'Accept': 'application/json, text/plain, */*',
+                                'X-Requested-With': 'XMLHttpRequest'
                             },
                             body: JSON.stringify(webhookData),
-                            signal: AbortSignal.timeout(600000), // 10 minute timeout for long workflows
+                            signal: AbortSignal.timeout(600000),
                             mode: 'cors',
                             credentials: 'omit'
                         });
                         
-                        console.log(`CORS proxy ${i + 1} response status:`, response.status);
+                        console.log(`POST-friendly proxy ${i + 1} response status:`, response.status);
                         
-                        // If we get a 403, try the next proxy
                         if (response.status === 403) {
-                            console.log(`CORS proxy ${i + 1} returned 403, trying next...`);
+                            console.log(`POST-friendly proxy ${i + 1} returned 403, trying next...`);
                             continue;
                         }
                         
-                        // If we get here, the proxy worked
-                        console.log(`CORS proxy ${i + 1} worked!`);
+                        console.log(`POST-friendly proxy ${i + 1} worked!`);
                         usedProxy = true;
                         break;
                         
                     } catch (proxyError) {
-                        console.error(`CORS proxy ${i + 1} failed:`, proxyError);
+                        console.error(`POST-friendly proxy ${i + 1} failed:`, proxyError);
                         lastError = proxyError;
                         
-                        // If this is the last proxy, throw the error
-                        if (i === CONFIG.CORS_PROXY_URLS.length - 1) {
+                        if (i === postFriendlyProxies.length - 1) {
                             throw proxyError;
                         }
                         continue;
                     }
                 }
-                
-                // If all proxies failed with 403, throw a specific error
-                if (response && response.status === 403) {
-                    throw new Error('All CORS proxies returned 403 Forbidden. Please use the local server for testing.');
+            }
+            
+            // Approach 3: Try with form data instead of JSON (some proxies work better with this)
+            if (!response && CONFIG.USE_CORS_PROXY) {
+                try {
+                    console.log('Trying form data approach...');
+                    
+                    // Convert JSON data to form data
+                    const formData = new FormData();
+                    formData.append('data', JSON.stringify(webhookData));
+                    
+                    const webhookUrl = "https://api.allorigins.win/raw?url=" + CONFIG.WEBHOOK_URL;
+                    
+                    response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        body: formData,
+                        signal: AbortSignal.timeout(600000),
+                        mode: 'cors',
+                        credentials: 'omit'
+                    });
+                    
+                    console.log('Form data approach response status:', response.status);
+                    usedProxy = true;
+                    
+                } catch (formError) {
+                    console.error('Form data approach failed:', formError);
+                    lastError = formError;
                 }
-            } else {
-                // If CORS proxy is disabled, throw the direct connection error
-                throw directError;
+            }
+            
+            // If all approaches failed, throw the error
+            if (!response) {
+                throw lastError || new Error('All connection methods failed. Please use the local server for testing.');
             }
         }
         
