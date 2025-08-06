@@ -518,7 +518,7 @@ function populateDropdowns() {
     }
     
     // Initialize category modal
-    populateCategoryModal();
+    setupCategoryModal();
 }
 
 function getSelectedCategories() {
