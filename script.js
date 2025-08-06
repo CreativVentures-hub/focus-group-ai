@@ -815,8 +815,8 @@ function applyCategorySelection() {
         categoryHidden.value = selectedItems.join(', ');
     }
     
-    // Update selected chips display
-    updateSelectedCategoriesDisplay();
+    // Update chips display
+    updateAllSelectedChips();
     
     // Hide modal
     hideCategoryModal();
@@ -834,29 +834,81 @@ function updateCategoryButtonText(selectedItems) {
     }
 }
 
-function updateSelectedCategoriesDisplay() {
-    if (!selectedCategoriesContainer) return;
+function updateAllSelectedChips() {
+    const selectedChipsContainer = document.getElementById('selectedChips');
+    if (!selectedChipsContainer) return;
     
-    selectedCategoriesContainer.innerHTML = '';
+    selectedChipsContainer.innerHTML = '';
     
-    const selectedItems = window.selectedCategories || [];
-    selectedItems.forEach(item => {
-        const chip = document.createElement('span');
-        chip.className = 'selected-category-tag';
-        chip.innerHTML = `
-            ${item}
-            <button type="button" class="remove-category" onclick="removeCategory('${item}')">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
-        selectedCategoriesContainer.appendChild(chip);
+    // Define all selection types and their display names
+    const selectionTypes = [
+        { key: 'selectedCategories', label: 'Categories', icon: 'fas fa-tags' },
+        { key: 'selectedGenders', label: 'Gender', icon: 'fas fa-venus-mars' },
+        { key: 'selectedAges', label: 'Age', icon: 'fas fa-birthday-cake' },
+        { key: 'selectedIncomes', label: 'Income', icon: 'fas fa-dollar-sign' },
+        { key: 'selectedMaritals', label: 'Marital', icon: 'fas fa-heart' },
+        { key: 'selectedChildrens', label: 'Children', icon: 'fas fa-baby' },
+        { key: 'selectedEducations', label: 'Education', icon: 'fas fa-graduation-cap' },
+        { key: 'selectedRaces', label: 'Race', icon: 'fas fa-globe-americas' }
+    ];
+    
+    selectionTypes.forEach(type => {
+        const selectedItems = window[type.key] || [];
+        if (selectedItems.length > 0) {
+            selectedItems.forEach(item => {
+                const chip = document.createElement('span');
+                chip.className = 'selected-category-tag';
+                chip.innerHTML = `
+                    <i class="${type.icon}"></i>
+                    ${item}
+                    <button type="button" class="remove-category" onclick="removeSelectionChip('${type.key}', '${item}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                selectedChipsContainer.appendChild(chip);
+            });
+        }
     });
+}
+
+function removeSelectionChip(selectionKey, item) {
+    // Remove from global storage
+    if (window[selectionKey]) {
+        window[selectionKey] = window[selectionKey].filter(selected => selected !== item);
+    }
+    
+    // Update button text and hidden input
+    const type = selectionKey.replace('selected', '').toLowerCase();
+    updateSelectionButton(type, window[selectionKey] || []);
+    
+    // Update hidden input
+    const hiddenId = type === 'marital' ? 'maritalStatus' : type === 'children' ? 'hasChildren' : type;
+    const hidden = document.getElementById(hiddenId);
+    if (hidden) {
+        hidden.value = (window[selectionKey] || []).join(', ');
+    }
+    
+    // Special handling for categories
+    if (selectionKey === 'selectedCategories') {
+        updateCategoryButtonText(window.selectedCategories || []);
+        if (categoryHidden) {
+            categoryHidden.value = (window.selectedCategories || []).join(', ');
+        }
+    }
+    
+    // Update chips display
+    updateAllSelectedChips();
+}
+
+function updateSelectedCategoriesDisplay() {
+    // This function is now replaced by updateAllSelectedChips
+    updateAllSelectedChips();
 }
 
 function removeCategory(category) {
     window.selectedCategories = window.selectedCategories.filter(cat => cat !== category);
     updateCategoryButtonText(window.selectedCategories);
-    updateSelectedCategoriesDisplay();
+    updateAllSelectedChips();
     
     // Uncheck in modal
     const checkbox = categoryList.querySelector(`input[data-category="${category}"]`);
@@ -965,6 +1017,9 @@ function applySelection(type, list, modal) {
     if (hidden) {
         hidden.value = selectedItems.join(', ');
     }
+    
+    // Update chips display
+    updateAllSelectedChips();
     
     // Hide modal
     hideModal(modal);
