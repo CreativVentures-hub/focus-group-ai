@@ -137,6 +137,17 @@ function initializeDOMElements() {
 function initializeApp() {
     // Show login section by default
     showLoginSection();
+    
+    // Initialize language system
+    initializeLanguage();
+    
+    // Force English mode on initial load to ensure everything is in English
+    setTimeout(() => {
+        forceEnglishMode();
+    }, 100);
+    
+    // Add global function for debugging - you can call forceEnglish() in console
+    window.forceEnglish = forceEnglishMode;
 }
 
 function setupEventListeners() {
@@ -1040,7 +1051,14 @@ function initializeSlider() {
 function initializeLanguage() {
     if (languageSelect) {
         languageSelect.addEventListener('change', handleLanguageChange);
-        currentLanguage = languageSelect.value || 'en';
+        // Force English as default if no language is selected or if it's not a valid option
+        const selectedValue = languageSelect.value;
+        if (!selectedValue || !CONFIG.TRANSLATIONS[selectedValue]) {
+            currentLanguage = 'en';
+            languageSelect.value = 'en';
+        } else {
+            currentLanguage = selectedValue;
+        }
         updateLanguage();
     }
 }
@@ -1055,6 +1073,20 @@ function updateLanguage() {
     updateFormTexts(translations);
     updateButtonTexts(translations);
     populateDropdowns(); // Repopulate dropdowns with new language
+}
+
+function forceEnglishMode() {
+    // Force everything to English mode
+    currentLanguage = 'en';
+    if (languageSelect) {
+        languageSelect.value = 'en';
+    }
+    const translations = CONFIG.TRANSLATIONS.en;
+    updateFormTexts(translations);
+    updateButtonTexts(translations);
+    populateDropdowns();
+    updateModalContent(translations);
+    updateDemographicOptions(translations);
 }
 
 function updateFormTexts(translations) {
