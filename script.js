@@ -969,37 +969,11 @@ async function handleFocusGroupForm(e) {
             console.log('Warning: Response appears to be empty');
         }
         
-        // Determine if this is a file download based on headers
-        const isFileDownload = contentType && contentType.includes('text/plain') && 
-                              contentDisposition && contentDisposition.includes('attachment');
+        // Check if response is JSON with base64 content
+        const isJsonResponse = contentType && contentType.includes('application/json');
         
-        if (isFileDownload) {
-            // Handle file download - read as blob
-            try {
-                const blob = await response.blob();
-                const filename = getFilenameFromDisposition(contentDisposition) || `focus-group-${webhookData.session_name}-${Date.now()}.txt`;
-                
-                // Save questions for future use
-                const questions = sessionSpecificData.questions || [];
-                if (questions.length > 0) {
-                    saveQuestions(sessionType, questions);
-                }
-                
-                hideLoadingScreen();
-                showFileDownloadScreen({
-                    filename: filename,
-                    blob: blob,
-                    sessionName: webhookData.session_name,
-                    categories: webhookData.categories,
-                    totalCount: webhookData.number_of_participants
-                });
-            } catch (blobError) {
-                console.error('Error reading response as blob:', blobError);
-                hideLoadingScreen();
-                showErrorScreen(`Error processing file download: ${blobError.message}`);
-            }
-        } else {
-            // Handle JSON response - read as JSON first, fallback to text if needed
+        if (isJsonResponse) {
+            // Handle JSON response (potentially with base64 content)
             try {
                 const result = await response.json();
                 console.log('Response data:', result);
@@ -1013,56 +987,138 @@ async function handleFocusGroupForm(e) {
                         saveQuestions(sessionType, questions);
                     }
                     
-                    showResponseScreen({
-                        success: true,
-                        message: `Focus group "${webhookData.session_name}" started successfully!`,
-                        categories: webhookData.categories,
-                        total_count: webhookData.number_of_participants,
-                        existing_count: 0,
-                        created_count: webhookData.number_of_participants
-                    });
+                    // Check if response contains base64 file content
+                    if (result.base64Content && result.filename) {
+                        // Convert base64 to blob and show download screen
+                        const base64Data = result.base64Content;
+                        const filename = result.filename;
+                        
+                        // Remove data URL prefix if present
+                        const base64String = base64Data.replace(/^data:text\/plain;base64,/, '');
+                        
+                        // Convert base64 to blob
+                        const byteCharacters = atob(base64String);
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        const blob = new Blob([byteArray], { type: 'text/plain' });
+                        
+                        showFileDownloadScreen({
+                            filename: filename,
+                            blob: blob,
+                            sessionName: webhookData.session_name,
+                            categories: webhookData.categories,
+                            totalCount: webhookData.number_of_participants
+                        });
+                    } else {
+                        // Regular JSON response
+                        showResponseScreen(result);
+                    }
                 } else {
-                    showErrorScreen(result.message || `HTTP ${response.status}: ${response.statusText}`);
+                    showErrorScreen(`Server error: ${result.error || 'Unknown error'}`);
                 }
             } catch (jsonError) {
-                console.error('JSON parsing error:', jsonError);
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
-                
-                // Try to read as text for error diagnosis
+                console.error('Error parsing JSON response:', jsonError);
+                hideLoadingScreen();
+                showErrorScreen(`Error processing response: ${jsonError.message}`);
+            }
+        } else {
+            // Determine if this is a file download based on headers
+            const isFileDownload = contentType && contentType.includes('text/plain') && 
+                                  contentDisposition && contentDisposition.includes('attachment');
+            
+            if (isFileDownload) {
+                // Handle file download - read as blob
                 try {
-                    const responseText = await response.text();
-                    console.log('Response text length:', responseText.length);
-                    console.log('Response text (first 500 chars):', responseText.substring(0, 500));
+                    const blob = await response.blob();
+                    const filename = getFilenameFromDisposition(contentDisposition) || `focus-group-${webhookData.session_name}-${Date.now()}.txt`;
+                    
+                    // Save questions for future use
+                    const questions = sessionSpecificData.questions || [];
+                    if (questions.length > 0) {
+                        saveQuestions(sessionType, questions);
+                    }
+                    
+                    hideLoadingScreen();
+                    showFileDownloadScreen({
+                        filename: filename,
+                        blob: blob,
+                        sessionName: webhookData.session_name,
+                        categories: webhookData.categories,
+                        totalCount: webhookData.number_of_participants
+                    });
+                } catch (blobError) {
+                    console.error('Error reading response as blob:', blobError);
+                    hideLoadingScreen();
+                    showErrorScreen(`Error processing file download: ${blobError.message}`);
+                }
+            } else {
+                // Handle JSON response - read as JSON first, fallback to text if needed
+                try {
+                    const result = await response.json();
+                    console.log('Response data:', result);
                     
                     hideLoadingScreen();
                     
-                    if (responseText.length === 0) {
-                        showErrorScreen(`Webhook returned an empty response. This might indicate:\n\n• The n8n workflow is still processing\n• The webhook is not configured correctly\n• The CORS proxy is not forwarding the response properly\n\nPlease try again or use the local server for testing.`);
-                    } else if (responseText.includes('html') || responseText.includes('<!DOCTYPE')) {
-                        showErrorScreen(`Webhook returned HTML instead of JSON. This usually means:\n\n• The webhook URL is incorrect\n• The n8n workflow is not active\n• The server is returning an error page\n\nResponse: ${responseText.substring(0, 200)}...`);
+                    if (response.ok) {
+                        // Save questions for future use
+                        const questions = sessionSpecificData.questions || [];
+                        if (questions.length > 0) {
+                            saveQuestions(sessionType, questions);
+                        }
+                        
+                        showResponseScreen({
+                            success: true,
+                            message: `Focus group "${webhookData.session_name}" started successfully!`,
+                            categories: webhookData.categories,
+                            total_count: webhookData.number_of_participants,
+                            existing_count: 0,
+                            created_count: webhookData.number_of_participants
+                        });
                     } else {
-                        showErrorScreen(`Webhook returned invalid JSON. Response: ${responseText.substring(0, 200)}...`);
+                        showErrorScreen(result.message || `HTTP ${response.status}: ${response.statusText}`);
                     }
-                } catch (textError) {
-                    console.error('Error reading response as text:', textError);
+                } catch (jsonError) {
+                    console.error('JSON parsing error:', jsonError);
                     console.log('Response status:', response.status);
-                    console.log('Response status text:', response.statusText);
                     console.log('Response headers:', response.headers);
                     
-                    hideLoadingScreen();
-                    
-                            // Check if response is empty or has issues
-        if (response.status === 200) {
-            showErrorScreen(`Received 200 OK but couldn't read response content.\n\nThis might be a temporary issue. Please try:\n\n1. Refreshing the page and trying again\n2. Waiting a few minutes and trying again\n3. Using a different browser\n\nIf the issue persists, you can also use the local version for testing.`);
-        } else if (response.status === 504) {
-            showErrorScreen(`Gateway Timeout (504): The n8n workflow is taking longer than expected.\n\nThis is normal for AI-powered workflows. Please try again in a few minutes.`);
-        } else {
-            showErrorScreen(`Unable to read response content. Status: ${response.status}, StatusText: ${response.statusText}`);
-        }
+                    // Try to read as text for error diagnosis
+                    try {
+                        const responseText = await response.text();
+                        console.log('Response text length:', responseText.length);
+                        console.log('Response text (first 500 chars):', responseText.substring(0, 500));
+                        
+                        hideLoadingScreen();
+                        
+                        if (responseText.length === 0) {
+                            showErrorScreen(`Webhook returned an empty response. This might indicate:\n\n• The n8n workflow is still processing\n• The webhook is not configured correctly\n• The CORS proxy is not forwarding the response properly\n\nPlease try again or use the local server for testing.`);
+                        } else if (responseText.includes('html') || responseText.includes('<!DOCTYPE')) {
+                            showErrorScreen(`Webhook returned HTML instead of JSON. This usually means:\n\n• The webhook URL is incorrect\n• The n8n workflow is not active\n• The server is returning an error page\n\nResponse: ${responseText.substring(0, 200)}...`);
+                        } else {
+                            showErrorScreen(`Webhook returned invalid JSON. Response: ${responseText.substring(0, 200)}...`);
+                        }
+                    } catch (textError) {
+                        console.error('Error reading response as text:', textError);
+                        console.log('Response status:', response.status);
+                        console.log('Response status text:', response.statusText);
+                        console.log('Response headers:', response.headers);
+                        
+                        hideLoadingScreen();
+                        
+                        // Check if response is empty or has issues
+                        if (response.status === 200) {
+                            showErrorScreen(`Received 200 OK but couldn't read response content.\n\nThis might be a temporary issue. Please try:\n\n1. Refreshing the page and trying again\n2. Waiting a few minutes and trying again\n3. Using a different browser\n\nIf the issue persists, you can also use the local version for testing.`);
+                        } else if (response.status === 504) {
+                            showErrorScreen(`Gateway Timeout (504): The n8n workflow is taking longer than expected.\n\nThis is normal for AI-powered workflows. Please try again in a few minutes.`);
+                        } else {
+                            showErrorScreen(`Unable to read response content. Status: ${response.status}, StatusText: ${response.statusText}`);
+                        }
+                    }
                 }
             }
-        }
         
     } catch (error) {
         console.error('Error starting focus group:', error);
