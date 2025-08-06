@@ -20,45 +20,27 @@ window.addEventListener('unhandledrejection', function(e) {
     alert('Unhandled Promise Error: ' + e.reason);
 });
 
-// DOM Elements
-const loginSection = document.getElementById('loginSection');
-const mainSection = document.getElementById('mainSection');
-const loginForm = document.getElementById('loginForm');
-const passwordInput = document.getElementById('passwordInput');
-const loginError = document.getElementById('loginError');
-const logoutBtn = document.getElementById('logoutBtn');
-
-const focusGroupForm = document.getElementById('focusGroupForm');
-const sessionTypeSelect = document.getElementById('sessionType');
-
-const categorySearch = document.getElementById('categorySearch');
-const categoryTabs = document.getElementById('categoryTabs');
-const categoryList = document.getElementById('categoryList');
-const categoryHidden = document.getElementById('category');
-const selectedCategoriesContainer = document.getElementById('selectedCategories');
-const categoryModal = document.getElementById('categoryModal');
-const openCategoryModal = document.getElementById('openCategoryModal');
-const closeCategoryModal = document.getElementById('closeCategoryModal');
-const applyCategories = document.getElementById('applyCategories');
-const clearAllCategories = document.getElementById('clearAllCategories');
-const categoryButtonText = document.getElementById('categoryButtonText');
-const categoryCount = document.getElementById('categoryCount');
-const numberOfParticipantsSlider = document.getElementById('numberOfParticipants');
-const numberOfParticipantsValue = document.getElementById('numberOfParticipantsValue');
-
-
-
-
+// DOM Elements - will be initialized after DOM loads
+let loginSection, mainSection, loginForm, passwordInput, loginError, logoutBtn;
+let focusGroupForm, sessionTypeSelect;
+let categorySearch, categoryTabs, categoryList, categoryHidden, selectedCategoriesContainer;
+let categoryModal, openCategoryModal, closeCategoryModal, applyCategories, clearAllCategories;
+let categoryButtonText, categoryCount, numberOfParticipantsSlider, numberOfParticipantsValue;
 
 // Language management
 let currentLanguage = 'en';
-const languageSelect = document.getElementById('languageSelect');
+let languageSelect;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing elements...');
+    
+    // Initialize all DOM elements
+    initializeDOMElements();
+    
     initializeApp();
     setupEventListeners();
-        // Don't populate dropdowns yet - wait for login
+    // Don't populate dropdowns yet - wait for login
     
     // Initialize language
     initializeLanguage();
@@ -90,10 +72,53 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         }, 30000);
     }
-    
-
-
 });
+
+function initializeDOMElements() {
+    console.log('Initializing DOM elements...');
+    
+    // Login elements
+    loginSection = document.getElementById('loginSection');
+    mainSection = document.getElementById('mainSection');
+    loginForm = document.getElementById('loginForm');
+    passwordInput = document.getElementById('passwordInput');
+    loginError = document.getElementById('loginError');
+    logoutBtn = document.getElementById('logoutBtn');
+    
+    // Form elements
+    focusGroupForm = document.getElementById('focusGroupForm');
+    sessionTypeSelect = document.getElementById('sessionType');
+    
+    // Category elements
+    categorySearch = document.getElementById('categorySearch');
+    categoryTabs = document.getElementById('categoryTabs');
+    categoryList = document.getElementById('categoryList');
+    categoryHidden = document.getElementById('category');
+    selectedCategoriesContainer = document.getElementById('selectedCategories');
+    categoryModal = document.getElementById('categoryModal');
+    openCategoryModal = document.getElementById('openCategoryModal');
+    closeCategoryModal = document.getElementById('closeCategoryModal');
+    applyCategories = document.getElementById('applyCategories');
+    clearAllCategories = document.getElementById('clearAllCategories');
+    categoryButtonText = document.getElementById('categoryButtonText');
+    categoryCount = document.getElementById('categoryCount');
+    
+    // Slider elements
+    numberOfParticipantsSlider = document.getElementById('numberOfParticipants');
+    numberOfParticipantsValue = document.getElementById('numberOfParticipantsValue');
+    
+    // Language element
+    languageSelect = document.getElementById('languageSelect');
+    
+    console.log('DOM elements initialized:', {
+        loginSection: !!loginSection,
+        mainSection: !!mainSection,
+        loginForm: !!loginForm,
+        passwordInput: !!passwordInput,
+        loginError: !!loginError,
+        logoutBtn: !!logoutBtn
+    });
+}
 
 function initializeApp() {
     // Show login section by default
