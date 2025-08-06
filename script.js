@@ -2158,6 +2158,13 @@ function showLoadingScreen(selectedCategories = [], sessionType = '', sessionNam
         <div class="loading-content">
             <h2>Creating Your Focus Group</h2>
             <p class="loading-message" id="loadingMessage">${messages[0]}</p>
+            
+            <!-- Progress Bar -->
+            <div class="loading-progress-container">
+                <div class="loading-progress-bar" style="width: 0%"></div>
+                <span class="loading-progress-text">0% Complete</span>
+            </div>
+            
             <div class="processing-time-notice">
                 <p>This process can take up to 4 minutes. Please don't close this window.</p>
             </div>
@@ -2743,5 +2750,103 @@ function hideGitHubPagesNotice() {
     const notice = document.getElementById('githubPagesNotice');
     if (notice) {
         notice.style.display = 'none';
+    }
+}
+
+// Add polling mechanism for n8n workflow status
+async function pollWorkflowStatus(sessionId, maxAttempts = 80) { // 80 attempts * 3 seconds = 4 minutes
+    let attempts = 0;
+    
+    const pollInterval = setInterval(async () => {
+        attempts++;
+        
+        try {
+            // Check if the workflow has completed
+            const statusResponse = await fetch(`${CONFIG.WEBHOOK_URL}/status/${sessionId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                signal: AbortSignal.timeout(10000), // 10 second timeout for status check
+                mode: 'cors',
+                credentials: 'omit'
+            });
+            
+            if (statusResponse.ok) {
+                const status = await statusResponse.json();
+                
+                if (status.status === 'completed') {
+                    clearInterval(pollInterval);
+                    hideLoadingScreen();
+                    
+                    // Download the generated file
+                    if (status.downloadUrl) {
+                        downloadGeneratedFile(status.downloadUrl, status.filename);
+                    } else {
+                        showSuccessMessage('Report generated successfully!');
+                    }
+                } else if (status.status === 'failed') {
+                    clearInterval(pollInterval);
+                    hideLoadingScreen();
+                    showErrorScreen(`Report generation failed: ${status.error || 'Unknown error'}`);
+                } else {
+                    // Update progress
+                    updateLoadingProgress(status.progress || Math.min((attempts / maxAttempts) * 100, 95));
+                }
+            }
+        } catch (error) {
+            console.log(`Status check attempt ${attempts} failed:`, error);
+            
+            // If we've tried too many times, give up
+            if (attempts >= maxAttempts) {
+                clearInterval(pollInterval);
+                hideLoadingScreen();
+                showErrorScreen('Report generation timed out. Please try again or contact support.');
+            }
+        }
+    }, 3000); // Check every 3 seconds
+    
+    return pollInterval;
+}
+
+// Download the generated file
+async function downloadGeneratedFile(downloadUrl, filename) {
+    try {
+        const response = await fetch(downloadUrl, {
+            method: 'GET',
+            signal: AbortSignal.timeout(30000), // 30 second timeout
+            mode: 'cors',
+            credentials: 'omit'
+        });
+        
+        if (response.ok) {
+            const blob = await response.blob();
+            showFileDownloadScreen({
+                filename: filename || `focus-group-report-${Date.now()}.txt`,
+                blob: blob,
+                sessionName: 'Generated Report',
+                categories: [],
+                totalCount: 0
+            });
+        } else {
+            throw new Error(`Download failed with status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error downloading file:', error);
+        showErrorScreen(`Error downloading report: ${error.message}`);
+    }
+}
+
+// Update loading screen with progress
+function updateLoadingProgress(percentage) {
+    const progressBar = document.querySelector('.loading-progress-bar');
+    const progressText = document.querySelector('.loading-progress-text');
+    
+    if (progressBar) {
+        progressBar.style.width = `${percentage}%`;
+    }
+    
+    if (progressText) {
+        progressText.textContent = `${Math.round(percentage)}% Complete`;
     }
 }
