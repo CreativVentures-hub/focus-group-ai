@@ -896,127 +896,59 @@ async function handleFocusGroupForm(e) {
     }
     
     try {
-        // Try multiple approaches to ensure data gets through
+        // Simplified approach: Use CORS proxy directly for GitHub Pages
         let response = null;
         let lastError = null;
-        let usedProxy = false;
         
-        // Approach 1: Direct connection with enhanced headers
-        try {
-            const webhookUrl = CONFIG.WEBHOOK_URL;
-            console.log('Trying direct connection to:', webhookUrl);
-            console.log('Request data:', webhookData);
-            console.log('Request body length:', JSON.stringify(webhookData).length);
-            console.log('Request body preview:', JSON.stringify(webhookData).substring(0, 200) + '...');
-            
-            response = await fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json, text/plain, */*',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify(webhookData),
-                signal: AbortSignal.timeout(600000), // 10 minute timeout for long workflows
-                mode: 'cors',
-                credentials: 'omit'
-            });
-            
-            console.log('Direct connection response status:', response.status);
-            
-            // If direct connection worked, use it
-            if (response.ok) {
-                console.log('Direct connection successful!');
-            } else {
-                throw new Error(`Direct connection failed with status: ${response.status}`);
-            }
-            
-        } catch (directError) {
-            console.log('Direct connection failed, trying alternative approaches...');
-            lastError = directError;
-            
-            // Approach 2: Try with different CORS proxy that supports POST bodies
-            if (CONFIG.USE_CORS_PROXY) {
-                // Try specific proxies that are known to work with POST bodies
-                const postFriendlyProxies = [
-                    "https://api.allorigins.win/raw?url=",
-                    "https://thingproxy.freeboard.io/fetch/",
-                    "https://cors.bridged.cc/"
-                ];
+        console.log('Request data:', webhookData);
+        console.log('Request body length:', JSON.stringify(webhookData).length);
+        
+        // Try CORS proxies in sequence
+        const proxies = [
+            "https://api.allorigins.win/raw?url=",
+            "https://thingproxy.freeboard.io/fetch/",
+            "https://cors.bridged.cc/"
+        ];
+        
+        for (let i = 0; i < proxies.length; i++) {
+            try {
+                const webhookUrl = proxies[i] + CONFIG.WEBHOOK_URL;
+                console.log(`Trying proxy ${i + 1}:`, webhookUrl);
                 
-                for (let i = 0; i < postFriendlyProxies.length; i++) {
-                    try {
-                        const webhookUrl = postFriendlyProxies[i] + CONFIG.WEBHOOK_URL;
-                        console.log(`Trying POST-friendly proxy ${i + 1}:`, webhookUrl);
-                        
-                        response = await fetch(webhookUrl, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json, text/plain, */*',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: JSON.stringify(webhookData),
-                            signal: AbortSignal.timeout(600000),
-                            mode: 'cors',
-                            credentials: 'omit'
-                        });
-                        
-                        console.log(`POST-friendly proxy ${i + 1} response status:`, response.status);
-                        
-                        if (response.status === 403) {
-                            console.log(`POST-friendly proxy ${i + 1} returned 403, trying next...`);
-                            continue;
-                        }
-                        
-                        console.log(`POST-friendly proxy ${i + 1} worked!`);
-                        usedProxy = true;
-                        break;
-                        
-                    } catch (proxyError) {
-                        console.error(`POST-friendly proxy ${i + 1} failed:`, proxyError);
-                        lastError = proxyError;
-                        
-                        if (i === postFriendlyProxies.length - 1) {
-                            throw proxyError;
-                        }
-                        continue;
-                    }
+                response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(webhookData),
+                    signal: AbortSignal.timeout(600000), // 10 minute timeout
+                    mode: 'cors',
+                    credentials: 'omit'
+                });
+                
+                console.log(`Proxy ${i + 1} response status:`, response.status);
+                
+                if (response.status === 403) {
+                    console.log(`Proxy ${i + 1} returned 403, trying next...`);
+                    continue;
                 }
-            }
-            
-            // Approach 3: Try with form data instead of JSON (some proxies work better with this)
-            if (!response && CONFIG.USE_CORS_PROXY) {
-                try {
-                    console.log('Trying form data approach...');
-                    
-                    // Convert JSON data to form data
-                    const formData = new FormData();
-                    formData.append('data', JSON.stringify(webhookData));
-                    
-                    const webhookUrl = "https://api.allorigins.win/raw?url=" + CONFIG.WEBHOOK_URL;
-                    
-                    response = await fetch(webhookUrl, {
-                        method: 'POST',
-                        body: formData,
-                        signal: AbortSignal.timeout(600000),
-                        mode: 'cors',
-                        credentials: 'omit'
-                    });
-                    
-                    console.log('Form data approach response status:', response.status);
-                    usedProxy = true;
-                    
-                } catch (formError) {
-                    console.error('Form data approach failed:', formError);
-                    lastError = formError;
+                
+                console.log(`Proxy ${i + 1} worked!`);
+                break;
+                
+            } catch (proxyError) {
+                console.error(`Proxy ${i + 1} failed:`, proxyError);
+                lastError = proxyError;
+                
+                if (i === proxies.length - 1) {
+                    throw proxyError;
                 }
+                continue;
             }
-            
-            // If all approaches failed, throw the error
-            if (!response) {
-                throw lastError || new Error('All connection methods failed. Please use the local server for testing.');
-            }
+        }
+        
+        if (!response) {
+            throw lastError || new Error('All proxies failed. Please use the local server for testing.');
         }
         
         console.log('Response status:', response.status);
@@ -1148,21 +1080,21 @@ async function handleFocusGroupForm(e) {
                           '2. Open http://localhost:8000\n' +
                           '3. Try submitting the form again';
         } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            errorMessage += 'Unable to connect to the webhook. The system tried both direct connection and CORS proxies.\n\n' +
-                          'This might be due to:\n' +
-                          '• Network connectivity issues\n' +
-                          '• n8n webhook is not active\n' +
-                          '• CORS headers not properly configured\n' +
-                          '• Temporary server issues\n\n' +
-                          'Please try again in a few moments. If the issue persists, you can also use the local version for testing.';
+            errorMessage += 'Unable to connect to the webhook due to browser security restrictions.\n\n' +
+                          'For immediate access:\n\n' +
+                          '1. Download the files from: https://github.com/CreativVentures-hub/focus-group-ai\n' +
+                          '2. Extract the ZIP file to your computer\n' +
+                          '3. Double-click "start-cors-server.bat"\n' +
+                          '4. Open http://localhost:8000 in your browser\n\n' +
+                          'The local version will work perfectly with your n8n webhook!';
         } else if (error.message.includes('Failed to fetch')) {
-            errorMessage += 'Failed to fetch from webhook. The system tried both direct connection and CORS proxies.\n\n' +
-                          'This might be due to:\n' +
-                          '• Network connectivity issues\n' +
-                          '• n8n webhook is not active\n' +
-                          '• CORS headers not properly configured\n' +
-                          '• Temporary server issues\n\n' +
-                          'Please try again in a few moments. If the issue persists, you can also use the local version for testing.';
+            errorMessage += 'Failed to fetch from webhook due to browser security restrictions.\n\n' +
+                          'For immediate access:\n\n' +
+                          '1. Download the files from: https://github.com/CreativVentures-hub/focus-group-ai\n' +
+                          '2. Extract the ZIP file to your computer\n' +
+                          '3. Double-click "start-cors-server.bat"\n' +
+                          '4. Open http://localhost:8000 in your browser\n\n' +
+                          'The local version will work perfectly with your n8n webhook!';
         } else {
             errorMessage += error.message;
         }

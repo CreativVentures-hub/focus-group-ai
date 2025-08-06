@@ -21,7 +21,7 @@ const CONFIG = {
         "https://cors.io/?"
     ],
     
-    // Use CORS proxy for development (will try direct first, then fallback to proxy)
+    // Use CORS proxy for development (GitHub Pages requires proxy for reliable connections)
     USE_CORS_PROXY: true,
     
     // Production settings
