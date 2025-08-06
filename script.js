@@ -879,27 +879,74 @@ async function handleFocusGroupForm(e) {
     showLoadingScreen(selectedCategories, formData.get('sessionType'), formData.get('sessionName'));
     
     try {
-            // Use CORS proxy if enabled
-            let webhookUrl = CONFIG.WEBHOOK_URL;
-            if (CONFIG.USE_CORS_PROXY) {
-                // Try the first CORS proxy
-                webhookUrl = CONFIG.CORS_PROXY_URLS[0] + CONFIG.WEBHOOK_URL;
+        // Try multiple CORS proxies if enabled, or direct connection if not
+        let response = null;
+        let lastError = null;
+        
+        if (CONFIG.USE_CORS_PROXY) {
+            // Try each CORS proxy in sequence
+            for (let i = 0; i < CONFIG.CORS_PROXY_URLS.length; i++) {
+                try {
+                    const webhookUrl = CONFIG.CORS_PROXY_URLS[i] + CONFIG.WEBHOOK_URL;
+                    console.log(`Trying CORS proxy ${i + 1}:`, webhookUrl);
+                    console.log('Request data:', webhookData);
+                    
+                    response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(webhookData),
+                        signal: AbortSignal.timeout(300000), // 5 minute timeout
+                        mode: 'cors',
+                        credentials: 'omit'
+                    });
+                    
+                    console.log(`CORS proxy ${i + 1} response status:`, response.status);
+                    
+                    // If we get a 403, try the next proxy
+                    if (response.status === 403) {
+                        console.log(`CORS proxy ${i + 1} returned 403, trying next...`);
+                        continue;
+                    }
+                    
+                    // If we get here, the proxy worked
+                    console.log(`CORS proxy ${i + 1} worked!`);
+                    break;
+                    
+                } catch (proxyError) {
+                    console.error(`CORS proxy ${i + 1} failed:`, proxyError);
+                    lastError = proxyError;
+                    
+                    // If this is the last proxy, throw the error
+                    if (i === CONFIG.CORS_PROXY_URLS.length - 1) {
+                        throw proxyError;
+                    }
+                    continue;
+                }
             }
             
-            console.log('Sending request to:', webhookUrl);
+            // If all proxies failed with 403, throw a specific error
+            if (response && response.status === 403) {
+                throw new Error('All CORS proxies returned 403 Forbidden. Please use the local server for testing.');
+            }
+        } else {
+            // Direct connection without CORS proxy
+            const webhookUrl = CONFIG.WEBHOOK_URL;
+            console.log('Sending direct request to:', webhookUrl);
             console.log('Request data:', webhookData);
             
-            const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify(webhookData),
-                // Add timeout and CORS settings
-                signal: AbortSignal.timeout(300000), // 5 minute timeout (300 seconds)
-                mode: 'cors', // Enable CORS
-                credentials: 'omit' // Don't send cookies
-        });
+                signal: AbortSignal.timeout(300000), // 5 minute timeout
+                mode: 'cors',
+                credentials: 'omit'
+            });
+        }
         
         console.log('Response status:', response.status);
         console.log('Response headers:', response.headers);
@@ -993,103 +1040,6 @@ async function handleFocusGroupForm(e) {
         
     } catch (error) {
         console.error('Error starting focus group:', error);
-        
-        // If CORS proxy is enabled and we got a 403, try alternative proxies
-        if (CONFIG.USE_CORS_PROXY && error.message.includes('403')) {
-            console.log('CORS proxy returned 403, trying alternative proxies...');
-            
-            // Try alternative CORS proxies
-            for (let i = 1; i < CONFIG.CORS_PROXY_URLS.length; i++) {
-                try {
-                    const alternativeUrl = CONFIG.CORS_PROXY_URLS[i] + CONFIG.WEBHOOK_URL;
-                    console.log(`Trying alternative CORS proxy ${i + 1}:`, alternativeUrl);
-                    
-                    const response = await fetch(alternativeUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(webhookData),
-                        signal: AbortSignal.timeout(300000),
-                        mode: 'cors',
-                        credentials: 'omit'
-                    });
-                    
-                    // If we get here, the alternative proxy worked
-                    console.log('Alternative CORS proxy worked!');
-                    
-                    // Process the response (same logic as above)
-                    const contentType = response.headers.get('content-type');
-                    const contentDisposition = response.headers.get('content-disposition');
-                    
-                    console.log('Content-Type:', contentType);
-                    console.log('Content-Disposition:', contentDisposition);
-                    
-                    const isFileDownload = contentType && contentType.includes('text/plain') && 
-                                          contentDisposition && contentDisposition.includes('attachment');
-                    
-                    if (isFileDownload) {
-                        try {
-                            const blob = await response.blob();
-                            const filename = getFilenameFromDisposition(contentDisposition) || `focus-group-${webhookData.session_name}-${Date.now()}.txt`;
-                            
-                            const questions = sessionSpecificData.questions || [];
-                            if (questions.length > 0) {
-                                saveQuestions(sessionType, questions);
-                            }
-                            
-                            hideLoadingScreen();
-                            showFileDownloadScreen({
-                                filename: filename,
-                                blob: blob,
-                                sessionName: webhookData.session_name,
-                                categories: webhookData.categories,
-                                totalCount: webhookData.number_of_participants
-                            });
-                            return; // Success, exit the function
-                        } catch (blobError) {
-                            console.error('Error reading response as blob:', blobError);
-                            continue; // Try next proxy
-                        }
-                    } else {
-                        try {
-                            const result = await response.json();
-                            console.log('Response data:', result);
-                            
-                            hideLoadingScreen();
-                            
-                            if (response.ok) {
-                                const questions = sessionSpecificData.questions || [];
-                                if (questions.length > 0) {
-                                    saveQuestions(sessionType, questions);
-                                }
-                                
-                                showResponseScreen({
-                                    success: true,
-                                    message: `Focus group "${webhookData.session_name}" started successfully!`,
-                                    categories: webhookData.categories,
-                                    total_count: webhookData.number_of_participants,
-                                    existing_count: 0,
-                                    created_count: webhookData.number_of_participants
-                                });
-                                return; // Success, exit the function
-                            } else {
-                                showErrorScreen(result.message || `HTTP ${response.status}: ${response.statusText}`);
-                                return; // Exit the function
-                            }
-                        } catch (jsonError) {
-                            console.error('JSON parsing error with alternative proxy:', jsonError);
-                            continue; // Try next proxy
-                        }
-                    }
-                } catch (proxyError) {
-                    console.error(`Alternative CORS proxy ${i + 1} failed:`, proxyError);
-                    continue; // Try next proxy
-                }
-            }
-        }
-        
-        // If we get here, all proxies failed or there was another error
         hideLoadingScreen();
         
         // Provide more specific error messages
@@ -1097,6 +1047,12 @@ async function handleFocusGroupForm(e) {
         
         if (error.name === 'AbortError') {
             errorMessage += 'Request timed out after 5 minutes. The n8n workflow may be taking longer than expected. Please try again.';
+        } else if (error.message.includes('All CORS proxies returned 403')) {
+            errorMessage += 'All CORS proxies are currently blocked. This is a common issue with public proxies.\n\n' +
+                          'For reliable testing, please use the local server:\n' +
+                          '1. Run .\\start-cors-server.bat\n' +
+                          '2. Open http://localhost:8000\n' +
+                          '3. Try submitting the form again';
         } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
             errorMessage += 'Unable to connect to the webhook. This could be due to:\n\n' +
                           '• CORS restrictions (most likely)\n' +
