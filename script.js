@@ -413,6 +413,7 @@ async function handleFocusGroupForm(e) {
         
         if (response.ok) {
             // Show success modal
+            console.log('Webhook successful, showing success modal');
             showSuccessModal(userEmail);
         } else {
             // Try to get more detailed error information
@@ -433,7 +434,15 @@ async function handleFocusGroupForm(e) {
                 console.error('Could not read error response:', textError);
             }
             
-            showFormError(focusGroupForm, errorMessage);
+            // For email-based approach, show success modal even on server error
+            // since the email will be sent when the workflow completes
+            console.log('Server error, but showing success modal for email approach');
+            showSuccessModal(userEmail);
+            
+            // Also show a warning about the server error
+            setTimeout(() => {
+                showFormError(focusGroupForm, `Note: ${errorMessage} - but your request has been queued and you will receive an email when complete.`);
+            }, 1000);
         }
         
     } catch (error) {
@@ -443,11 +452,22 @@ async function handleFocusGroupForm(e) {
 }
 
 function showSuccessModal(email) {
+    console.log('showSuccessModal called with email:', email);
+    console.log('userEmailDisplay element:', userEmailDisplay);
+    console.log('successModal element:', successModal);
+    
     if (userEmailDisplay) {
         userEmailDisplay.textContent = email;
+        console.log('Set email display to:', email);
+    } else {
+        console.error('userEmailDisplay element not found!');
     }
+    
     if (successModal) {
         successModal.style.display = 'flex';
+        console.log('Success modal displayed');
+    } else {
+        console.error('successModal element not found!');
     }
 }
 
