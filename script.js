@@ -1142,15 +1142,14 @@ function updateFormTexts(translations) {
     // Update question input placeholders
     const questionInputs = document.querySelectorAll('.question-input');
     questionInputs.forEach(input => {
-        if (input.placeholder.includes('Enter question') || input.placeholder.includes('输入问题') || input.placeholder.includes('輸入問題')) {
-            input.placeholder = translations.enterQuestion || 'Enter question...';
-        }
+        // Always update the placeholder regardless of current content
+        input.placeholder = translations.enterQuestion + ' ' + (input.placeholder.match(/\d+/) || ['1'])[0] + '...';
     });
     
     // Find and update questions labels
     const allLabels = document.querySelectorAll('label');
     allLabels.forEach(label => {
-        if (label.textContent.includes('Questions')) {
+        if (label.textContent.includes('Questions') || label.textContent.includes('问题') || label.textContent.includes('問題')) {
             label.textContent = translations.questions;
         }
     });
@@ -1207,21 +1206,46 @@ function updateDemographicOptions(translations) {
     if (femaleLabel) {
         femaleLabel.textContent = translations.female;
     }
+    
+    // Update all demographic labels comprehensively
+    const demographicMappings = {
+        // English to translations
+        'Any': translations.any,
+        'Male': translations.male,
+        'Female': translations.female,
+        // Chinese to translations (for reverting back)
+        '任何': translations.any,
+        '男性': translations.male,
+        '女性': translations.female
+    };
+    
+    // Update all demographic labels
+    const allDemographicLabels = document.querySelectorAll('.category-checkbox label');
+    allDemographicLabels.forEach(label => {
+        const currentText = label.textContent;
+        if (demographicMappings[currentText]) {
+            label.textContent = demographicMappings[currentText];
+        }
+    });
 }
 
 function updateModalContent(translations) {
     // Update modal titles
     const modalTitles = document.querySelectorAll('h3');
     modalTitles.forEach(title => {
-        if (title.textContent === 'Select Participant Categories') {
+        if (title.textContent === 'Select Participant Categories' || 
+            title.textContent === '选择参与者类别' || 
+            title.textContent === '選擇參與者類別') {
             title.textContent = translations.selectParticipantCategories;
         }
     });
     
     // Update search placeholders
-    const searchInputs = document.querySelectorAll('input[placeholder*="Search"]');
+    const searchInputs = document.querySelectorAll('input[placeholder*="Search"], input[placeholder*="搜索"]');
     searchInputs.forEach(input => {
-        if (input.placeholder.includes('Search categories')) {
+        if (input.placeholder.includes('Search categories') || 
+            input.placeholder.includes('搜索类别') || 
+            input.placeholder.includes('搜索類別')) {
             input.placeholder = translations.searchCategories;
         }
     });
@@ -1230,7 +1254,8 @@ function updateModalContent(translations) {
     const clearAllButtons = document.querySelectorAll('button[id*="clearAll"]');
     clearAllButtons.forEach(button => {
         const icon = button.querySelector('i');
-        if (icon && button.textContent.includes('Clear All')) {
+        if (icon && (button.textContent.includes('Clear All') || 
+                     button.textContent.includes('清除全部'))) {
             button.innerHTML = `<i class="${icon.className}"></i> ${translations.clearAll}`;
         }
     });
@@ -1239,7 +1264,9 @@ function updateModalContent(translations) {
     const applyButtons = document.querySelectorAll('button[id*="apply"]');
     applyButtons.forEach(button => {
         const icon = button.querySelector('i');
-        if (icon && button.textContent.includes('Apply Selection')) {
+        if (icon && (button.textContent.includes('Apply Selection') || 
+                     button.textContent.includes('应用选择') || 
+                     button.textContent.includes('應用選擇'))) {
             button.innerHTML = `<i class="${icon.className}"></i> ${translations.applySelection}`;
         }
     });
@@ -1249,8 +1276,9 @@ function updateModalContent(translations) {
 }
 
 function updateCategoryLabels(translations) {
-    // Update buying behavior category labels
+    // Update buying behavior category labels with comprehensive mapping
     const categoryMappings = {
+        // English to translations
         'General': translations.general,
         'Online': translations.online,
         'Budget-Conscious': translations.budgetConscious,
@@ -1259,15 +1287,31 @@ function updateCategoryLabels(translations) {
         'Impulse Buyer': translations.impulseBuyer,
         'Research Heavy': translations.researchHeavy,
         'Brand Loyal': translations.brandLoyal,
-        'Deal Seekers': translations.dealSeekers
+        'Deal Seekers': translations.dealSeekers,
+        // Chinese to translations (for reverting back)
+        '通用': translations.general,
+        '在线': translations.online,
+        '在線': translations.online,
+        '预算意识': translations.budgetConscious,
+        '預算意識': translations.budgetConscious,
+        '奢侈品': translations.luxury,
+        '环保意识': translations.ecoConscious,
+        '環保意識': translations.ecoConscious,
+        '冲动购买': translations.impulseBuyer,
+        '衝動購買': translations.impulseBuyer,
+        '重度研究': translations.researchHeavy,
+        '品牌忠诚': translations.brandLoyal,
+        '品牌忠誠': translations.brandLoyal,
+        '优惠寻求者': translations.dealSeekers,
+        '優惠尋求者': translations.dealSeekers
     };
     
     // Update all category labels in modals
     const categoryLabels = document.querySelectorAll('.category-checkbox label');
     categoryLabels.forEach(label => {
-        const englishText = label.textContent;
-        if (categoryMappings[englishText]) {
-            label.textContent = categoryMappings[englishText];
+        const currentText = label.textContent;
+        if (categoryMappings[currentText]) {
+            label.textContent = categoryMappings[currentText];
         }
     });
 }
