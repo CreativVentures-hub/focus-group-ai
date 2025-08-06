@@ -254,9 +254,18 @@ function handleSessionTypeChange() {
 async function handleFocusGroupForm(e) {
     e.preventDefault();
     
+    console.log('Form submission started');
+    
     const formData = new FormData(focusGroupForm);
     const selectedCategories = getSelectedCategories();
     const userEmail = formData.get('userEmail');
+    
+    console.log('Form data collected:', {
+        userEmail: userEmail,
+        selectedCategories: selectedCategories,
+        sessionType: formData.get('sessionType'),
+        sessionName: formData.get('sessionName')
+    });
     
     // Validate required fields
     if (selectedCategories.length === 0) {
@@ -358,12 +367,17 @@ async function handleFocusGroupForm(e) {
         source: 'focus_group_ui'
     };
     
+    console.log('Webhook data prepared:', webhookData);
+    
     // Validate webhook data before sending
     const validationResult = validateWebhookData(webhookData);
     if (!validationResult.isValid) {
+        console.log('Validation failed:', validationResult.message);
         showFormError(focusGroupForm, validationResult.message);
         return;
     }
+    
+    console.log('Validation passed, sending webhook...');
     
     try {
         // Send to n8n webhook
@@ -375,8 +389,11 @@ async function handleFocusGroupForm(e) {
             body: JSON.stringify(webhookData)
         });
         
+        console.log('Webhook response received:', response.status, response.statusText);
+        
         if (response.ok) {
             // Show success modal
+            console.log('Webhook successful, showing success modal');
             showSuccessModal(userEmail);
         } else {
             // Try to get more detailed error information
@@ -407,12 +424,20 @@ async function handleFocusGroupForm(e) {
 }
 
 function showSuccessModal(email) {
+    console.log('showSuccessModal called with email:', email);
+    console.log('userEmailDisplay element:', userEmailDisplay);
+    console.log('successModal element:', successModal);
+    
     if (userEmailDisplay) {
         userEmailDisplay.textContent = email;
+        console.log('Set email display to:', email);
+    } else {
+        console.error('userEmailDisplay element not found!');
     }
     
     if (successModal) {
         successModal.style.display = 'flex';
+        console.log('Success modal displayed');
     } else {
         console.error('Success modal element not found!');
     }
