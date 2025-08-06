@@ -551,24 +551,9 @@ function initializeQuestions(containerId, maxQuestions) {
     // Clear existing questions
     container.innerHTML = '';
     
-    // Add initial questions
-    for (let i = 1; i <= Math.min(3, maxQuestions); i++) {
+    // Add exactly 10 questions without add/remove functionality
+    for (let i = 1; i <= 10; i++) {
         addQuestion(container, i);
-    }
-    
-    // Add "Add Question" button if needed
-    if (maxQuestions > 3) {
-        const addButton = document.createElement('button');
-        addButton.type = 'button';
-        addButton.className = 'btn btn-outline add-question-btn';
-        addButton.innerHTML = '<i class="fas fa-plus"></i> Add Question';
-        addButton.onclick = () => {
-            const currentQuestions = container.querySelectorAll('.question-item').length;
-            if (currentQuestions < maxQuestions) {
-                addQuestion(container, currentQuestions + 1);
-            }
-        };
-        container.appendChild(addButton);
     }
 }
 
@@ -579,9 +564,6 @@ function addQuestion(container, questionNumber, questionText = '') {
     questionItem.innerHTML = `
         <div class="question-number">${questionNumber}</div>
         <input type="text" class="question-input" placeholder="Enter question ${questionNumber}..." value="${questionText}" maxlength="500">
-        <button type="button" class="remove-question-btn" onclick="removeQuestion(this)">
-            <i class="fas fa-times"></i>
-        </button>
     `;
     
     container.appendChild(questionItem);
@@ -832,6 +814,17 @@ function setupDemographicModals() {
         const buttonText = document.getElementById(`${type}ButtonText`);
         const count = document.getElementById(`${type}Count`);
         const hidden = document.getElementById(type === 'marital' ? 'maritalStatus' : type === 'children' ? 'hasChildren' : type);
+        
+        console.log(`Setting up ${type} modal:`, {
+            openBtn: !!openBtn,
+            closeBtn: !!closeBtn,
+            applyBtn: !!applyBtn,
+            clearBtn: !!clearBtn,
+            list: !!list,
+            buttonText: !!buttonText,
+            count: !!count,
+            hidden: !!hidden
+        });
         
         if (openBtn) openBtn.addEventListener('click', () => showModal(document.getElementById(`${type}Modal`)));
         if (closeBtn) closeBtn.addEventListener('click', () => hideModal(document.getElementById(`${type}Modal`)));
