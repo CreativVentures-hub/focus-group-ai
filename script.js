@@ -898,31 +898,44 @@ async function handleFocusGroupForm(e) {
         console.log('Response status:', response.status);
         console.log('Response headers:', response.headers);
         
-        // Check if response is a file download
+        // Check response headers first to determine how to handle the response
         const contentType = response.headers.get('content-type');
         const contentDisposition = response.headers.get('content-disposition');
         
-        if (contentType && contentType.includes('text/plain') && contentDisposition && contentDisposition.includes('attachment')) {
-            // Handle file download
-            const blob = await response.blob();
-            const filename = getFilenameFromDisposition(contentDisposition) || `focus-group-${webhookData.session_name}-${Date.now()}.txt`;
-            
-            // Save questions for future use
-            const questions = sessionSpecificData.questions || [];
-            if (questions.length > 0) {
-                saveQuestions(sessionType, questions);
+        console.log('Content-Type:', contentType);
+        console.log('Content-Disposition:', contentDisposition);
+        
+        // Determine if this is a file download based on headers
+        const isFileDownload = contentType && contentType.includes('text/plain') && 
+                              contentDisposition && contentDisposition.includes('attachment');
+        
+        if (isFileDownload) {
+            // Handle file download - read as blob
+            try {
+                const blob = await response.blob();
+                const filename = getFilenameFromDisposition(contentDisposition) || `focus-group-${webhookData.session_name}-${Date.now()}.txt`;
+                
+                // Save questions for future use
+                const questions = sessionSpecificData.questions || [];
+                if (questions.length > 0) {
+                    saveQuestions(sessionType, questions);
+                }
+                
+                hideLoadingScreen();
+                showFileDownloadScreen({
+                    filename: filename,
+                    blob: blob,
+                    sessionName: webhookData.session_name,
+                    categories: webhookData.categories,
+                    totalCount: webhookData.number_of_participants
+                });
+            } catch (blobError) {
+                console.error('Error reading response as blob:', blobError);
+                hideLoadingScreen();
+                showErrorScreen(`Error processing file download: ${blobError.message}`);
             }
-            
-            hideLoadingScreen();
-            showFileDownloadScreen({
-                filename: filename,
-                blob: blob,
-                sessionName: webhookData.session_name,
-                categories: webhookData.categories,
-                totalCount: webhookData.number_of_participants
-            });
         } else {
-            // Handle JSON response (existing behavior)
+            // Handle JSON response - read as JSON first, fallback to text if needed
             try {
                 const result = await response.json();
                 console.log('Response data:', result);
@@ -952,17 +965,22 @@ async function handleFocusGroupForm(e) {
                 console.log('Response status:', response.status);
                 console.log('Response headers:', response.headers);
                 
-                // Clone the response before reading it as text
-                const responseClone = response.clone();
-                const responseText = await responseClone.text();
-                console.log('Response text:', responseText);
-                
-                hideLoadingScreen();
-                
-                if (responseText.includes('html') || responseText.includes('<!DOCTYPE')) {
-                    showErrorScreen(`Webhook returned HTML instead of JSON. This usually means:\n\n• The webhook URL is incorrect\n• The n8n workflow is not active\n• The server is returning an error page\n\nResponse: ${responseText.substring(0, 200)}...`);
-                } else {
-                    showErrorScreen(`Webhook returned invalid JSON. Response: ${responseText.substring(0, 200)}...`);
+                // Try to read as text for error diagnosis
+                try {
+                    const responseText = await response.text();
+                    console.log('Response text:', responseText);
+                    
+                    hideLoadingScreen();
+                    
+                    if (responseText.includes('html') || responseText.includes('<!DOCTYPE')) {
+                        showErrorScreen(`Webhook returned HTML instead of JSON. This usually means:\n\n• The webhook URL is incorrect\n• The n8n workflow is not active\n• The server is returning an error page\n\nResponse: ${responseText.substring(0, 200)}...`);
+                    } else {
+                        showErrorScreen(`Webhook returned invalid JSON. Response: ${responseText.substring(0, 200)}...`);
+                    }
+                } catch (textError) {
+                    console.error('Error reading response as text:', textError);
+                    hideLoadingScreen();
+                    showErrorScreen(`Unable to read response content. Status: ${response.status}, StatusText: ${response.statusText}`);
                 }
             }
         }
