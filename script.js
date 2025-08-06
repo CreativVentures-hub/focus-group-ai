@@ -9,13 +9,11 @@ window.addEventListener('error', function(e) {
         lineno: e.lineno,
         colno: e.colno
     });
-    alert('JavaScript Error: ' + e.message + ' at line ' + e.lineno);
 });
 
 // Also catch unhandled promise rejections
 window.addEventListener('unhandledrejection', function(e) {
     console.error('Unhandled promise rejection:', e.reason);
-    alert('Unhandled Promise Error: ' + e.reason);
 });
 
 // Global login function for onclick handler
@@ -23,21 +21,15 @@ window.handleLoginClick = function(event) {
     event.preventDefault();
     event.stopPropagation();
     
-    console.log('Global login function called!');
-    
     const passwordInput = document.getElementById('passwordInput');
     if (!passwordInput) {
         console.error('Password input not found in global function');
-        alert('Error: Password input not found');
         return false;
     }
     
     const password = passwordInput.value.trim();
-    console.log('Password from global function:', password ? '***' : 'empty');
-    console.log('Expected password:', CONFIG.PASSWORD);
     
     if (password === CONFIG.PASSWORD) {
-        console.log('Password correct in global function!');
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
         
         // Show main section
@@ -57,7 +49,6 @@ window.handleLoginClick = function(event) {
             }
         }
     } else {
-        console.log('Password incorrect in global function!');
         const loginError = document.getElementById('loginError');
         if (loginError) {
             loginError.style.display = 'block';
@@ -84,8 +75,6 @@ let languageSelect;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing elements...');
-    
     // Initialize all DOM elements
     initializeDOMElements();
     
@@ -102,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeDOMElements() {
-    console.log('Initializing DOM elements...');
     
     // Login elements
     loginSection = document.getElementById('loginSection');
@@ -143,15 +131,10 @@ function initializeDOMElements() {
     // Language element
     languageSelect = document.getElementById('languageSelect');
     
-    console.log('DOM elements initialized:', {
-        loginSection: !!loginSection,
-        mainSection: !!mainSection,
-        loginForm: !!loginForm,
-        passwordInput: !!passwordInput,
-        loginError: !!loginError,
-        logoutBtn: !!logoutBtn,
-        successModal: !!successModal
-    });
+    // Log any missing critical elements
+    if (!loginSection || !mainSection || !focusGroupForm) {
+        console.warn('Some critical DOM elements not found');
+    }
 }
 
 function initializeApp() {
@@ -160,11 +143,8 @@ function initializeApp() {
 }
 
 function setupEventListeners() {
-    console.log('Setting up event listeners...');
-    
     // Login functionality
     if (loginForm) {
-        console.log('Adding login form event listener');
         loginForm.addEventListener('submit', handleLogin);
     } else {
         console.error('Login form not found!');
@@ -208,27 +188,21 @@ function setupEventListeners() {
 
 function handleLogin(e) {
     e.preventDefault();
-    console.log('Login function called!');
     
     if (!passwordInput) {
         console.error('Password input element not found!');
-        alert('Error: Password input not found. Please refresh the page.');
         return;
     }
     
     const password = passwordInput.value.trim();
-    console.log('Password entered:', password ? '***' : 'empty');
-    console.log('Expected password:', CONFIG.PASSWORD);
     
     if (password === CONFIG.PASSWORD) {
-        console.log('Password correct! Logging in...');
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
         
         showMainSection();
         populateDropdowns();
         clearLoginForm();
     } else {
-        console.log('Password incorrect!');
         showLoginError();
     }
 }
@@ -384,20 +358,12 @@ async function handleFocusGroupForm(e) {
         source: 'focus_group_ui'
     };
     
-    console.log('Sending webhook data:', webhookData);
-    console.log('Webhook URL:', CONFIG.WEBHOOK_URL);
-    
     // Validate webhook data before sending
     const validationResult = validateWebhookData(webhookData);
     if (!validationResult.isValid) {
         showFormError(focusGroupForm, validationResult.message);
         return;
     }
-    
-    // Log the JSON string being sent
-    const jsonData = JSON.stringify(webhookData, null, 2);
-    console.log('JSON data being sent:', jsonData);
-    console.log('Data size:', jsonData.length, 'characters');
     
     try {
         // Send to n8n webhook
@@ -409,11 +375,8 @@ async function handleFocusGroupForm(e) {
             body: JSON.stringify(webhookData)
         });
         
-        console.log('Webhook response status:', response.status);
-        
         if (response.ok) {
             // Show success modal
-            console.log('Webhook successful, showing success modal');
             showSuccessModal(userEmail);
         } else {
             // Try to get more detailed error information
@@ -421,7 +384,6 @@ async function handleFocusGroupForm(e) {
             
             try {
                 const errorData = await response.text();
-                console.log('Error response body:', errorData);
                 
                 if (errorData) {
                     if (errorData.includes('html') || errorData.includes('<!DOCTYPE')) {
@@ -435,7 +397,6 @@ async function handleFocusGroupForm(e) {
             }
             
             // Show error message for server errors
-            console.log('Server error, showing error message');
             showFormError(focusGroupForm, errorMessage);
         }
         
@@ -446,22 +407,14 @@ async function handleFocusGroupForm(e) {
 }
 
 function showSuccessModal(email) {
-    console.log('showSuccessModal called with email:', email);
-    console.log('userEmailDisplay element:', userEmailDisplay);
-    console.log('successModal element:', successModal);
-    
     if (userEmailDisplay) {
         userEmailDisplay.textContent = email;
-        console.log('Set email display to:', email);
-    } else {
-        console.error('userEmailDisplay element not found!');
     }
     
     if (successModal) {
         successModal.style.display = 'flex';
-        console.log('Success modal displayed');
     } else {
-        console.error('successModal element not found!');
+        console.error('Success modal element not found!');
     }
 }
 
@@ -520,8 +473,6 @@ function showLoginError() {
 }
 
 function showFormError(form, message) {
-    console.log('Showing form error:', message);
-    
     // Remove any existing error messages
     const existingError = form.querySelector('.error-message');
     if (existingError) {
@@ -544,8 +495,6 @@ function showFormError(form, message) {
 
 // Session types and categories management
 function populateDropdowns() {
-    console.log('Populating dropdowns...');
-    
     // Populate session types
     if (sessionTypeSelect) {
         sessionTypeSelect.innerHTML = '<option value="">Select session type</option>';
@@ -648,8 +597,6 @@ function collectQuestions(containerId) {
 }
 
 function initializeQuestions(containerId, maxQuestions) {
-    console.log('Initializing questions for:', containerId);
-    
     const container = document.getElementById(containerId);
     if (!container) return;
     
@@ -674,21 +621,7 @@ function addQuestion(container, questionNumber, questionText = '') {
     container.appendChild(questionItem);
 }
 
-function removeQuestion(button) {
-    const questionItem = button.parentElement;
-    const container = questionItem.parentElement;
-    
-    questionItem.remove();
-    
-    // Renumber remaining questions
-    const questions = container.querySelectorAll('.question-item');
-    questions.forEach((item, index) => {
-        const numberDiv = item.querySelector('.question-number');
-        if (numberDiv) {
-            numberDiv.textContent = index + 1;
-        }
-    });
-}
+
 
 function setupCharacterCounters() {
     const textareas = document.querySelectorAll('textarea[maxlength]');
@@ -908,22 +841,9 @@ function removeSelectionChip(selectionKey, item) {
     updateAllSelectedChips();
 }
 
-function updateSelectedCategoriesDisplay() {
-    // This function is now replaced by updateAllSelectedChips
-    updateAllSelectedChips();
-}
 
-function removeCategory(category) {
-    window.selectedCategories = window.selectedCategories.filter(cat => cat !== category);
-    updateCategoryButtonText(window.selectedCategories);
-    updateAllSelectedChips();
-    
-    // Uncheck in modal
-    const checkbox = categoryList.querySelector(`input[data-category="${category}"]`);
-    if (checkbox) {
-        checkbox.checked = false;
-    }
-}
+
+
 
 function clearAllCategorySelections() {
     const checkboxes = categoryList.querySelectorAll('input[type="checkbox"]');
@@ -975,16 +895,10 @@ function setupDemographicModals() {
         const count = document.getElementById(`${type}Count`);
         const hidden = document.getElementById(type === 'marital' ? 'maritalStatus' : type === 'children' ? 'hasChildren' : type);
         
-        console.log(`Setting up ${type} modal:`, {
-            openBtn: !!openBtn,
-            closeBtn: !!closeBtn,
-            applyBtn: !!applyBtn,
-            clearBtn: !!clearBtn,
-            list: !!list,
-            buttonText: !!buttonText,
-            count: !!count,
-            hidden: !!hidden
-        });
+        // Log missing elements for debugging
+        if (!openBtn || !closeBtn || !applyBtn || !list) {
+            console.warn(`Missing elements for ${type} modal`);
+        }
         
         if (openBtn) openBtn.addEventListener('click', () => showModal(document.getElementById(`${type}Modal`)));
         if (closeBtn) closeBtn.addEventListener('click', () => hideModal(document.getElementById(`${type}Modal`)));
@@ -1071,7 +985,17 @@ function initializeSelectionButtons() {
         const count = document.getElementById(`${type}Count`);
         
         if (buttonText) {
-            buttonText.textContent = `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            const originalTexts = {
+                'category': 'Categories',
+                'gender': 'Gender',
+                'age': 'Age Range',
+                'income': 'Income Range',
+                'marital': 'Marital Status',
+                'children': 'Children Status',
+                'education': 'Education Level',
+                'race': 'Race'
+            };
+            buttonText.textContent = originalTexts[type] || `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
         }
         
         if (count) {
