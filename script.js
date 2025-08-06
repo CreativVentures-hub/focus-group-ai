@@ -546,6 +546,13 @@ function populateDropdowns() {
             }
             sessionTypeSelect.appendChild(option);
         });
+        
+        // Set Market Research as default
+        sessionTypeSelect.value = 'market_research';
+        
+        // Trigger the change event to show the market research fields
+        const changeEvent = new Event('change');
+        sessionTypeSelect.dispatchEvent(changeEvent);
     }
     
     // Initialize category modal
