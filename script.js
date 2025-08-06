@@ -892,8 +892,17 @@ function setupDemographicModals() {
     modalTypes.forEach(type => {
         const openBtn = document.getElementById(`open${type.charAt(0).toUpperCase() + type.slice(1)}Modal`);
         const closeBtn = document.getElementById(`close${type.charAt(0).toUpperCase() + type.slice(1)}Modal`);
-        const applyBtn = document.getElementById(`apply${type.charAt(0).toUpperCase() + type.slice(1)}s`);
-        const clearBtn = document.getElementById(`clearAll${type.charAt(0).toUpperCase() + type.slice(1)}s`);
+        
+        // Handle special cases for button IDs
+        let applyBtn, clearBtn;
+        if (type === 'children') {
+            applyBtn = document.getElementById('applyChildren');
+            clearBtn = document.getElementById('clearAllChildren');
+        } else {
+            applyBtn = document.getElementById(`apply${type.charAt(0).toUpperCase() + type.slice(1)}s`);
+            clearBtn = document.getElementById(`clearAll${type.charAt(0).toUpperCase() + type.slice(1)}s`);
+        }
+        
         const list = document.getElementById(`${type}List`);
         const buttonText = document.getElementById(`${type}ButtonText`);
         const count = document.getElementById(`${type}Count`);
