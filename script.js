@@ -101,9 +101,26 @@ function initializeApp() {
 }
 
 function setupEventListeners() {
+    console.log('Setting up event listeners...');
+    console.log('loginForm element:', loginForm);
+    console.log('passwordInput element:', passwordInput);
+    
     // Login functionality
     if (loginForm) {
-    loginForm.addEventListener('submit', handleLogin);
+        console.log('Adding login form event listener');
+        loginForm.addEventListener('submit', handleLogin);
+        
+        // Also add click handler to the submit button for testing
+        const submitButton = loginForm.querySelector('button[type="submit"]');
+        if (submitButton) {
+            console.log('Adding submit button click handler');
+            submitButton.addEventListener('click', (e) => {
+                console.log('Submit button clicked!');
+                // Don't prevent default here - let the form submit handle it
+            });
+        }
+    } else {
+        console.error('Login form not found!');
     }
     
     // Logout button
@@ -204,10 +221,20 @@ function populateDropdowns() {
 
 function handleLogin(e) {
     e.preventDefault();
+    console.log('Login function called!');
+    
+    if (!passwordInput) {
+        console.error('Password input element not found!');
+        alert('Error: Password input not found. Please refresh the page.');
+        return;
+    }
     
     const password = passwordInput.value.trim();
+    console.log('Password entered:', password ? '***' : 'empty');
+    console.log('Expected password:', CONFIG.PASSWORD);
     
     if (password === CONFIG.PASSWORD) {
+        console.log('Password correct! Logging in...');
         // Store login state in session storage
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
         
@@ -218,6 +245,7 @@ function handleLogin(e) {
         
         clearLoginForm();
     } else {
+        console.log('Password incorrect!');
         showLoginError();
     }
 }
