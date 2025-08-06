@@ -231,21 +231,21 @@ function handleSessionTypeChange() {
             const productFields = document.getElementById('productResearchFields');
             if (productFields) productFields.style.display = 'block';
             initializeQuestions('productQuestions', 10);
-            setupCharacterCounters();
             break;
         case 'market_research':
             const marketFields = document.getElementById('marketResearchFields');
             if (marketFields) marketFields.style.display = 'block';
             initializeQuestions('marketQuestions', 10);
-            setupCharacterCounters();
             break;
         case 'brand_perception':
             const brandFields = document.getElementById('brandPerceptionFields');
             if (brandFields) brandFields.style.display = 'block';
             initializeQuestions('brandQuestions', 10);
-            setupCharacterCounters();
             break;
     }
+    
+    // Setup character counters once after showing fields
+    setupCharacterCounters();
 }
 
 function handleFocusGroupForm(e) {
@@ -598,6 +598,12 @@ function addQuestion(container, questionNumber, questionText = '') {
 function setupCharacterCounters() {
     const textareas = document.querySelectorAll('textarea[maxlength]');
     textareas.forEach(textarea => {
+        // Check if counter already exists
+        const existingCounter = textarea.parentNode.querySelector('.char-count');
+        if (existingCounter) {
+            return; // Skip if counter already exists
+        }
+        
         const counter = document.createElement('div');
         counter.className = 'char-count';
         textarea.parentNode.appendChild(counter);
