@@ -924,36 +924,37 @@ async function handleFocusGroupForm(e) {
         } else {
             // Handle JSON response (existing behavior)
             try {
-        const result = await response.json();
-        console.log('Response data:', result);
-        
-        hideLoadingScreen();
-        
-        if (response.ok) {
-            // Save questions for future use
-            const questions = sessionSpecificData.questions || [];
-            if (questions.length > 0) {
-                saveQuestions(sessionType, questions);
-            }
-            
-            showResponseScreen({
-                success: true,
-                message: `Focus group "${webhookData.session_name}" started successfully!`,
-                categories: webhookData.categories,
-                total_count: webhookData.number_of_participants,
-                existing_count: 0,
-                created_count: webhookData.number_of_participants
-            });
-        } else {
-            showErrorScreen(result.message || `HTTP ${response.status}: ${response.statusText}`);
+                const result = await response.json();
+                console.log('Response data:', result);
+                
+                hideLoadingScreen();
+                
+                if (response.ok) {
+                    // Save questions for future use
+                    const questions = sessionSpecificData.questions || [];
+                    if (questions.length > 0) {
+                        saveQuestions(sessionType, questions);
+                    }
+                    
+                    showResponseScreen({
+                        success: true,
+                        message: `Focus group "${webhookData.session_name}" started successfully!`,
+                        categories: webhookData.categories,
+                        total_count: webhookData.number_of_participants,
+                        existing_count: 0,
+                        created_count: webhookData.number_of_participants
+                    });
+                } else {
+                    showErrorScreen(result.message || `HTTP ${response.status}: ${response.statusText}`);
                 }
             } catch (jsonError) {
                 console.error('JSON parsing error:', jsonError);
                 console.log('Response status:', response.status);
                 console.log('Response headers:', response.headers);
                 
-                // Try to get the response as text to see what we're actually getting
-                const responseText = await response.text();
+                // Clone the response before reading it as text
+                const responseClone = response.clone();
+                const responseText = await responseClone.text();
                 console.log('Response text:', responseText);
                 
                 hideLoadingScreen();
