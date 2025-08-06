@@ -434,15 +434,9 @@ async function handleFocusGroupForm(e) {
                 console.error('Could not read error response:', textError);
             }
             
-            // For email-based approach, show success modal even on server error
-            // since the email will be sent when the workflow completes
-            console.log('Server error, but showing success modal for email approach');
-            showSuccessModal(userEmail);
-            
-            // Also show a warning about the server error
-            setTimeout(() => {
-                showFormError(focusGroupForm, `Note: ${errorMessage} - but your request has been queued and you will receive an email when complete.`);
-            }, 1000);
+            // Show error message for server errors
+            console.log('Server error, showing error message');
+            showFormError(focusGroupForm, errorMessage);
         }
         
     } catch (error) {
