@@ -882,7 +882,7 @@ async function handleFocusGroupForm(e) {
     // Show loading screen
     showLoadingScreen(selectedCategories, formData.get('sessionType'), formData.get('sessionName'));
     
-    // Start 5-minute timeout countdown
+    // Start 5-minute timeout (hidden)
     const timeoutDuration = 5 * 60 * 1000; // 5 minutes in milliseconds
     const timeoutId = setTimeout(() => {
         hideLoadingScreen();
@@ -1090,11 +1090,7 @@ async function handleFocusGroupForm(e) {
         if (response.status === 200) {
             showErrorScreen(`Received 200 OK but couldn't read response content.\n\nThis might be a temporary issue. Please try:\n\n1. Refreshing the page and trying again\n2. Waiting a few minutes and trying again\n3. Using a different browser\n\nIf the issue persists, you can also use the local version for testing.`);
         } else if (response.status === 504) {
-            showErrorScreen(`Gateway Timeout (504): The n8n workflow is taking longer than expected.\n\nThis is normal for AI-powered workflows. The system will automatically retry with a longer timeout.\n\nPlease wait while we process your request...`);
-            
-            // Start polling for completion
-            const sessionId = generateSessionId();
-            pollWorkflowStatus(sessionId);
+            showErrorScreen(`Gateway Timeout (504): The n8n workflow is taking longer than expected.\n\nThis is normal for AI-powered workflows. Please try again in a few minutes.`);
         } else {
             showErrorScreen(`Unable to read response content. Status: ${response.status}, StatusText: ${response.statusText}`);
         }
@@ -2178,18 +2174,6 @@ function showLoadingScreen(selectedCategories = [], sessionType = '', sessionNam
             <h2>Creating Your Focus Group</h2>
             <p class="loading-message" id="loadingMessage">${messages[0]}</p>
             
-            <!-- Progress Bar -->
-            <div class="loading-progress-container">
-                <div class="loading-progress-bar" style="width: 0%"></div>
-                <span class="loading-progress-text">0% Complete</span>
-            </div>
-            
-            <!-- Countdown Timer -->
-            <div class="countdown-timer">
-                <i class="fas fa-clock"></i>
-                <span id="countdownText">Time remaining: 5:00</span>
-            </div>
-            
             <div class="processing-time-notice">
                 <p>This process can take up to 4 minutes. Please don't close this window.</p>
             </div>
@@ -2227,9 +2211,6 @@ function showLoadingScreen(selectedCategories = [], sessionType = '', sessionNam
     
     // Store interval ID for cleanup
     loadingOverlay.dataset.messageInterval = messageInterval;
-    
-    // Start countdown timer
-    startCountdownTimer(300); // 5 minutes = 300 seconds
 }
 
 function hideLoadingScreen() {
@@ -2247,11 +2228,7 @@ function hideLoadingScreen() {
             clearTimeout(parseInt(timeoutId));
         }
         
-        // Clear the countdown interval if it exists
-        const countdownInterval = loadingOverlay.dataset.countdownInterval;
-        if (countdownInterval) {
-            clearInterval(parseInt(countdownInterval));
-        }
+
         
         loadingOverlay.remove();
     }
@@ -2794,140 +2771,10 @@ function hideGitHubPagesNotice() {
     }
 }
 
-// Add polling mechanism for n8n workflow status
-async function pollWorkflowStatus(sessionId, maxAttempts = 80) { // 80 attempts * 3 seconds = 4 minutes
-    let attempts = 0;
-    
-    const pollInterval = setInterval(async () => {
-        attempts++;
-        
-        try {
-            // Check if the workflow has completed
-            const statusResponse = await fetch(`${CONFIG.WEBHOOK_URL}/status/${sessionId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                signal: AbortSignal.timeout(10000), // 10 second timeout for status check
-                mode: 'cors',
-                credentials: 'omit'
-            });
-            
-            if (statusResponse.ok) {
-                const status = await statusResponse.json();
-                
-                if (status.status === 'completed') {
-                    clearInterval(pollInterval);
-                    hideLoadingScreen();
-                    
-                    // Download the generated file
-                    if (status.downloadUrl) {
-                        downloadGeneratedFile(status.downloadUrl, status.filename);
-                    } else {
-                        showSuccessMessage('Report generated successfully!');
-                    }
-                } else if (status.status === 'failed') {
-                    clearInterval(pollInterval);
-                    hideLoadingScreen();
-                    showErrorScreen(`Report generation failed: ${status.error || 'Unknown error'}`);
-                } else {
-                    // Update progress
-                    updateLoadingProgress(status.progress || Math.min((attempts / maxAttempts) * 100, 95));
-                }
-            }
-        } catch (error) {
-            console.log(`Status check attempt ${attempts} failed:`, error);
-            
-            // If we've tried too many times, give up
-            if (attempts >= maxAttempts) {
-                clearInterval(pollInterval);
-                hideLoadingScreen();
-                showErrorScreen('Report generation timed out. Please try again or contact support.');
-            }
-        }
-    }, 3000); // Check every 3 seconds
-    
-    return pollInterval;
-}
 
-// Download the generated file
-async function downloadGeneratedFile(downloadUrl, filename) {
-    try {
-        const response = await fetch(downloadUrl, {
-            method: 'GET',
-            signal: AbortSignal.timeout(30000), // 30 second timeout
-            mode: 'cors',
-            credentials: 'omit'
-        });
-        
-        if (response.ok) {
-            const blob = await response.blob();
-            showFileDownloadScreen({
-                filename: filename || `focus-group-report-${Date.now()}.txt`,
-                blob: blob,
-                sessionName: 'Generated Report',
-                categories: [],
-                totalCount: 0
-            });
-        } else {
-            throw new Error(`Download failed with status: ${response.status}`);
-        }
-    } catch (error) {
-        console.error('Error downloading file:', error);
-        showErrorScreen(`Error downloading report: ${error.message}`);
-    }
-}
 
-// Generate a unique session ID for tracking
-function generateSessionId() {
-    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-}
 
-// Start countdown timer
-function startCountdownTimer(seconds) {
-    const countdownElement = document.getElementById('countdownText');
-    if (!countdownElement) return;
-    
-    const countdownInterval = setInterval(() => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        
-        countdownElement.textContent = `Time remaining: ${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-        
-        // Change color when time is running low
-        if (seconds <= 60) {
-            countdownElement.style.color = '#ff6b6b';
-            countdownElement.style.fontWeight = 'bold';
-        } else if (seconds <= 120) {
-            countdownElement.style.color = '#ffa726';
-        }
-        
-        if (seconds <= 0) {
-            clearInterval(countdownInterval);
-            countdownElement.textContent = 'Time expired';
-            countdownElement.style.color = '#ff6b6b';
-        }
-        
-        seconds--;
-    }, 1000);
-    
-    // Store interval ID for cleanup
-    const loadingOverlay = document.getElementById('loadingOverlay');
-    if (loadingOverlay) {
-        loadingOverlay.dataset.countdownInterval = countdownInterval;
-    }
-}
 
-// Update loading screen with progress
-function updateLoadingProgress(percentage) {
-    const progressBar = document.querySelector('.loading-progress-bar');
-    const progressText = document.querySelector('.loading-progress-text');
-    
-    if (progressBar) {
-        progressBar.style.width = `${percentage}%`;
-    }
-    
-    if (progressText) {
-        progressText.textContent = `${Math.round(percentage)}% Complete`;
-    }
-}
+
+
+
