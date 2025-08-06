@@ -1677,3 +1677,64 @@ textarea:focus {
         opacity: 0;
     }
 }
+
+/* Email field styles */
+.form-help {
+    color: #6c757d;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Success modal styles */
+.success-message {
+    text-align: center;
+    padding: 20px;
+}
+
+.success-message p {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.email-notice {
+    background-color: #e3f2fd;
+    border: 1px solid #bbdefb;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.email-notice i {
+    font-size: 24px;
+    color: #1976d2;
+    margin-bottom: 10px;
+}
+
+.email-notice p {
+    margin: 5px 0;
+}
+
+#userEmailDisplay {
+    font-weight: bold;
+    color: #1976d2;
+}
+
+.processing-info {
+    background-color: #fff3e0;
+    border: 1px solid #ffcc02;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.processing-info p {
+    margin: 8px 0;
+    font-size: 14px;
+}
+
+.processing-info i {
+    margin-right: 8px;
+    color: #f57c00;
+}
