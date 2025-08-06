@@ -1098,11 +1098,16 @@ async function handleFocusGroupForm(e) {
                           '• CORS restrictions (most likely)\n' +
                           '• Webhook URL is not accessible\n' +
                           '• Network connectivity issues\n\n' +
-                          'Please check the webhook URL and ensure CORS is enabled on the server.';
+                          'For testing, please use the local server:\n' +
+                          '1. Run .\\start-cors-server.bat\n' +
+                          '2. Open http://localhost:8000\n' +
+                          '3. Try submitting the form again';
         } else if (error.message.includes('Failed to fetch')) {
             errorMessage += 'Failed to fetch from webhook. This is usually a CORS issue.\n\n' +
-                          'The n8n server needs to allow requests from your domain.\n' +
-                          'Check the browser console for more details.';
+                          'For testing, please use the local server:\n' +
+                          '1. Run .\\start-cors-server.bat\n' +
+                          '2. Open http://localhost:8000\n' +
+                          '3. Try submitting the form again';
         } else {
             errorMessage += error.message;
         }
