@@ -14,6 +14,58 @@ window.addEventListener('error', function(e) {
     alert('JavaScript Error: ' + e.message + ' at line ' + e.lineno);
 });
 
+// Global login function for onclick handler
+window.handleLoginClick = function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    console.log('Global login function called!');
+    
+    const passwordInput = document.getElementById('passwordInput');
+    if (!passwordInput) {
+        console.error('Password input not found in global function');
+        alert('Error: Password input not found');
+        return false;
+    }
+    
+    const password = passwordInput.value.trim();
+    console.log('Password from global function:', password ? '***' : 'empty');
+    console.log('Expected password:', CONFIG.PASSWORD);
+    
+    if (password === CONFIG.PASSWORD) {
+        console.log('Password correct in global function!');
+        sessionStorage.setItem('focusGroupLoggedIn', 'true');
+        
+        // Show main section
+        const loginSection = document.getElementById('loginSection');
+        const mainSection = document.getElementById('mainSection');
+        
+        if (loginSection && mainSection) {
+            loginSection.style.display = 'none';
+            mainSection.style.display = 'block';
+            
+            // Initialize the rest of the app
+            if (typeof populateDropdowns === 'function') {
+                populateDropdowns();
+            }
+            if (typeof clearLoginForm === 'function') {
+                clearLoginForm();
+            }
+        }
+    } else {
+        console.log('Password incorrect in global function!');
+        const loginError = document.getElementById('loginError');
+        if (loginError) {
+            loginError.style.display = 'block';
+            setTimeout(() => {
+                loginError.style.display = 'none';
+            }, 3000);
+        }
+    }
+    
+    return false;
+};
+
 // Also catch unhandled promise rejections
 window.addEventListener('unhandledrejection', function(e) {
     console.error('Unhandled promise rejection:', e.reason);
@@ -141,7 +193,23 @@ function setupEventListeners() {
             console.log('Adding submit button click handler');
             submitButton.addEventListener('click', (e) => {
                 console.log('Submit button clicked!');
-                // Don't prevent default here - let the form submit handle it
+                e.preventDefault(); // Prevent form submission
+                e.stopPropagation(); // Stop event bubbling
+                
+                // Manually trigger login
+                const password = passwordInput.value.trim();
+                console.log('Password from button click:', password ? '***' : 'empty');
+                
+                if (password === CONFIG.PASSWORD) {
+                    console.log('Password correct from button click!');
+                    sessionStorage.setItem('focusGroupLoggedIn', 'true');
+                    showMainSection();
+                    populateDropdowns();
+                    clearLoginForm();
+                } else {
+                    console.log('Password incorrect from button click!');
+                    showLoginError();
+                }
             });
         }
     } else {
