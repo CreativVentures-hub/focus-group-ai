@@ -497,10 +497,28 @@ function showFormError(form, message) {
     }, 5000);
 }
 
-// Placeholder functions for compatibility
+// Session types and categories management
 function populateDropdowns() {
-    console.log('Populate dropdowns called');
-    // Implementation would go here
+    console.log('Populating dropdowns...');
+    
+    // Populate session types
+    if (sessionTypeSelect) {
+        sessionTypeSelect.innerHTML = '<option value="">Select session type</option>';
+        
+        CONFIG.SESSION_TYPES.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type.value;
+            option.textContent = type.label;
+            if (type.disabled) {
+                option.disabled = true;
+                option.textContent += ' (Coming Soon)';
+            }
+            sessionTypeSelect.appendChild(option);
+        });
+    }
+    
+    // Initialize category modal
+    populateCategoryModal();
 }
 
 function getSelectedCategories() {
@@ -525,43 +543,465 @@ function collectQuestions(containerId) {
 }
 
 function initializeQuestions(containerId, maxQuestions) {
-    console.log('Initialize questions called for:', containerId);
-    // Implementation would go here
+    console.log('Initializing questions for:', containerId);
+    
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Clear existing questions
+    container.innerHTML = '';
+    
+    // Add initial questions
+    for (let i = 1; i <= Math.min(3, maxQuestions); i++) {
+        addQuestion(container, i);
+    }
+    
+    // Add "Add Question" button if needed
+    if (maxQuestions > 3) {
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.className = 'btn btn-outline add-question-btn';
+        addButton.innerHTML = '<i class="fas fa-plus"></i> Add Question';
+        addButton.onclick = () => {
+            const currentQuestions = container.querySelectorAll('.question-item').length;
+            if (currentQuestions < maxQuestions) {
+                addQuestion(container, currentQuestions + 1);
+            }
+        };
+        container.appendChild(addButton);
+    }
+}
+
+function addQuestion(container, questionNumber, questionText = '') {
+    const questionItem = document.createElement('div');
+    questionItem.className = 'question-item';
+    
+    questionItem.innerHTML = `
+        <div class="question-number">${questionNumber}</div>
+        <input type="text" class="question-input" placeholder="Enter question ${questionNumber}..." value="${questionText}" maxlength="500">
+        <button type="button" class="remove-question-btn" onclick="removeQuestion(this)">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    container.appendChild(questionItem);
+}
+
+function removeQuestion(button) {
+    const questionItem = button.parentElement;
+    const container = questionItem.parentElement;
+    
+    questionItem.remove();
+    
+    // Renumber remaining questions
+    const questions = container.querySelectorAll('.question-item');
+    questions.forEach((item, index) => {
+        const numberDiv = item.querySelector('.question-number');
+        if (numberDiv) {
+            numberDiv.textContent = index + 1;
+        }
+    });
 }
 
 function setupCharacterCounters() {
-    console.log('Setup character counters called');
-    // Implementation would go here
+    const textareas = document.querySelectorAll('textarea[maxlength]');
+    textareas.forEach(textarea => {
+        const counter = document.createElement('div');
+        counter.className = 'char-count';
+        textarea.parentNode.appendChild(counter);
+        
+        const updateCount = () => {
+            const remaining = textarea.maxLength - textarea.value.length;
+            counter.textContent = `${remaining} characters remaining`;
+            
+            if (remaining <= 50) {
+                counter.className = 'char-count warning';
+            } else if (remaining <= 0) {
+                counter.className = 'char-count error';
+            } else {
+                counter.className = 'char-count';
+            }
+        };
+        
+        textarea.addEventListener('input', updateCount);
+        updateCount();
+    });
 }
 
+// Category modal functionality
 function setupCategoryModal() {
-    console.log('Setup category modal called');
-    // Implementation would go here
+    if (openCategoryModal) {
+        openCategoryModal.addEventListener('click', showCategoryModal);
+    }
+    if (closeCategoryModal) {
+        closeCategoryModal.addEventListener('click', hideCategoryModal);
+    }
+    if (applyCategories) {
+        applyCategories.addEventListener('click', applyCategorySelection);
+    }
+    if (clearAllCategories) {
+        clearAllCategories.addEventListener('click', clearAllCategorySelections);
+    }
+    if (categorySearch) {
+        categorySearch.addEventListener('input', (e) => filterCategoryModal(e.target.value));
+    }
+    
+    populateCategoryTabs();
+    populateCategoryGroups();
 }
 
+function populateCategoryTabs() {
+    if (!categoryTabs) return;
+    
+    categoryTabs.innerHTML = `
+        <button class="category-tab active" onclick="switchToTab('buying_behaviors')">
+            <i class="fas fa-shopping-cart"></i> Buying Behaviors
+        </button>
+        <button class="category-tab" onclick="switchToTab('product_categories')">
+            <i class="fas fa-tags"></i> Product Categories
+        </button>
+    `;
+}
+
+function populateCategoryGroups() {
+    if (!categoryList) return;
+    
+    // Show buying behaviors by default
+    switchToTab('buying_behaviors');
+}
+
+function switchToTab(groupName) {
+    if (!categoryList || !categoryTabs) return;
+    
+    // Update tab buttons
+    const tabs = categoryTabs.querySelectorAll('.category-tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    const activeTab = categoryTabs.querySelector(`[onclick*="${groupName}"]`);
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
+    
+    // Populate categories based on group
+    categoryList.innerHTML = '';
+    
+    let categories = [];
+    if (groupName === 'buying_behaviors') {
+        categories = CONFIG.BUYING_BEHAVIORS;
+    } else if (groupName === 'product_categories') {
+        categories = CONFIG.PRODUCT_CATEGORIES;
+    }
+    
+    categories.forEach(category => {
+        const checkboxDiv = document.createElement('div');
+        checkboxDiv.className = 'category-checkbox';
+        checkboxDiv.setAttribute('data-category', category.label);
+        
+        checkboxDiv.innerHTML = `
+            <input type="checkbox" id="cat-${category.value}" data-category="${category.label}">
+            <label for="cat-${category.value}">${category.label}</label>
+        `;
+        
+        categoryList.appendChild(checkboxDiv);
+    });
+    
+    // Setup checkbox interactions
+    setupCheckboxInteractions(categoryList);
+}
+
+function setupCheckboxInteractions(list) {
+    const checkboxes = list.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateModalSelections);
+    });
+}
+
+function updateModalSelections() {
+    const checkboxes = categoryList.querySelectorAll('input[type="checkbox"]:checked');
+    const selectedItems = Array.from(checkboxes).map(cb => cb.getAttribute('data-category'));
+    
+    // Update count display
+    if (categoryCount) {
+        categoryCount.textContent = `${selectedItems.length} selected`;
+        categoryCount.style.display = selectedItems.length > 0 ? 'inline' : 'none';
+    }
+}
+
+function applyCategorySelection() {
+    const checkboxes = categoryList.querySelectorAll('input[type="checkbox"]:checked');
+    const selectedItems = Array.from(checkboxes).map(cb => cb.getAttribute('data-category'));
+    
+    // Store selected categories globally
+    window.selectedCategories = selectedItems;
+    
+    // Update button text
+    updateCategoryButtonText(selectedItems);
+    
+    // Update hidden input
+    if (categoryHidden) {
+        categoryHidden.value = selectedItems.join(', ');
+    }
+    
+    // Update selected chips display
+    updateSelectedCategoriesDisplay();
+    
+    // Hide modal
+    hideCategoryModal();
+}
+
+function updateCategoryButtonText(selectedItems) {
+    if (categoryButtonText) {
+        if (selectedItems.length === 0) {
+            categoryButtonText.textContent = 'Select Categories';
+        } else if (selectedItems.length === 1) {
+            categoryButtonText.textContent = selectedItems[0];
+        } else {
+            categoryButtonText.textContent = `${selectedItems.length} Categories Selected`;
+        }
+    }
+}
+
+function updateSelectedCategoriesDisplay() {
+    if (!selectedCategoriesContainer) return;
+    
+    selectedCategoriesContainer.innerHTML = '';
+    
+    const selectedItems = window.selectedCategories || [];
+    selectedItems.forEach(item => {
+        const chip = document.createElement('span');
+        chip.className = 'selected-category-tag';
+        chip.innerHTML = `
+            ${item}
+            <button type="button" class="remove-category" onclick="removeCategory('${item}')">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        selectedCategoriesContainer.appendChild(chip);
+    });
+}
+
+function removeCategory(category) {
+    window.selectedCategories = window.selectedCategories.filter(cat => cat !== category);
+    updateCategoryButtonText(window.selectedCategories);
+    updateSelectedCategoriesDisplay();
+    
+    // Uncheck in modal
+    const checkbox = categoryList.querySelector(`input[data-category="${category}"]`);
+    if (checkbox) {
+        checkbox.checked = false;
+    }
+}
+
+function clearAllCategorySelections() {
+    const checkboxes = categoryList.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = false);
+    updateModalSelections();
+}
+
+function filterCategoryModal(searchTerm) {
+    const checkboxes = categoryList.querySelectorAll('.category-checkbox');
+    checkboxes.forEach(checkbox => {
+        const label = checkbox.querySelector('label').textContent.toLowerCase();
+        const matches = label.includes(searchTerm.toLowerCase());
+        checkbox.style.display = matches ? 'block' : 'none';
+    });
+}
+
+function showCategoryModal() {
+    if (categoryModal) {
+        categoryModal.style.display = 'flex';
+    }
+}
+
+function hideCategoryModal() {
+    if (categoryModal) {
+        categoryModal.style.display = 'none';
+    }
+}
+
+// Demographic modals setup
 function setupDemographicModals() {
-    console.log('Setup demographic modals called');
-    // Implementation would go here
+    const modalTypes = ['gender', 'age', 'income', 'marital', 'children', 'education', 'race'];
+    
+    modalTypes.forEach(type => {
+        const openBtn = document.getElementById(`open${type.charAt(0).toUpperCase() + type.slice(1)}Modal`);
+        const closeBtn = document.getElementById(`close${type.charAt(0).toUpperCase() + type.slice(1)}Modal`);
+        const applyBtn = document.getElementById(`apply${type.charAt(0).toUpperCase() + type.slice(1)}s`);
+        const clearBtn = document.getElementById(`clearAll${type.charAt(0).toUpperCase() + type.slice(1)}s`);
+        const list = document.getElementById(`${type}List`);
+        const buttonText = document.getElementById(`${type}ButtonText`);
+        const count = document.getElementById(`${type}Count`);
+        const hidden = document.getElementById(type === 'marital' ? 'maritalStatus' : type === 'children' ? 'hasChildren' : type);
+        
+        if (openBtn) openBtn.addEventListener('click', () => showModal(document.getElementById(`${type}Modal`)));
+        if (closeBtn) closeBtn.addEventListener('click', () => hideModal(document.getElementById(`${type}Modal`)));
+        if (applyBtn) applyBtn.addEventListener('click', () => applySelection(type, list, document.getElementById(`${type}Modal`)));
+        if (clearBtn) clearBtn.addEventListener('click', () => clearAllSelections(list));
+        
+        if (list) {
+            setupCheckboxInteractions(list);
+        }
+    });
+}
+
+function showModal(modal) {
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function hideModal(modal) {
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function applySelection(type, list, modal) {
+    const checkboxes = list.querySelectorAll('input[type="checkbox"]:checked');
+    const selectedItems = Array.from(checkboxes).map(cb => cb.getAttribute('data-category'));
+    
+    // Store selected items globally
+    window[`selected${type.charAt(0).toUpperCase() + type.slice(1)}s`] = selectedItems;
+    
+    // Update button text
+    updateSelectionButton(type, selectedItems);
+    
+    // Update hidden input
+    const hiddenId = type === 'marital' ? 'maritalStatus' : type === 'children' ? 'hasChildren' : type;
+    const hidden = document.getElementById(hiddenId);
+    if (hidden) {
+        hidden.value = selectedItems.join(', ');
+    }
+    
+    // Hide modal
+    hideModal(modal);
+}
+
+function updateSelectionButton(type, selectedItems) {
+    const buttonText = document.getElementById(`${type}ButtonText`);
+    const count = document.getElementById(`${type}Count`);
+    
+    if (buttonText) {
+        if (selectedItems.length === 0) {
+            buttonText.textContent = `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+        } else if (selectedItems.length === 1) {
+            buttonText.textContent = selectedItems[0];
+        } else {
+            buttonText.textContent = `${selectedItems.length} Selected`;
+        }
+    }
+    
+    if (count) {
+        count.textContent = `${selectedItems.length} selected`;
+        count.style.display = selectedItems.length > 0 ? 'inline' : 'none';
+    }
+}
+
+function clearAllSelections(list) {
+    const checkboxes = list.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = false);
 }
 
 function initializeSelectionButtons() {
-    console.log('Initialize selection buttons called');
-    // Implementation would go here
+    // Initialize all selection buttons with default text
+    const buttonTypes = ['category', 'gender', 'age', 'income', 'marital', 'children', 'education', 'race'];
+    
+    buttonTypes.forEach(type => {
+        const buttonText = document.getElementById(`${type}ButtonText`);
+        const count = document.getElementById(`${type}Count`);
+        
+        if (buttonText) {
+            buttonText.textContent = `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+        }
+        
+        if (count) {
+            count.style.display = 'none';
+        }
+    });
 }
 
 function initializeSlider() {
-    console.log('Initialize slider called');
-    // Implementation would go here
+    if (numberOfParticipantsSlider && numberOfParticipantsValue) {
+        numberOfParticipantsSlider.addEventListener('input', function() {
+            numberOfParticipantsValue.textContent = this.value;
+        });
+        
+        // Set initial value
+        numberOfParticipantsValue.textContent = numberOfParticipantsSlider.value;
+    }
 }
 
 function initializeLanguage() {
-    console.log('Initialize language called');
-    // Implementation would go here
+    if (languageSelect) {
+        languageSelect.addEventListener('change', handleLanguageChange);
+        currentLanguage = languageSelect.value || 'en';
+        updateLanguage();
+    }
+}
+
+function handleLanguageChange() {
+    currentLanguage = languageSelect.value;
+    updateLanguage();
+}
+
+function updateLanguage() {
+    const translations = CONFIG.TRANSLATIONS[currentLanguage] || CONFIG.TRANSLATIONS.en;
+    updateFormTexts(translations);
+    updateButtonTexts(translations);
+}
+
+function updateFormTexts(translations) {
+    // Update form labels and placeholders
+    const elements = {
+        'sessionType': translations.sessionType,
+        'sessionName': translations.sessionName,
+        'numberOfParticipants': translations.numberOfParticipants,
+        'userEmail': translations.userEmail
+    };
+    
+    Object.entries(elements).forEach(([id, text]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            if (element.tagName === 'INPUT' || element.tagName === 'SELECT') {
+                element.placeholder = text;
+            } else {
+                element.textContent = text;
+            }
+        }
+    });
+}
+
+function updateButtonTexts(translations) {
+    // Update button texts
+    const buttons = {
+        'startFocusGroup': translations.startFocusGroup,
+        'login': translations.login,
+        'logout': translations.logout
+    };
+    
+    Object.entries(buttons).forEach(([key, text]) => {
+        const button = document.querySelector(`[data-translate="${key}"]`);
+        if (button) {
+            button.textContent = text;
+        }
+    });
 }
 
 function showGitHubPagesNotice() {
-    console.log('Show GitHub Pages notice called');
-    // Implementation would go here
+    // Show notice about GitHub Pages limitations
+    const notice = document.createElement('div');
+    notice.className = 'notice-banner';
+    notice.innerHTML = `
+        <div class="notice-content">
+            <i class="fas fa-info-circle"></i>
+            <span>This is a live demo. For full functionality, download and run locally.</span>
+            <button class="notice-close" onclick="this.parentElement.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    document.body.insertBefore(notice, document.body.firstChild);
 }
 
 
