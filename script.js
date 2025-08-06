@@ -824,13 +824,7 @@ function applyCategorySelection() {
 
 function updateCategoryButtonText(selectedItems) {
     if (categoryButtonText) {
-        if (selectedItems.length === 0) {
-            categoryButtonText.textContent = 'Select Categories';
-        } else if (selectedItems.length === 1) {
-            categoryButtonText.textContent = selectedItems[0];
-        } else {
-            categoryButtonText.textContent = `${selectedItems.length} Categories Selected`;
-        }
+        categoryButtonText.textContent = 'Categories';
     }
 }
 
@@ -1029,14 +1023,18 @@ function updateSelectionButton(type, selectedItems) {
     const buttonText = document.getElementById(`${type}ButtonText`);
     const count = document.getElementById(`${type}Count`);
     
+    // Keep the original button text
     if (buttonText) {
-        if (selectedItems.length === 0) {
-            buttonText.textContent = `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-        } else if (selectedItems.length === 1) {
-            buttonText.textContent = selectedItems[0];
-        } else {
-            buttonText.textContent = `${selectedItems.length} Selected`;
-        }
+        const originalTexts = {
+            'gender': 'Gender',
+            'age': 'Age Range',
+            'income': 'Income Range',
+            'marital': 'Marital Status',
+            'children': 'Children Status',
+            'education': 'Education Level',
+            'race': 'Race'
+        };
+        buttonText.textContent = originalTexts[type] || `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
     }
     
     if (count) {
