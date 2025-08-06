@@ -125,6 +125,9 @@ function setupEventListeners() {
     
     // Initialize slider
     initializeSlider();
+    
+    // Setup questions file upload
+    setupQuestionsFileUpload();
 }
 
 function populateDropdowns() {
@@ -322,6 +325,170 @@ function clearAllSavedQuestions() {
     localStorage.removeItem('focus_group_questions_market_research');
     localStorage.removeItem('focus_group_questions_product_research');
     localStorage.removeItem('focus_group_questions_brand_perception');
+}
+
+function setupQuestionsFileUpload() {
+    // Setup upload buttons for each session type
+    const uploadButtons = {
+        'uploadProductQuestions': 'productQuestions',
+        'uploadMarketQuestions': 'marketQuestions',
+        'uploadBrandQuestions': 'brandQuestions'
+    };
+    
+    Object.entries(uploadButtons).forEach(([buttonId, containerId]) => {
+        const button = document.getElementById(buttonId);
+        const fileInput = document.getElementById(buttonId.replace('upload', '') + 'File');
+        
+        if (button && fileInput) {
+            button.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', (e) => {
+                handleQuestionsFileUpload(e, containerId);
+            });
+        }
+    });
+}
+
+function handleQuestionsFileUpload(event, containerId) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        const questions = parseQuestionsFromFile(content);
+        
+        if (questions.length > 0) {
+            populateQuestionsFromFile(containerId, questions);
+            showQuestionsUploadSuccess(questions.length);
+        } else {
+            showQuestionsUploadError('No valid questions found in the file. Please check the format.');
+        }
+    };
+    
+    reader.onerror = function() {
+        showQuestionsUploadError('Error reading file. Please try again.');
+    };
+    
+    reader.readAsText(file);
+}
+
+function parseQuestionsFromFile(content) {
+    const questions = [];
+    const lines = content.split('\n');
+    
+    for (let line of lines) {
+        line = line.trim();
+        
+        // Skip empty lines
+        if (!line) continue;
+        
+        // Remove common prefixes like "1.", "Q1.", "Question 1:", etc.
+        line = line.replace(/^(\d+\.|Q\d+\.|Question\s+\d+:?\s*)/i, '');
+        
+        // Skip lines that are just numbers or very short
+        if (line.length < 5) continue;
+        
+        // Skip lines that are just punctuation or special characters
+        if (/^[^\w\s]/.test(line)) continue;
+        
+        questions.push(line);
+    }
+    
+    return questions;
+}
+
+function populateQuestionsFromFile(containerId, questions) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Clear existing questions
+    container.innerHTML = '';
+    
+    // Add questions (up to 10)
+    const maxQuestions = 10;
+    const questionsToAdd = questions.slice(0, maxQuestions);
+    
+    questionsToAdd.forEach((question, index) => {
+        addQuestion(container, index + 1, question);
+    });
+    
+    // Add additional empty questions if needed
+    for (let i = questionsToAdd.length; i < maxQuestions; i++) {
+        addQuestion(container, i + 1);
+    }
+}
+
+function showQuestionsUploadSuccess(questionCount) {
+    const notification = document.createElement('div');
+    notification.className = 'questions-upload-notification success';
+    notification.innerHTML = `
+        <i class="fas fa-check-circle"></i>
+        Successfully loaded ${questionCount} questions from file
+    `;
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4CAF50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-size: 14px;
+        max-width: 300px;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 3000);
+}
+
+function showQuestionsUploadError(message) {
+    const notification = document.createElement('div');
+    notification.className = 'questions-upload-notification error';
+    notification.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        ${message}
+    `;
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #f44336;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        font-size: 14px;
+        max-width: 300px;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-in';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 5000);
 }
 
 function showSavedQuestionsNotification(sessionType, questionCount) {

@@ -653,6 +653,23 @@ body {
     color: #f44336;
 }
 
+.questions-upload-section {
+    margin-bottom: 15px;
+}
+
+.questions-upload-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.upload-hint {
+    color: #666;
+    font-size: 14px;
+    font-style: italic;
+}
+
 .questions-container {
     display: flex;
     flex-direction: column;
