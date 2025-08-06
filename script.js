@@ -585,9 +585,11 @@ function addQuestion(container, questionNumber, questionText = '') {
     const questionItem = document.createElement('div');
     questionItem.className = 'question-item';
     
+    const translations = CONFIG.TRANSLATIONS[currentLanguage] || CONFIG.TRANSLATIONS.en;
+    
     questionItem.innerHTML = `
         <div class="question-number">${questionNumber}</div>
-        <input type="text" class="question-input" placeholder="Enter question ${questionNumber}..." value="${questionText}" maxlength="500">
+        <input type="text" class="question-input" placeholder="${translations.enterQuestion} ${questionNumber}..." value="${questionText}" maxlength="500">
     `;
     
     container.appendChild(questionItem);
@@ -1064,13 +1066,13 @@ function updateFormTexts(translations) {
         }
     });
     
-    // Update other text elements
-    const textElements = {
-        'selectedCriteriaTitle': translations.selectedCriteria,
-        'questionsLabel1': translations.questions,
-        'questionsLabel2': translations.questions,
-        'questionsLabel3': translations.questions
-    };
+    // Update question input placeholders
+    const questionInputs = document.querySelectorAll('.question-input');
+    questionInputs.forEach(input => {
+        if (input.placeholder.includes('Enter question') || input.placeholder.includes('输入问题') || input.placeholder.includes('輸入問題')) {
+            input.placeholder = translations.enterQuestion || 'Enter question...';
+        }
+    });
     
     // Find and update questions labels
     const allLabels = document.querySelectorAll('label');
@@ -1104,6 +1106,30 @@ function updateFormTexts(translations) {
     const gotItButton = document.querySelector('#closeSuccessModalBtn');
     if (gotItButton) {
         gotItButton.textContent = translations.gotIt;
+    }
+    
+    // Update demographic options
+    updateDemographicOptions(translations);
+}
+
+function updateDemographicOptions(translations) {
+    // Update "Any" labels in all demographic modals
+    const anyLabels = document.querySelectorAll('label[for*="-any"]');
+    anyLabels.forEach(label => {
+        if (label.textContent === 'Any' || label.textContent === '任何') {
+            label.textContent = translations.any;
+        }
+    });
+    
+    // Update gender options
+    const maleLabel = document.querySelector('label[for="gender-male"]');
+    if (maleLabel) {
+        maleLabel.textContent = translations.male;
+    }
+    
+    const femaleLabel = document.querySelector('label[for="gender-female"]');
+    if (femaleLabel) {
+        femaleLabel.textContent = translations.female;
     }
 }
 

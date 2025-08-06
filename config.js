@@ -247,7 +247,12 @@ const CONFIG = {
         successMessage: "Your focus group request has been successfully submitted.",
         emailNotice: "You will receive an email with your focus group results when they are ready.",
         processingInfo: "Processing typically takes 5-10 minutes.",
-        gotIt: "Got it!"
+        gotIt: "Got it!",
+        enterQuestion: "Enter question...",
+        // Demographic options
+        any: "Any",
+        male: "Male",
+        female: "Female"
         },
         "zh-cn": {
             focusGroupSystem: "焦点小组系统",
@@ -296,7 +301,12 @@ const CONFIG = {
         successMessage: "您的焦点小组请求已成功提交。",
         emailNotice: "当结果准备好时，您将收到一封包含焦点小组结果的电子邮件。",
         processingInfo: "处理通常需要5-10分钟。",
-        gotIt: "知道了!"
+        gotIt: "知道了!",
+        enterQuestion: "输入问题...",
+        // Demographic options
+        any: "任何",
+        male: "男性",
+        female: "女性"
         },
         "zh-hk": {
             focusGroupSystem: "焦點小組系統",
@@ -345,7 +355,12 @@ const CONFIG = {
         successMessage: "您的焦點小組請求已成功提交。",
         emailNotice: "當結果準備好時，您將收到一封包含焦點小組結果的電子郵件。",
         processingInfo: "處理通常需要5-10分鐘。",
-        gotIt: "知道了!"
+        gotIt: "知道了!",
+        enterQuestion: "輸入問題...",
+        // Demographic options
+        any: "任何",
+        male: "男性",
+        female: "女性"
         }
     }
 };
