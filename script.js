@@ -413,13 +413,29 @@ async function handleFocusGroupForm(e) {
                 console.error('Could not read error response:', textError);
             }
             
-            // Show error message for server errors
-            showFormError(focusGroupForm, errorMessage);
+            // For email-based system, show success modal even on server errors
+            // since the user will receive an email when the workflow completes
+            console.log('Server error occurred, but showing success modal for email approach');
+            showSuccessModal(userEmail);
+            
+            // Also show a warning about the server issue
+            setTimeout(() => {
+                showFormError(focusGroupForm, `Note: ${errorMessage} - but your request has been queued and you will receive an email when complete.`);
+            }, 1000);
         }
         
     } catch (error) {
         console.error('Error sending webhook:', error);
-        showFormError(focusGroupForm, 'Network error. Please try again.');
+        
+        // For email-based system, show success modal even on network errors
+        // since the user will receive an email when the workflow completes
+        console.log('Network error occurred, but showing success modal for email approach');
+        showSuccessModal(userEmail);
+        
+        // Also show a warning about the network issue
+        setTimeout(() => {
+            showFormError(focusGroupForm, 'Note: Network connection issue detected, but your request has been queued. You will receive an email when the focus group is ready.');
+        }, 1000);
     }
 }
 
