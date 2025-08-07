@@ -33,8 +33,8 @@ window.handleLoginClick = function(event) {
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
         
         // Show main section
-        const loginSection = document.getElementById('loginSection');
-        const mainSection = document.getElementById('mainSection');
+const loginSection = document.getElementById('loginSection');
+const mainSection = document.getElementById('mainSection');
         
         if (loginSection && mainSection) {
             loginSection.style.display = 'none';
@@ -49,7 +49,7 @@ window.handleLoginClick = function(event) {
             }
         }
     } else {
-        const loginError = document.getElementById('loginError');
+const loginError = document.getElementById('loginError');
         if (loginError) {
             loginError.style.display = 'block';
             setTimeout(() => {
@@ -152,24 +152,24 @@ function initializeApp() {
 function setupEventListeners() {
     // Login functionality
     if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
+    loginForm.addEventListener('submit', handleLogin);
     } else {
         console.error('Login form not found!');
     }
     
     // Logout button
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', handleLogout);
+    logoutBtn.addEventListener('click', handleLogout);
     }
     
     // Form submissions
     if (focusGroupForm) {
-        focusGroupForm.addEventListener('submit', handleFocusGroupForm);
+    focusGroupForm.addEventListener('submit', handleFocusGroupForm);
     }
     
     // Session type change
     if (sessionTypeSelect) {
-        sessionTypeSelect.addEventListener('change', handleSessionTypeChange);
+    sessionTypeSelect.addEventListener('change', handleSessionTypeChange);
     }
     
     // Success modal events
@@ -229,7 +229,7 @@ function handleSessionTypeChange() {
     
     // Show session fields container
     if (sessionFields) {
-        sessionFields.style.display = 'block';
+    sessionFields.style.display = 'block';
     }
     
     // Show specific fields based on session type
@@ -284,7 +284,7 @@ function handleFocusGroupForm(e) {
     }
     
     // Prepare webhook data
-    const sliderValue = '10'; // Fixed to standard focus group size
+    const numberOfParticipants = 10; // Fixed to standard focus group size
     
     // Get all selected demographic data
     const selectedGenders = window.selectedGenders || [];
@@ -343,7 +343,7 @@ function handleFocusGroupForm(e) {
         // Session information
         session_type: sessionType,
         session_name: formData.get('sessionName'),
-        number_of_participants: parseInt(sliderValue),
+        number_of_participants: numberOfParticipants,
         user_email: userEmail,
         
         // Session-specific data
@@ -373,11 +373,11 @@ function handleFocusGroupForm(e) {
     
     // Send to n8n webhook (fire and forget)
     fetch(CONFIG.WEBHOOK_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(webhookData)
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(webhookData)
     }).catch(error => {
         console.error('Error sending webhook:', error);
         // Don't show error to user - just log it
@@ -394,7 +394,7 @@ function showSuccessModal(email) {
     
     if (successModal) {
         successModal.style.display = 'flex';
-    } else {
+        } else {
         console.error('Success modal element not found!');
     }
 }
@@ -411,42 +411,42 @@ function closeSuccessModalHandler() {
 
 function showMainSection() {
     if (loginSection && mainSection) {
-        loginSection.style.display = 'none';
-        mainSection.style.display = 'block';
-        
-        // Re-initialize slider after showing main section
+    loginSection.style.display = 'none';
+    mainSection.style.display = 'block';
+    
+    // Re-initialize slider after showing main section
 
     }
 }
 
 function showLoginSection() {
     if (mainSection && loginSection) {
-        mainSection.style.display = 'none';
-        loginSection.style.display = 'block';
+    mainSection.style.display = 'none';
+    loginSection.style.display = 'block';
     }
 }
 
 function clearLoginForm() {
     if (loginForm) {
-        loginForm.reset();
+    loginForm.reset();
     }
     if (loginError) {
-        loginError.style.display = 'none';
+    loginError.style.display = 'none';
     }
 }
 
 function showLoginError() {
     if (loginError) {
-        loginError.style.display = 'block';
+    loginError.style.display = 'block';
     }
     if (passwordInput) {
-        passwordInput.focus();
+    passwordInput.focus();
     }
     
     // Clear error after 3 seconds
     setTimeout(() => {
         if (loginError) {
-            loginError.style.display = 'none';
+        loginError.style.display = 'none';
         }
     }, 3000);
 }
@@ -655,8 +655,8 @@ function populateCategoryTabs() {
         </button>
         <button class="category-tab" onclick="switchToTab('product_categories')">
             <i class="fas fa-tags"></i> ${translations.productCategories}
-        </button>
-    `;
+            </button>
+        `;
 }
 
 function populateCategoryGroups() {
