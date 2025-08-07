@@ -570,9 +570,14 @@ function showFormError(form, message) {
 
 // Session types and categories management
 function populateDropdowns() {
+    console.log('populateDropdowns called');
+    console.log('sessionTypeSelect:', sessionTypeSelect);
+    console.log('CONFIG.SESSION_TYPES:', CONFIG.SESSION_TYPES);
+    
     // Populate session types
     if (sessionTypeSelect) {
         const translations = CONFIG.TRANSLATIONS[currentLanguage] || CONFIG.TRANSLATIONS.en;
+        console.log('translations:', translations);
         
         sessionTypeSelect.innerHTML = `<option value="">${translations.selectSessionType}</option>`;
         
@@ -625,12 +630,18 @@ function populateDropdowns() {
             sessionTypeSelect.appendChild(option);
         });
         
+        console.log('Options added to sessionTypeSelect. Current options:', sessionTypeSelect.options.length);
+        
         // Set Market Research as default
         sessionTypeSelect.value = 'market_research';
+        console.log('Set default value to market_research. Current value:', sessionTypeSelect.value);
         
         // Trigger the change event to show the market research fields
         const changeEvent = new Event('change');
         sessionTypeSelect.dispatchEvent(changeEvent);
+        console.log('Change event dispatched');
+    } else {
+        console.error('sessionTypeSelect element not found!');
     }
     
     // Category modals are now set up after login
