@@ -815,7 +815,16 @@ function populateBuyingBehaviors() {
         buyingBehaviorsList.appendChild(checkboxDiv);
     });
     
-    setupCheckboxInteractions(buyingBehaviorsList);
+    // Setup checkbox interactions
+    const checkboxes = buyingBehaviorsList.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            // Update selections when checkboxes change
+            const selectedItems = Array.from(buyingBehaviorsList.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.getAttribute('data-category'));
+            updateBuyingBehaviorsButtonText(selectedItems);
+        });
+    });
 }
 
 function populateProductCategories() {
@@ -845,7 +854,16 @@ function populateProductCategories() {
         productCategoriesList.appendChild(checkboxDiv);
     });
     
-    setupCheckboxInteractions(productCategoriesList);
+    // Setup checkbox interactions
+    const checkboxes = productCategoriesList.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            // Update selections when checkboxes change
+            const selectedItems = Array.from(productCategoriesList.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.getAttribute('data-category'));
+            updateProductCategoriesButtonText(selectedItems);
+        });
+    });
 }
 
 
