@@ -706,11 +706,29 @@ body {
 .file-upload-text {
     color: #666;
     font-size: 14px;
+    transition: all 0.3s ease;
+    text-align: center;
 }
 
 .file-upload-text i {
     margin-right: 8px;
     color: #ffd700;
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.file-upload-text div {
+    margin-top: 5px;
+}
+
+.file-upload-text strong {
+    display: block;
+    margin-bottom: 2px;
+}
+
+.file-upload-text small {
+    color: #888;
 }
 
 /* Buttons */

@@ -253,6 +253,9 @@ function handleSessionTypeChange() {
     
     // Setup character counters once after showing fields
     setupCharacterCounters();
+    
+    // Setup file upload feedback
+    setupFileUploads();
 }
 
 function handleFocusGroupForm(e) {
@@ -982,6 +985,41 @@ function initializeSelectionButtons() {
 }
 
 // Slider function removed - using fixed 10 participants
+
+function setupFileUploads() {
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    
+    fileInputs.forEach(input => {
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const uploadText = this.parentNode.querySelector('.file-upload-text');
+            
+            if (file) {
+                // Show file name and size
+                const fileSize = (file.size / 1024 / 1024).toFixed(2); // Convert to MB
+                uploadText.innerHTML = `
+                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                    <div>
+                        <strong>${file.name}</strong><br>
+                        <small>${fileSize} MB</small>
+                    </div>
+                `;
+                uploadText.style.color = '#28a745';
+            } else {
+                // Reset to default state
+                const isProductImage = this.id === 'productImage';
+                const isBrandImage = this.id === 'brandImage';
+                const label = isProductImage ? 'product image' : isBrandImage ? 'brand image' : 'image';
+                
+                uploadText.innerHTML = `
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Click to upload ${label} or drag and drop
+                `;
+                uploadText.style.color = '';
+            }
+        });
+    });
+}
 
 function initializeLanguage() {
     if (languageSelect) {
