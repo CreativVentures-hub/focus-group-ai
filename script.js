@@ -892,6 +892,18 @@ function applyBuyingBehaviorsSelection() {
 }
 
 function updateBuyingBehaviorsButtonText(selectedItems) {
+    // Use the same styling system as demographic buttons
+    const button = document.querySelector('#openBuyingBehaviorsModal');
+    if (button) {
+        if (selectedItems.length === 0) {
+            button.classList.remove('selected');
+            button.classList.add('btn-outline');
+        } else {
+            button.classList.remove('btn-outline');
+            button.classList.add('selected');
+        }
+    }
+    
     if (buyingBehaviorsButtonText && buyingBehaviorsCount) {
         if (selectedItems.length === 0) {
             buyingBehaviorsButtonText.textContent = 'Select Buying Behaviors';
@@ -931,6 +943,18 @@ function applyProductCategoriesSelection() {
 }
 
 function updateProductCategoriesButtonText(selectedItems) {
+    // Use the same styling system as demographic buttons
+    const button = document.querySelector('#openProductCategoriesModal');
+    if (button) {
+        if (selectedItems.length === 0) {
+            button.classList.remove('selected');
+            button.classList.add('btn-outline');
+        } else {
+            button.classList.remove('btn-outline');
+            button.classList.add('selected');
+        }
+    }
+    
     if (productCategoriesButtonText && productCategoriesCount) {
         if (selectedItems.length === 0) {
             productCategoriesButtonText.textContent = 'Select Product Categories';
@@ -1209,12 +1233,18 @@ function initializeSelectionButtons() {
 // Slider function removed - using fixed 10 participants
 
 function setupFileUploads() {
+    console.log('setupFileUploads called');
     const fileInputs = document.querySelectorAll('input[type="file"]');
+    console.log('Found file inputs:', fileInputs.length);
     
     fileInputs.forEach(input => {
+        console.log('Setting up file input:', input.id);
         input.addEventListener('change', function(e) {
+            console.log('File input change event triggered for:', this.id);
             const file = e.target.files[0];
             const uploadText = this.parentNode.querySelector('.file-upload-text');
+            console.log('File selected:', file ? file.name : 'none');
+            console.log('Upload text element:', uploadText);
             
             if (file) {
                 // Show file name and size
