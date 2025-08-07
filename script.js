@@ -597,8 +597,8 @@ function populateDropdowns() {
         sessionTypeSelect.dispatchEvent(changeEvent);
     }
     
-    // Initialize category modal
-    setupCategoryModal();
+    // Category modals are now set up after login
+    // setupCategoryModal();
 }
 
 function getSelectedCategories() {
