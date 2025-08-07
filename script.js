@@ -167,13 +167,22 @@ function initializeDOMElements() {
 }
 
 function initializeApp() {
+    console.log('initializeApp called');
+    
     // Check if user is already logged in
     const isLoggedIn = sessionStorage.getItem('focusGroupLoggedIn') === 'true';
+    console.log('isLoggedIn:', isLoggedIn);
     
     if (isLoggedIn) {
         console.log('User already logged in, showing main section...');
         showMainSection();
-        populateDropdowns();
+        console.log('About to call populateDropdowns...');
+        try {
+            populateDropdowns();
+            console.log('populateDropdowns completed successfully');
+        } catch (error) {
+            console.error('Error in populateDropdowns:', error);
+        }
         // Trigger session type change to show appropriate fields
         handleSessionTypeChange();
     } else {
@@ -1234,13 +1243,14 @@ function initializeLanguage() {
 function handleLanguageChange() {
     currentLanguage = languageSelect.value;
     updateLanguage();
+    populateDropdowns(); // Repopulate dropdowns with new language
 }
 
 function updateLanguage() {
     const translations = CONFIG.TRANSLATIONS[currentLanguage] || CONFIG.TRANSLATIONS.en;
     updateFormTexts(translations);
     updateButtonTexts(translations);
-    populateDropdowns(); // Repopulate dropdowns with new language
+    // populateDropdowns() is called separately when needed
 }
 
 function forceEnglishMode() {
@@ -1252,7 +1262,7 @@ function forceEnglishMode() {
     const translations = CONFIG.TRANSLATIONS.en;
     updateFormTexts(translations);
     updateButtonTexts(translations);
-    populateDropdowns();
+    // populateDropdowns() is already called in initializeApp, no need to call it again
     updateModalContent(translations);
     updateDemographicOptions(translations);
 }
