@@ -129,6 +129,13 @@ function initializeDOMElements() {
     productCategoriesButtonText = document.getElementById('productCategoriesButtonText');
     productCategoriesCount = document.getElementById('productCategoriesCount');
     
+    // Debug DOM element initialization
+    console.log('DOM Elements initialized:');
+    console.log('buyingBehaviorsModal:', buyingBehaviorsModal);
+    console.log('openBuyingBehaviorsModal:', openBuyingBehaviorsModal);
+    console.log('productCategoriesModal:', productCategoriesModal);
+    console.log('openProductCategoriesModal:', openProductCategoriesModal);
+    
     // Slider elements
     // Slider elements removed - using fixed 10 participants
     
@@ -223,8 +230,10 @@ function handleLogin(e) {
         clearLoginForm();
         
         // Set up modals after login
+        console.log('Setting up modals after login...');
         setupBuyingBehaviorsModal();
         setupProductCategoriesModal();
+        console.log('Modal setup complete');
         
         // Trigger session type change to show appropriate fields
         handleSessionTypeChange();
