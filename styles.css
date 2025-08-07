@@ -680,19 +680,28 @@ body {
 
 .file-upload {
     position: relative;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     background: #f8f9fa;
     border: 2px dashed #e1e5e9;
     border-radius: 8px;
     padding: 20px;
     text-align: center;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
     width: 100%;
+    min-height: 120px;
 }
 
 .file-upload:hover {
     border-color: #ffd700;
+    background-color: #fffbf0;
+}
+
+.file-upload.has-file {
+    border-color: #28a745;
+    background-color: #f8fff9;
 }
 
 .file-upload input[type="file"] {
@@ -701,6 +710,7 @@ body {
     width: 100%;
     height: 100%;
     cursor: pointer;
+    z-index: 1;
 }
 
 .file-upload-text {
@@ -708,6 +718,7 @@ body {
     font-size: 14px;
     transition: all 0.3s ease;
     text-align: center;
+    width: 100%;
 }
 
 .file-upload-text i {
@@ -729,6 +740,57 @@ body {
 
 .file-upload-text small {
     color: #888;
+}
+
+/* File upload success state */
+.file-upload-success {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.file-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.file-actions .btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.file-actions .replace-file {
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #007bff;
+}
+
+.file-actions .replace-file:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.file-actions .remove-file {
+    background-color: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
+}
+
+.file-actions .remove-file:hover {
+    background-color: #c82333;
+    border-color: #c82333;
 }
 
 /* Buttons */

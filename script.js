@@ -1239,24 +1239,57 @@ function setupFileUploads() {
     
     fileInputs.forEach(input => {
         console.log('Setting up file input:', input.id);
-        input.addEventListener('change', function(e) {
+        
+        // Remove existing event listeners to prevent duplication
+        const newInput = input.cloneNode(true);
+        input.parentNode.replaceChild(newInput, input);
+        
+        // Get the upload area (parent container)
+        const uploadArea = newInput.parentNode;
+        const uploadText = uploadArea.querySelector('.file-upload-text');
+        
+        // Add click handler to the upload area
+        uploadArea.addEventListener('click', function(e) {
+            // Don't trigger if clicking on remove/replace buttons
+            if (e.target.classList.contains('remove-file') || e.target.classList.contains('replace-file')) {
+                return;
+            }
+            newInput.click();
+        });
+        
+        // Add change event listener
+        newInput.addEventListener('change', function(e) {
             console.log('File input change event triggered for:', this.id);
             const file = e.target.files[0];
-            const uploadText = this.parentNode.querySelector('.file-upload-text');
             console.log('File selected:', file ? file.name : 'none');
             console.log('Upload text element:', uploadText);
             
             if (file) {
-                // Show file name and size
+                // Show file name, size, and action buttons
                 const fileSize = (file.size / 1024 / 1024).toFixed(2); // Convert to MB
+                const isProductImage = this.id === 'productImage';
+                const isBrandImage = this.id === 'brandImage';
+                const label = isProductImage ? 'product image' : isBrandImage ? 'brand image' : 'image';
+                
                 uploadText.innerHTML = `
-                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
-                    <div>
-                        <strong>${file.name}</strong><br>
-                        <small>${fileSize} MB</small>
+                    <div class="file-upload-success">
+                        <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                        <div class="file-info">
+                            <strong>${file.name}</strong><br>
+                            <small>${fileSize} MB</small>
+                        </div>
+                        <div class="file-actions">
+                            <button type="button" class="btn btn-sm btn-outline replace-file" onclick="replaceFile('${this.id}')">
+                                <i class="fas fa-sync-alt"></i> Replace
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline remove-file" onclick="removeFile('${this.id}')">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
                     </div>
                 `;
                 uploadText.style.color = '#28a745';
+                uploadArea.classList.add('has-file');
             } else {
                 // Reset to default state
                 const isProductImage = this.id === 'productImage';
@@ -1268,9 +1301,39 @@ function setupFileUploads() {
                     Click to upload ${label} or drag and drop
                 `;
                 uploadText.style.color = '';
+                uploadArea.classList.remove('has-file');
             }
         });
     });
+}
+
+// Global functions for file actions
+function replaceFile(inputId) {
+    const input = document.getElementById(inputId);
+    if (input) {
+        input.value = ''; // Clear the input
+        input.click(); // Trigger file dialog
+    }
+}
+
+function removeFile(inputId) {
+    const input = document.getElementById(inputId);
+    if (input) {
+        input.value = ''; // Clear the input
+        const uploadArea = input.parentNode;
+        const uploadText = uploadArea.querySelector('.file-upload-text');
+        const isProductImage = inputId === 'productImage';
+        const isBrandImage = inputId === 'brandImage';
+        const label = isProductImage ? 'product image' : isBrandImage ? 'brand image' : 'image';
+        
+        // Reset to default state
+        uploadText.innerHTML = `
+            <i class="fas fa-cloud-upload-alt"></i>
+            Click to upload ${label} or drag and drop
+        `;
+        uploadText.style.color = '';
+        uploadArea.classList.remove('has-file');
+    }
 }
 
 function initializeLanguage() {
