@@ -221,6 +221,9 @@ function handleLogin(e) {
         showMainSection();
         populateDropdowns();
         clearLoginForm();
+        
+        // Trigger session type change to show appropriate fields
+        handleSessionTypeChange();
     } else {
         showLoginError();
     }
@@ -658,20 +661,42 @@ function setupCharacterCounters() {
 
 // Buying behaviors modal functionality
 function setupBuyingBehaviorsModal() {
+    console.log('Setting up buying behaviors modal...');
+    console.log('openBuyingBehaviorsModal:', openBuyingBehaviorsModal);
+    console.log('closeBuyingBehaviorsModal:', closeBuyingBehaviorsModal);
+    console.log('applyBuyingBehaviors:', applyBuyingBehaviors);
+    console.log('clearAllBuyingBehaviors:', clearAllBuyingBehaviors);
+    console.log('buyingBehaviorsSearch:', buyingBehaviorsSearch);
+    
     if (openBuyingBehaviorsModal) {
         openBuyingBehaviorsModal.addEventListener('click', showBuyingBehaviorsModal);
+        console.log('Added click listener to openBuyingBehaviorsModal');
+    } else {
+        console.error('openBuyingBehaviorsModal element not found!');
     }
     if (closeBuyingBehaviorsModal) {
         closeBuyingBehaviorsModal.addEventListener('click', hideBuyingBehaviorsModal);
+        console.log('Added click listener to closeBuyingBehaviorsModal');
+    } else {
+        console.error('closeBuyingBehaviorsModal element not found!');
     }
     if (applyBuyingBehaviors) {
         applyBuyingBehaviors.addEventListener('click', applyBuyingBehaviorsSelection);
+        console.log('Added click listener to applyBuyingBehaviors');
+    } else {
+        console.error('applyBuyingBehaviors element not found!');
     }
     if (clearAllBuyingBehaviors) {
         clearAllBuyingBehaviors.addEventListener('click', clearAllBuyingBehaviorsSelections);
+        console.log('Added click listener to clearAllBuyingBehaviors');
+    } else {
+        console.error('clearAllBuyingBehaviors element not found!');
     }
     if (buyingBehaviorsSearch) {
         buyingBehaviorsSearch.addEventListener('input', (e) => filterBuyingBehaviorsModal(e.target.value));
+        console.log('Added input listener to buyingBehaviorsSearch');
+    } else {
+        console.error('buyingBehaviorsSearch element not found!');
     }
     
     populateBuyingBehaviors();
@@ -679,20 +704,42 @@ function setupBuyingBehaviorsModal() {
 
 // Product categories modal functionality
 function setupProductCategoriesModal() {
+    console.log('Setting up product categories modal...');
+    console.log('openProductCategoriesModal:', openProductCategoriesModal);
+    console.log('closeProductCategoriesModal:', closeProductCategoriesModal);
+    console.log('applyProductCategories:', applyProductCategories);
+    console.log('clearAllProductCategories:', clearAllProductCategories);
+    console.log('productCategoriesSearch:', productCategoriesSearch);
+    
     if (openProductCategoriesModal) {
         openProductCategoriesModal.addEventListener('click', showProductCategoriesModal);
+        console.log('Added click listener to openProductCategoriesModal');
+    } else {
+        console.error('openProductCategoriesModal element not found!');
     }
     if (closeProductCategoriesModal) {
         closeProductCategoriesModal.addEventListener('click', hideProductCategoriesModal);
+        console.log('Added click listener to closeProductCategoriesModal');
+    } else {
+        console.error('closeProductCategoriesModal element not found!');
     }
     if (applyProductCategories) {
         applyProductCategories.addEventListener('click', applyProductCategoriesSelection);
+        console.log('Added click listener to applyProductCategories');
+    } else {
+        console.error('applyProductCategories element not found!');
     }
     if (clearAllProductCategories) {
         clearAllProductCategories.addEventListener('click', clearAllProductCategoriesSelections);
+        console.log('Added click listener to clearAllProductCategories');
+    } else {
+        console.error('clearAllProductCategories element not found!');
     }
     if (productCategoriesSearch) {
         productCategoriesSearch.addEventListener('input', (e) => filterProductCategoriesModal(e.target.value));
+        console.log('Added input listener to productCategoriesSearch');
+    } else {
+        console.error('productCategoriesSearch element not found!');
     }
     
     populateProductCategories();
@@ -1003,26 +1050,44 @@ function filterProductCategoriesModal(searchTerm) {
 }
 
 function showBuyingBehaviorsModal() {
+    console.log('showBuyingBehaviorsModal called');
+    console.log('buyingBehaviorsModal:', buyingBehaviorsModal);
     if (buyingBehaviorsModal) {
         buyingBehaviorsModal.style.display = 'flex';
+        console.log('Buying behaviors modal shown');
+    } else {
+        console.error('buyingBehaviorsModal element not found!');
     }
 }
 
 function hideBuyingBehaviorsModal() {
+    console.log('hideBuyingBehaviorsModal called');
     if (buyingBehaviorsModal) {
         buyingBehaviorsModal.style.display = 'none';
+        console.log('Buying behaviors modal hidden');
+    } else {
+        console.error('buyingBehaviorsModal element not found!');
     }
 }
 
 function showProductCategoriesModal() {
+    console.log('showProductCategoriesModal called');
+    console.log('productCategoriesModal:', productCategoriesModal);
     if (productCategoriesModal) {
         productCategoriesModal.style.display = 'flex';
+        console.log('Product categories modal shown');
+    } else {
+        console.error('productCategoriesModal element not found!');
     }
 }
 
 function hideProductCategoriesModal() {
+    console.log('hideProductCategoriesModal called');
     if (productCategoriesModal) {
         productCategoriesModal.style.display = 'none';
+        console.log('Product categories modal hidden');
+    } else {
+        console.error('productCategoriesModal element not found!');
     }
 }
 
