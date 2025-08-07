@@ -136,6 +136,8 @@ function initializeDOMElements() {
     console.log('productCategoriesModal:', productCategoriesModal);
     console.log('openProductCategoriesModal:', openProductCategoriesModal);
     
+
+    
     // Slider elements
     // Slider elements removed - using fixed 10 participants
     
@@ -210,6 +212,8 @@ function setupEventListeners() {
     
     // Initialize all selection buttons with default text
     initializeSelectionButtons();
+    
+
 }
 
 function handleLogin(e) {
@@ -228,12 +232,6 @@ function handleLogin(e) {
         showMainSection();
         populateDropdowns();
         clearLoginForm();
-        
-        // Set up modals after login
-        console.log('Setting up modals after login...');
-        setupBuyingBehaviorsModal();
-        setupProductCategoriesModal();
-        console.log('Modal setup complete');
         
         // Trigger session type change to show appropriate fields
         handleSessionTypeChange();
@@ -484,7 +482,11 @@ function showMainSection() {
     mainSection.style.display = 'block';
     
     // Re-initialize slider after showing main section
-
+    
+    // Re-attach modal event listeners after showing main section
+    console.log('Main section shown, re-attaching modal listeners...');
+    setupBuyingBehaviorsModal();
+    setupProductCategoriesModal();
     }
 }
 
@@ -707,6 +709,8 @@ function setupBuyingBehaviorsModal() {
     console.log('buyingBehaviorsSearch:', buyingBehaviorsSearch);
     
     if (openBuyingBehaviorsModal) {
+        // Remove any existing listeners first
+        openBuyingBehaviorsModal.removeEventListener('click', showBuyingBehaviorsModal);
         openBuyingBehaviorsModal.addEventListener('click', showBuyingBehaviorsModal);
         console.log('Added click listener to openBuyingBehaviorsModal');
     } else {
@@ -750,6 +754,8 @@ function setupProductCategoriesModal() {
     console.log('productCategoriesSearch:', productCategoriesSearch);
     
     if (openProductCategoriesModal) {
+        // Remove any existing listeners first
+        openProductCategoriesModal.removeEventListener('click', showProductCategoriesModal);
         openProductCategoriesModal.addEventListener('click', showProductCategoriesModal);
         console.log('Added click listener to openProductCategoriesModal');
     } else {
@@ -1093,6 +1099,7 @@ function showBuyingBehaviorsModal() {
     if (buyingBehaviorsModal) {
         buyingBehaviorsModal.style.display = 'flex';
         console.log('Buying behaviors modal shown');
+        console.log('Modal display style:', buyingBehaviorsModal.style.display);
     } else {
         console.error('buyingBehaviorsModal element not found!');
     }
@@ -1114,6 +1121,7 @@ function showProductCategoriesModal() {
     if (productCategoriesModal) {
         productCategoriesModal.style.display = 'flex';
         console.log('Product categories modal shown');
+        console.log('Modal display style:', productCategoriesModal.style.display);
     } else {
         console.error('productCategoriesModal element not found!');
     }
