@@ -407,8 +407,9 @@ function handleFocusGroupForm(e) {
             sessionSpecificData = {
                 product_name: formData.get('productName') || '',
                 product_description: formData.get('productDescription') || '',
+                product_price: formData.get('productPrice') || '',
                 product_image: formData.get('productImage') ? 'image_provided' : 'no_image'
-                // AI will generate questions from product name, description, and image
+                // AI will generate questions from product name, description, price, and image
             };
             break;
         case 'market_research':
@@ -676,6 +677,7 @@ function validateWebhookData(data) {
     } else if (data.session_type === 'product_research') {
         if (!data.product_name) errors.push('Product name is required');
         if (!data.product_description) errors.push('Product description is required');
+        if (!data.product_price) errors.push('Product price is required');
     } else if (data.session_type === 'brand_perception') {
         if (!data.brand_name) errors.push('Brand name is required');
         if (!data.brand_description) errors.push('Brand description is required');
@@ -1390,6 +1392,7 @@ function updateFormTexts(translations) {
         'numberOfParticipants': translations.numberOfParticipants,
         'productName': translations.productName,
         'productDescription': translations.productDescription,
+        'productPrice': translations.productPrice,
         'productImage': translations.productImage,
         'marketName': translations.marketName,
         'marketDescription': translations.marketDescription,
@@ -1418,6 +1421,7 @@ function updateFormTexts(translations) {
         'sessionName': translations.enterSessionName,
         'productName': translations.enterProductName,
         'productDescription': translations.describeProduct,
+        'productPrice': translations.enterProductPrice,
         'marketName': translations.enterMarketName,
         'marketDescription': translations.describeMarket,
         'brandName': translations.enterBrandName,
