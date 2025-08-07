@@ -189,9 +189,6 @@ function setupEventListeners() {
     
     // Initialize all selection buttons with default text
     initializeSelectionButtons();
-    
-    // Initialize slider
-    initializeSlider();
 }
 
 function handleLogin(e) {
@@ -210,6 +207,9 @@ function handleLogin(e) {
         showMainSection();
         populateDropdowns();
         clearLoginForm();
+        
+        // Initialize slider after login since the main section is now visible
+        initializeSlider();
     } else {
         showLoginError();
     }
@@ -1038,13 +1038,22 @@ function initializeSelectionButtons() {
 }
 
 function initializeSlider() {
-    if (numberOfParticipantsSlider && numberOfParticipantsValue) {
-        numberOfParticipantsSlider.addEventListener('input', function() {
-            numberOfParticipantsValue.textContent = this.value;
+    // Re-get the elements in case they weren't available during initial DOM setup
+    const slider = document.getElementById('numberOfParticipants');
+    const valueDisplay = document.getElementById('numberOfParticipantsValue');
+    
+    if (slider && valueDisplay) {
+        // Add event listener for slider changes
+        slider.addEventListener('input', function() {
+            valueDisplay.textContent = this.value;
         });
         
         // Set initial value
-        numberOfParticipantsValue.textContent = numberOfParticipantsSlider.value;
+        valueDisplay.textContent = slider.value;
+        
+        console.log('Slider initialized successfully');
+    } else {
+        console.error('Slider elements not found:', { slider: !!slider, valueDisplay: !!valueDisplay });
     }
 }
 
