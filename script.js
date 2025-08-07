@@ -11,7 +11,7 @@ window.addEventListener('error', function(e) {
     });
 });
 
-// Also catch unhandled promise rejections
+// Catch unhandled promise rejections
 window.addEventListener('unhandledrejection', function(e) {
     console.error('Unhandled promise rejection:', e.reason);
 });
@@ -223,10 +223,6 @@ function setupEventListeners() {
     if (closeSuccessModalBtn) {
         closeSuccessModalBtn.addEventListener('click', closeSuccessModalHandler);
     }
-    
-    // Category modal events - will be set up after login
-    // setupBuyingBehaviorsModal();
-    // setupProductCategoriesModal();
     
     // Setup all demographic modals
     setupDemographicModals();
@@ -731,89 +727,42 @@ function setupCharacterCounters() {
 
 // Buying behaviors modal functionality
 function setupBuyingBehaviorsModal() {
-    console.log('Setting up buying behaviors modal...');
-    console.log('openBuyingBehaviorsModal:', openBuyingBehaviorsModal);
-    console.log('closeBuyingBehaviorsModal:', closeBuyingBehaviorsModal);
-    console.log('applyBuyingBehaviors:', applyBuyingBehaviors);
-    console.log('clearAllBuyingBehaviors:', clearAllBuyingBehaviors);
-    console.log('buyingBehaviorsSearch:', buyingBehaviorsSearch);
-    
     if (openBuyingBehaviorsModal) {
-        // Remove any existing listeners first
         openBuyingBehaviorsModal.removeEventListener('click', showBuyingBehaviorsModal);
         openBuyingBehaviorsModal.addEventListener('click', showBuyingBehaviorsModal);
-        console.log('Added click listener to openBuyingBehaviorsModal');
-    } else {
-        console.error('openBuyingBehaviorsModal element not found!');
     }
     if (closeBuyingBehaviorsModal) {
         closeBuyingBehaviorsModal.addEventListener('click', hideBuyingBehaviorsModal);
-        console.log('Added click listener to closeBuyingBehaviorsModal');
-    } else {
-        console.error('closeBuyingBehaviorsModal element not found!');
     }
     if (applyBuyingBehaviors) {
         applyBuyingBehaviors.addEventListener('click', applyBuyingBehaviorsSelection);
-        console.log('Added click listener to applyBuyingBehaviors');
-    } else {
-        console.error('applyBuyingBehaviors element not found!');
     }
     if (clearAllBuyingBehaviors) {
         clearAllBuyingBehaviors.addEventListener('click', clearAllBuyingBehaviorsSelections);
-        console.log('Added click listener to clearAllBuyingBehaviors');
-    } else {
-        console.error('clearAllBuyingBehaviors element not found!');
     }
     if (buyingBehaviorsSearch) {
         buyingBehaviorsSearch.addEventListener('input', (e) => filterBuyingBehaviorsModal(e.target.value));
-        console.log('Added input listener to buyingBehaviorsSearch');
-    } else {
-        console.error('buyingBehaviorsSearch element not found!');
     }
     
     populateBuyingBehaviors();
 }
 
-// Product categories modal functionality
 function setupProductCategoriesModal() {
-    console.log('Setting up product categories modal...');
-    console.log('openProductCategoriesModal:', openProductCategoriesModal);
-    console.log('closeProductCategoriesModal:', closeProductCategoriesModal);
-    console.log('applyProductCategories:', applyProductCategories);
-    console.log('clearAllProductCategories:', clearAllProductCategories);
-    console.log('productCategoriesSearch:', productCategoriesSearch);
-    
     if (openProductCategoriesModal) {
-        // Remove any existing listeners first
         openProductCategoriesModal.removeEventListener('click', showProductCategoriesModal);
         openProductCategoriesModal.addEventListener('click', showProductCategoriesModal);
-        console.log('Added click listener to openProductCategoriesModal');
-    } else {
-        console.error('openProductCategoriesModal element not found!');
     }
     if (closeProductCategoriesModal) {
         closeProductCategoriesModal.addEventListener('click', hideProductCategoriesModal);
-        console.log('Added click listener to closeProductCategoriesModal');
-    } else {
-        console.error('closeProductCategoriesModal element not found!');
     }
     if (applyProductCategories) {
         applyProductCategories.addEventListener('click', applyProductCategoriesSelection);
-        console.log('Added click listener to applyProductCategories');
-    } else {
-        console.error('applyProductCategories element not found!');
     }
     if (clearAllProductCategories) {
         clearAllProductCategories.addEventListener('click', clearAllProductCategoriesSelections);
-        console.log('Added click listener to clearAllProductCategories');
-    } else {
-        console.error('clearAllProductCategories element not found!');
     }
     if (productCategoriesSearch) {
         productCategoriesSearch.addEventListener('input', (e) => filterProductCategoriesModal(e.target.value));
-        console.log('Added input listener to productCategoriesSearch');
-    } else {
-        console.error('productCategoriesSearch element not found!');
     }
     
     populateProductCategories();
@@ -879,62 +828,7 @@ function populateProductCategories() {
     setupCheckboxInteractions(productCategoriesList);
 }
 
-function switchToTab(groupName) {
-    if (!categoryList || !categoryTabs) return;
-    
-    // Update tab buttons
-    const tabs = categoryTabs.querySelectorAll('.category-tab');
-    tabs.forEach(tab => tab.classList.remove('active'));
-    
-    const activeTab = categoryTabs.querySelector(`[onclick*="${groupName}"]`);
-    if (activeTab) {
-        activeTab.classList.add('active');
-    }
-    
-    // Populate categories based on group
-    categoryList.innerHTML = '';
-    
-    let categories = [];
-    if (groupName === 'buying_behaviors') {
-        categories = CONFIG.BUYING_BEHAVIORS;
-    } else if (groupName === 'product_categories') {
-        categories = CONFIG.PRODUCT_CATEGORIES;
-    }
-    
-    categories.forEach(category => {
-        const checkboxDiv = document.createElement('div');
-        checkboxDiv.className = 'category-checkbox';
-        checkboxDiv.setAttribute('data-category', category.label);
-        
-        checkboxDiv.innerHTML = `
-            <input type="checkbox" id="cat-${category.value}" data-category="${category.label}">
-            <label for="cat-${category.value}">${category.label}</label>
-        `;
-        
-        categoryList.appendChild(checkboxDiv);
-    });
-    
-    // Setup checkbox interactions
-    setupCheckboxInteractions(categoryList);
-}
 
-function setupCheckboxInteractions(list) {
-    const checkboxes = list.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateModalSelections);
-    });
-}
-
-function updateModalSelections() {
-    const checkboxes = categoryList.querySelectorAll('input[type="checkbox"]:checked');
-    const selectedItems = Array.from(checkboxes).map(cb => cb.getAttribute('data-category'));
-    
-    // Update count display
-    if (categoryCount) {
-        categoryCount.textContent = `${selectedItems.length} selected`;
-        categoryCount.style.display = selectedItems.length > 0 ? 'inline' : 'none';
-    }
-}
 
 function applyBuyingBehaviorsSelection() {
     const checkboxes = buyingBehaviorsList.querySelectorAll('input[type="checkbox"]:checked');
@@ -1124,48 +1018,26 @@ function filterProductCategoriesModal(searchTerm) {
 }
 
 function showBuyingBehaviorsModal() {
-    console.log('showBuyingBehaviorsModal called');
-    console.log('buyingBehaviorsModal:', buyingBehaviorsModal);
     if (buyingBehaviorsModal) {
         buyingBehaviorsModal.style.display = 'flex';
-        console.log('Buying behaviors modal shown');
-        console.log('Modal display style:', buyingBehaviorsModal.style.display);
-        console.log('Modal computed style:', window.getComputedStyle(buyingBehaviorsModal).display);
-    } else {
-        console.error('buyingBehaviorsModal element not found!');
     }
 }
 
 function hideBuyingBehaviorsModal() {
-    console.log('hideBuyingBehaviorsModal called');
     if (buyingBehaviorsModal) {
         buyingBehaviorsModal.style.display = 'none';
-        console.log('Buying behaviors modal hidden');
-    } else {
-        console.error('buyingBehaviorsModal element not found!');
     }
 }
 
 function showProductCategoriesModal() {
-    console.log('showProductCategoriesModal called');
-    console.log('productCategoriesModal:', productCategoriesModal);
     if (productCategoriesModal) {
         productCategoriesModal.style.display = 'flex';
-        console.log('Product categories modal shown');
-        console.log('Modal display style:', productCategoriesModal.style.display);
-        console.log('Modal computed style:', window.getComputedStyle(productCategoriesModal).display);
-    } else {
-        console.error('productCategoriesModal element not found!');
     }
 }
 
 function hideProductCategoriesModal() {
-    console.log('hideProductCategoriesModal called');
     if (productCategoriesModal) {
         productCategoriesModal.style.display = 'none';
-        console.log('Product categories modal hidden');
-    } else {
-        console.error('productCategoriesModal element not found!');
     }
 }
 
@@ -1188,11 +1060,7 @@ function setupDemographicModals() {
         }
         
         const list = document.getElementById(`${type}List`);
-        const buttonText = document.getElementById(`${type}ButtonText`);
-        const count = document.getElementById(`${type}Count`);
-        const hidden = document.getElementById(type === 'marital' ? 'maritalStatus' : type === 'children' ? 'hasChildren' : type);
         
-        // Log missing elements for debugging
         if (!openBtn || !closeBtn || !applyBtn || !list) {
             console.warn(`Missing elements for ${type} modal`);
         }
@@ -1203,7 +1071,15 @@ function setupDemographicModals() {
         if (clearBtn) clearBtn.addEventListener('click', () => clearAllSelections(list));
         
         if (list) {
-            setupCheckboxInteractions(list);
+            const checkboxes = list.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    // Update selections when checkboxes change
+                    const selectedItems = Array.from(list.querySelectorAll('input[type="checkbox"]:checked'))
+                        .map(cb => cb.getAttribute('data-category'));
+                    updateSelectionButton(type, selectedItems);
+                });
+            });
         }
     });
 }
@@ -1244,22 +1120,24 @@ function applySelection(type, list, modal) {
     hideModal(modal);
 }
 
+// Button text configuration
+const BUTTON_TEXT_CONFIG = {
+    'gender': 'Gender',
+    'age': 'Age Range',
+    'income': 'Income Range',
+    'marital': 'Marital Status',
+    'children': 'Children Status',
+    'education': 'Education Level',
+    'race': 'Race',
+    'category': 'Categories'
+};
+
 function updateSelectionButton(type, selectedItems) {
     const buttonText = document.getElementById(`${type}ButtonText`);
     const count = document.getElementById(`${type}Count`);
     
-    // Keep the original button text
     if (buttonText) {
-        const originalTexts = {
-            'gender': 'Gender',
-            'age': 'Age Range',
-            'income': 'Income Range',
-            'marital': 'Marital Status',
-            'children': 'Children Status',
-            'education': 'Education Level',
-            'race': 'Race'
-        };
-        buttonText.textContent = originalTexts[type] || `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+        buttonText.textContent = BUTTON_TEXT_CONFIG[type] || `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
     }
     
     if (count) {
@@ -1274,7 +1152,6 @@ function clearAllSelections(list) {
 }
 
 function initializeSelectionButtons() {
-    // Initialize all selection buttons with default text
     const buttonTypes = ['category', 'gender', 'age', 'income', 'marital', 'children', 'education', 'race'];
     
     buttonTypes.forEach(type => {
@@ -1282,17 +1159,7 @@ function initializeSelectionButtons() {
         const count = document.getElementById(`${type}Count`);
         
         if (buttonText) {
-            const originalTexts = {
-                'category': 'Categories',
-                'gender': 'Gender',
-                'age': 'Age Range',
-                'income': 'Income Range',
-                'marital': 'Marital Status',
-                'children': 'Children Status',
-                'education': 'Education Level',
-                'race': 'Race'
-            };
-            buttonText.textContent = originalTexts[type] || `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            buttonText.textContent = BUTTON_TEXT_CONFIG[type] || `Select ${type.charAt(0).toUpperCase() + type.slice(1)}`;
         }
         
         if (count) {
@@ -1305,16 +1172,11 @@ function initializeSelectionButtons() {
 
 function setupFileUploads() {
     const fileInputs = document.querySelectorAll('input[type="file"]');
-    console.log('setupFileUploads called, found file inputs:', fileInputs.length);
     
     fileInputs.forEach(input => {
-        console.log('Setting up file input:', input.id);
         input.addEventListener('change', function(e) {
-            console.log('File input change event triggered for:', this.id);
             const file = e.target.files[0];
             const uploadText = this.parentNode.querySelector('.file-upload-text');
-            console.log('File selected:', file ? file.name : 'none');
-            console.log('Upload text element:', uploadText);
             
             if (file) {
                 // Show file name and size
