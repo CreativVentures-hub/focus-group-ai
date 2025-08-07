@@ -66,7 +66,7 @@ let loginSection, mainSection, loginForm, passwordInput, loginError, logoutBtn;
 let focusGroupForm, sessionTypeSelect;
 let categorySearch, categoryTabs, categoryList, categoryHidden, selectedCategoriesContainer;
 let categoryModal, openCategoryModal, closeCategoryModal, applyCategories, clearAllCategories;
-let categoryButtonText, categoryCount, numberOfParticipantsSlider, numberOfParticipantsValue;
+let categoryButtonText, categoryCount;
 let successModal, closeSuccessModal, closeSuccessModalBtn, userEmailDisplay;
 
 // Language management
@@ -116,8 +116,7 @@ function initializeDOMElements() {
     categoryCount = document.getElementById('categoryCount');
     
     // Slider elements
-    numberOfParticipantsSlider = document.getElementById('numberOfParticipants');
-    numberOfParticipantsValue = document.getElementById('numberOfParticipantsValue');
+    // Slider elements removed - using fixed 10 participants
     
     // Success modal elements
     successModal = document.getElementById('successModal');
@@ -207,9 +206,6 @@ function handleLogin(e) {
         showMainSection();
         populateDropdowns();
         clearLoginForm();
-        
-        // Initialize slider after login since the main section is now visible
-        initializeSlider();
     } else {
         showLoginError();
     }
@@ -288,7 +284,7 @@ function handleFocusGroupForm(e) {
     }
     
     // Prepare webhook data
-    const sliderValue = formData.get('numberOfParticipants') || (numberOfParticipantsSlider ? numberOfParticipantsSlider.value : '8');
+    const sliderValue = '10'; // Fixed to standard focus group size
     
     // Get all selected demographic data
     const selectedGenders = window.selectedGenders || [];
@@ -419,9 +415,7 @@ function showMainSection() {
         mainSection.style.display = 'block';
         
         // Re-initialize slider after showing main section
-        setTimeout(() => {
-            initializeSlider();
-        }, 100);
+
     }
 }
 
@@ -986,25 +980,7 @@ function initializeSelectionButtons() {
     });
 }
 
-function initializeSlider() {
-    // Re-get the elements in case they weren't available during initial DOM setup
-    const slider = document.getElementById('numberOfParticipants');
-    const valueDisplay = document.getElementById('numberOfParticipantsValue');
-    
-    if (slider && valueDisplay) {
-        // Add event listener for slider changes
-        slider.addEventListener('input', function() {
-            valueDisplay.textContent = this.value;
-        });
-        
-        // Set initial value
-        valueDisplay.textContent = slider.value;
-        
-        console.log('Slider initialized successfully');
-    } else {
-        console.error('Slider elements not found:', { slider: !!slider, valueDisplay: !!valueDisplay });
-    }
-}
+// Slider function removed - using fixed 10 participants
 
 function initializeLanguage() {
     if (languageSelect) {

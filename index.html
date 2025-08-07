@@ -64,14 +64,11 @@
 
                         <!-- Participant Selection Criteria -->
                         <div class="form-group">
-                            <label for="numberOfParticipants">Number of Participants: <span id="numberOfParticipantsValue">12</span></label>
-                            <div class="slider-container">
-                                <input type="range" id="numberOfParticipants" name="numberOfParticipants" min="6" max="20" value="12" class="slider" required>
-                                <div class="slider-labels">
-                                    <span>6</span>
-                                    <span>20</span>
-                                </div>
+                            <label>Number of Participants:</label>
+                            <div class="participant-info">
+                                <p>We use the standard focus group size of <strong>10 participants</strong> for optimal discussion quality and insights.</p>
                             </div>
+                            <input type="hidden" id="numberOfParticipants" name="numberOfParticipants" value="10">
                         </div>
 
                         <!-- Selected Chips Display -->
@@ -585,7 +582,7 @@
         </div>
     </div>
 
-    <script src="config.js?v=52"></script>
-    <script src="script.js?v=52"></script>
+    <script src="config.js?v=53"></script>
+    <script src="script.js?v=53"></script>
 </body>
 </html>
