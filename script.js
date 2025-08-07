@@ -32,24 +32,34 @@ window.handleLoginClick = function(event) {
     if (password === CONFIG.PASSWORD) {
         sessionStorage.setItem('focusGroupLoggedIn', 'true');
         
-        // Show main section
-const loginSection = document.getElementById('loginSection');
-const mainSection = document.getElementById('mainSection');
-        
-        if (loginSection && mainSection) {
-            loginSection.style.display = 'none';
-            mainSection.style.display = 'block';
+        // Use the proper showMainSection function that sets up modals
+        if (typeof showMainSection === 'function') {
+            showMainSection();
+        } else {
+            // Fallback if showMainSection is not available
+            const loginSection = document.getElementById('loginSection');
+            const mainSection = document.getElementById('mainSection');
             
-            // Initialize the rest of the app
-            if (typeof populateDropdowns === 'function') {
-                populateDropdowns();
-            }
-            if (typeof clearLoginForm === 'function') {
-                clearLoginForm();
+            if (loginSection && mainSection) {
+                loginSection.style.display = 'none';
+                mainSection.style.display = 'block';
             }
         }
+        
+        // Initialize the rest of the app
+        if (typeof populateDropdowns === 'function') {
+            populateDropdowns();
+        }
+        if (typeof clearLoginForm === 'function') {
+            clearLoginForm();
+        }
+        
+        // Trigger session type change to show appropriate fields
+        if (typeof handleSessionTypeChange === 'function') {
+            handleSessionTypeChange();
+        }
     } else {
-const loginError = document.getElementById('loginError');
+        const loginError = document.getElementById('loginError');
         if (loginError) {
             loginError.style.display = 'block';
             setTimeout(() => {
@@ -157,8 +167,19 @@ function initializeDOMElements() {
 }
 
 function initializeApp() {
-    // Show login section by default
-    showLoginSection();
+    // Check if user is already logged in
+    const isLoggedIn = sessionStorage.getItem('focusGroupLoggedIn') === 'true';
+    
+    if (isLoggedIn) {
+        console.log('User already logged in, showing main section...');
+        showMainSection();
+        populateDropdowns();
+        // Trigger session type change to show appropriate fields
+        handleSessionTypeChange();
+    } else {
+        // Show login section by default
+        showLoginSection();
+    }
     
     // Initialize language system
     initializeLanguage();
@@ -1100,6 +1121,7 @@ function showBuyingBehaviorsModal() {
         buyingBehaviorsModal.style.display = 'flex';
         console.log('Buying behaviors modal shown');
         console.log('Modal display style:', buyingBehaviorsModal.style.display);
+        console.log('Modal computed style:', window.getComputedStyle(buyingBehaviorsModal).display);
     } else {
         console.error('buyingBehaviorsModal element not found!');
     }
@@ -1122,6 +1144,7 @@ function showProductCategoriesModal() {
         productCategoriesModal.style.display = 'flex';
         console.log('Product categories modal shown');
         console.log('Modal display style:', productCategoriesModal.style.display);
+        console.log('Modal computed style:', window.getComputedStyle(productCategoriesModal).display);
     } else {
         console.error('productCategoriesModal element not found!');
     }
