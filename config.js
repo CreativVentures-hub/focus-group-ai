@@ -64,7 +64,8 @@ const CONFIG = {
         { value: "financial_services", label: "Financial Services" },
         { value: "education_learning", label: "Education and Learning" },
         { value: "hobbies_crafts", label: "Hobbies and Crafts" },
-        { value: "gifts_special_occasions", label: "Gifts and Special Occasions" }
+        { value: "gifts_special_occasions", label: "Gifts and Special Occasions" },
+        { value: "tools_hardware", label: "Tools and Hardware" }
     ],
     
     // Default form values

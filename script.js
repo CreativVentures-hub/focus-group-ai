@@ -64,9 +64,13 @@ const loginError = document.getElementById('loginError');
 // DOM Elements - will be initialized after DOM loads
 let loginSection, mainSection, loginForm, passwordInput, loginError, logoutBtn;
 let focusGroupForm, sessionTypeSelect;
-let categorySearch, categoryTabs, categoryList, categoryHidden, selectedCategoriesContainer;
-let categoryModal, openCategoryModal, closeCategoryModal, applyCategories, clearAllCategories;
-let categoryButtonText, categoryCount;
+let buyingBehaviorsSearch, buyingBehaviorsList, selectedBuyingBehaviorsContainer;
+let buyingBehaviorsModal, openBuyingBehaviorsModal, closeBuyingBehaviorsModal, applyBuyingBehaviors, clearAllBuyingBehaviors;
+let buyingBehaviorsButtonText, buyingBehaviorsCount;
+
+let productCategoriesSearch, productCategoriesList, selectedProductCategoriesContainer;
+let productCategoriesModal, openProductCategoriesModal, closeProductCategoriesModal, applyProductCategories, clearAllProductCategories;
+let productCategoriesButtonText, productCategoriesCount;
 let successModal, closeSuccessModal, closeSuccessModalBtn, userEmailDisplay;
 
 // Language management
@@ -101,19 +105,29 @@ function initializeDOMElements() {
     focusGroupForm = document.getElementById('focusGroupForm');
     sessionTypeSelect = document.getElementById('sessionType');
     
-    // Category elements
-    categorySearch = document.getElementById('categorySearch');
-    categoryTabs = document.getElementById('categoryTabs');
-    categoryList = document.getElementById('categoryList');
-    categoryHidden = document.getElementById('category');
-    selectedCategoriesContainer = document.getElementById('selectedCategories');
-    categoryModal = document.getElementById('categoryModal');
-    openCategoryModal = document.getElementById('openCategoryModal');
-    closeCategoryModal = document.getElementById('closeCategoryModal');
-    applyCategories = document.getElementById('applyCategories');
-    clearAllCategories = document.getElementById('clearAllCategories');
-    categoryButtonText = document.getElementById('categoryButtonText');
-    categoryCount = document.getElementById('categoryCount');
+    // Buying behaviors modal elements
+    buyingBehaviorsSearch = document.getElementById('buyingBehaviorsSearch');
+    buyingBehaviorsList = document.getElementById('buyingBehaviorsList');
+    selectedBuyingBehaviorsContainer = document.getElementById('selectedChips');
+    buyingBehaviorsModal = document.getElementById('buyingBehaviorsModal');
+    openBuyingBehaviorsModal = document.getElementById('openBuyingBehaviorsModal');
+    closeBuyingBehaviorsModal = document.getElementById('closeBuyingBehaviorsModal');
+    applyBuyingBehaviors = document.getElementById('applyBuyingBehaviors');
+    clearAllBuyingBehaviors = document.getElementById('clearAllBuyingBehaviors');
+    buyingBehaviorsButtonText = document.getElementById('buyingBehaviorsButtonText');
+    buyingBehaviorsCount = document.getElementById('buyingBehaviorsCount');
+
+    // Product categories modal elements
+    productCategoriesSearch = document.getElementById('productCategoriesSearch');
+    productCategoriesList = document.getElementById('productCategoriesList');
+    selectedProductCategoriesContainer = document.getElementById('selectedChips');
+    productCategoriesModal = document.getElementById('productCategoriesModal');
+    openProductCategoriesModal = document.getElementById('openProductCategoriesModal');
+    closeProductCategoriesModal = document.getElementById('closeProductCategoriesModal');
+    applyProductCategories = document.getElementById('applyProductCategories');
+    clearAllProductCategories = document.getElementById('clearAllProductCategories');
+    productCategoriesButtonText = document.getElementById('productCategoriesButtonText');
+    productCategoriesCount = document.getElementById('productCategoriesCount');
     
     // Slider elements
     // Slider elements removed - using fixed 10 participants
@@ -181,7 +195,8 @@ function setupEventListeners() {
     }
     
     // Category modal events
-    setupCategoryModal();
+    setupBuyingBehaviorsModal();
+    setupProductCategoriesModal();
     
     // Setup all demographic modals
     setupDemographicModals();
@@ -298,13 +313,22 @@ function handleFocusGroupForm(e) {
     const selectedEducations = window.selectedEducations || [];
     const selectedRaces = window.selectedRaces || [];
     
-    // Format categories for n8n (convert to snake_case)
-    const formattedCategories = selectedCategories.map(cat => {
-        if (cat.startsWith('Pet - ')) {
-            return cat.toLowerCase().replace('pet - ', 'pet_').replace(/[\s-]+/g, '_');
-        }
-        return cat.replace(/&/g, 'and').toLowerCase().replace(/[\s-]+/g, '_');
-    });
+    // Format buying behaviors and product categories for n8n (convert to snake_case)
+    const buyingBehaviors = window.selectedBuyingBehaviors || [];
+    const productCategories = window.selectedProductCategories || [];
+    
+    const formatCategories = (categories) => {
+        return categories.map(cat => {
+            if (cat === 'Any') return 'any';
+            if (cat.startsWith('Pet - ')) {
+                return cat.toLowerCase().replace('pet - ', 'pet_').replace(/[\s-]+/g, '_');
+            }
+            return cat.replace(/&/g, 'and').toLowerCase().replace(/[\s-]+/g, '_');
+        });
+    };
+    
+    const formattedBuyingBehaviors = formatCategories(buyingBehaviors);
+    const formattedProductCategories = formatCategories(productCategories);
     
     // Format demographic data for n8n
     const formatDemographics = (items) => {
@@ -353,7 +377,8 @@ function handleFocusGroupForm(e) {
         ...sessionSpecificData,
         
         // Participant selection criteria
-        categories: formattedCategories,
+        buying_behaviors: formattedBuyingBehaviors,
+        product_categories: formattedProductCategories,
         gender: formatDemographics(selectedGenders),
         age_range: formatDemographics(selectedAges),
         income_range: formatDemographics(selectedIncomes),
@@ -545,7 +570,9 @@ function populateDropdowns() {
 }
 
 function getSelectedCategories() {
-    return window.selectedCategories || [];
+    const buyingBehaviors = window.selectedBuyingBehaviors || [];
+    const productCategories = window.selectedProductCategories || [];
+    return [...buyingBehaviors, ...productCategories];
 }
 
 function validateWebhookData(data) {
@@ -563,9 +590,12 @@ function validateWebhookData(data) {
         errors.push('Please enter a valid email address');
     }
     
-    // Check categories
-    if (!data.categories || data.categories.length === 0) {
-        errors.push('Please select at least one participant category');
+    // Check buying behaviors and product categories
+    const buyingBehaviors = data.buying_behaviors || [];
+    const productCategories = data.product_categories || [];
+    
+    if (buyingBehaviors.length === 0 && productCategories.length === 0) {
+        errors.push('Please select at least one buying behavior or product category');
     }
     
     // Check session-specific data
@@ -626,48 +656,106 @@ function setupCharacterCounters() {
     });
 }
 
-// Category modal functionality
-function setupCategoryModal() {
-    if (openCategoryModal) {
-        openCategoryModal.addEventListener('click', showCategoryModal);
+// Buying behaviors modal functionality
+function setupBuyingBehaviorsModal() {
+    if (openBuyingBehaviorsModal) {
+        openBuyingBehaviorsModal.addEventListener('click', showBuyingBehaviorsModal);
     }
-    if (closeCategoryModal) {
-        closeCategoryModal.addEventListener('click', hideCategoryModal);
+    if (closeBuyingBehaviorsModal) {
+        closeBuyingBehaviorsModal.addEventListener('click', hideBuyingBehaviorsModal);
     }
-    if (applyCategories) {
-        applyCategories.addEventListener('click', applyCategorySelection);
+    if (applyBuyingBehaviors) {
+        applyBuyingBehaviors.addEventListener('click', applyBuyingBehaviorsSelection);
     }
-    if (clearAllCategories) {
-        clearAllCategories.addEventListener('click', clearAllCategorySelections);
+    if (clearAllBuyingBehaviors) {
+        clearAllBuyingBehaviors.addEventListener('click', clearAllBuyingBehaviorsSelections);
     }
-    if (categorySearch) {
-        categorySearch.addEventListener('input', (e) => filterCategoryModal(e.target.value));
+    if (buyingBehaviorsSearch) {
+        buyingBehaviorsSearch.addEventListener('input', (e) => filterBuyingBehaviorsModal(e.target.value));
     }
     
-    populateCategoryTabs();
-    populateCategoryGroups();
+    populateBuyingBehaviors();
 }
 
-function populateCategoryTabs() {
-    if (!categoryTabs) return;
+// Product categories modal functionality
+function setupProductCategoriesModal() {
+    if (openProductCategoriesModal) {
+        openProductCategoriesModal.addEventListener('click', showProductCategoriesModal);
+    }
+    if (closeProductCategoriesModal) {
+        closeProductCategoriesModal.addEventListener('click', hideProductCategoriesModal);
+    }
+    if (applyProductCategories) {
+        applyProductCategories.addEventListener('click', applyProductCategoriesSelection);
+    }
+    if (clearAllProductCategories) {
+        clearAllProductCategories.addEventListener('click', clearAllProductCategoriesSelections);
+    }
+    if (productCategoriesSearch) {
+        productCategoriesSearch.addEventListener('input', (e) => filterProductCategoriesModal(e.target.value));
+    }
+    
+    populateProductCategories();
+}
+
+function populateBuyingBehaviors() {
+    if (!buyingBehaviorsList) return;
     
     const translations = CONFIG.TRANSLATIONS[currentLanguage] || CONFIG.TRANSLATIONS.en;
     
-    categoryTabs.innerHTML = `
-        <button class="category-tab active" onclick="switchToTab('buying_behaviors')">
-            <i class="fas fa-shopping-cart"></i> ${translations.buyingBehaviors}
-        </button>
-        <button class="category-tab" onclick="switchToTab('product_categories')">
-            <i class="fas fa-tags"></i> ${translations.productCategories}
-            </button>
+    // Add "Any" option first
+    buyingBehaviorsList.innerHTML = `
+        <div class="category-checkbox" data-category="Any">
+            <input type="checkbox" id="buying-behaviors-any" data-category="Any">
+            <label for="buying-behaviors-any">Any</label>
+        </div>
+    `;
+    
+    // Add all buying behaviors
+    CONFIG.BUYING_BEHAVIORS.forEach(behavior => {
+        const checkboxDiv = document.createElement('div');
+        checkboxDiv.className = 'category-checkbox';
+        checkboxDiv.setAttribute('data-category', behavior.label);
+        
+        checkboxDiv.innerHTML = `
+            <input type="checkbox" id="buying-behaviors-${behavior.value}" data-category="${behavior.label}">
+            <label for="buying-behaviors-${behavior.value}">${behavior.label}</label>
         `;
+        
+        buyingBehaviorsList.appendChild(checkboxDiv);
+    });
+    
+    setupCheckboxInteractions(buyingBehaviorsList);
 }
 
-function populateCategoryGroups() {
-    if (!categoryList) return;
+function populateProductCategories() {
+    if (!productCategoriesList) return;
     
-    // Show buying behaviors by default
-    switchToTab('buying_behaviors');
+    const translations = CONFIG.TRANSLATIONS[currentLanguage] || CONFIG.TRANSLATIONS.en;
+    
+    // Add "Any" option first
+    productCategoriesList.innerHTML = `
+        <div class="category-checkbox" data-category="Any">
+            <input type="checkbox" id="product-categories-any" data-category="Any">
+            <label for="product-categories-any">Any</label>
+        </div>
+    `;
+    
+    // Add all product categories
+    CONFIG.PRODUCT_CATEGORIES.forEach(category => {
+        const checkboxDiv = document.createElement('div');
+        checkboxDiv.className = 'category-checkbox';
+        checkboxDiv.setAttribute('data-category', category.label);
+        
+        checkboxDiv.innerHTML = `
+            <input type="checkbox" id="product-categories-${category.value}" data-category="${category.label}">
+            <label for="product-categories-${category.value}">${category.label}</label>
+        `;
+        
+        productCategoriesList.appendChild(checkboxDiv);
+    });
+    
+    setupCheckboxInteractions(productCategoriesList);
 }
 
 function switchToTab(groupName) {
@@ -727,31 +815,81 @@ function updateModalSelections() {
     }
 }
 
-function applyCategorySelection() {
-    const checkboxes = categoryList.querySelectorAll('input[type="checkbox"]:checked');
+function applyBuyingBehaviorsSelection() {
+    const checkboxes = buyingBehaviorsList.querySelectorAll('input[type="checkbox"]:checked');
     const selectedItems = Array.from(checkboxes).map(cb => cb.getAttribute('data-category'));
     
-    // Store selected categories globally
-    window.selectedCategories = selectedItems;
+    // Store selected buying behaviors globally
+    window.selectedBuyingBehaviors = selectedItems;
     
     // Update button text
-    updateCategoryButtonText(selectedItems);
+    updateBuyingBehaviorsButtonText(selectedItems);
     
     // Update hidden input
-    if (categoryHidden) {
-        categoryHidden.value = selectedItems.join(', ');
+    const buyingBehaviorsHidden = document.getElementById('buyingBehaviors');
+    if (buyingBehaviorsHidden) {
+        buyingBehaviorsHidden.value = selectedItems.join(', ');
     }
     
     // Update chips display
     updateAllSelectedChips();
     
     // Hide modal
-    hideCategoryModal();
+    hideBuyingBehaviorsModal();
 }
 
-function updateCategoryButtonText(selectedItems) {
-    if (categoryButtonText) {
-        categoryButtonText.textContent = 'Categories';
+function updateBuyingBehaviorsButtonText(selectedItems) {
+    if (buyingBehaviorsButtonText && buyingBehaviorsCount) {
+        if (selectedItems.length === 0) {
+            buyingBehaviorsButtonText.textContent = 'Select Buying Behaviors';
+            buyingBehaviorsCount.style.display = 'none';
+        } else if (selectedItems.length === 1) {
+            buyingBehaviorsButtonText.textContent = selectedItems[0];
+            buyingBehaviorsCount.style.display = 'none';
+        } else {
+            buyingBehaviorsButtonText.textContent = 'Buying Behaviors';
+            buyingBehaviorsCount.textContent = `${selectedItems.length} selected`;
+            buyingBehaviorsCount.style.display = 'inline';
+        }
+    }
+}
+
+function applyProductCategoriesSelection() {
+    const checkboxes = productCategoriesList.querySelectorAll('input[type="checkbox"]:checked');
+    const selectedItems = Array.from(checkboxes).map(cb => cb.getAttribute('data-category'));
+    
+    // Store selected product categories globally
+    window.selectedProductCategories = selectedItems;
+    
+    // Update button text
+    updateProductCategoriesButtonText(selectedItems);
+    
+    // Update hidden input
+    const productCategoriesHidden = document.getElementById('productCategories');
+    if (productCategoriesHidden) {
+        productCategoriesHidden.value = selectedItems.join(', ');
+    }
+    
+    // Update chips display
+    updateAllSelectedChips();
+    
+    // Hide modal
+    hideProductCategoriesModal();
+}
+
+function updateProductCategoriesButtonText(selectedItems) {
+    if (productCategoriesButtonText && productCategoriesCount) {
+        if (selectedItems.length === 0) {
+            productCategoriesButtonText.textContent = 'Select Product Categories';
+            productCategoriesCount.style.display = 'none';
+        } else if (selectedItems.length === 1) {
+            productCategoriesButtonText.textContent = selectedItems[0];
+            productCategoriesCount.style.display = 'none';
+        } else {
+            productCategoriesButtonText.textContent = 'Product Categories';
+            productCategoriesCount.textContent = `${selectedItems.length} selected`;
+            productCategoriesCount.style.display = 'inline';
+        }
     }
 }
 
@@ -763,7 +901,8 @@ function updateAllSelectedChips() {
     
     // Define all selection types and their display names
     const selectionTypes = [
-        { key: 'selectedCategories', label: 'Categories', icon: 'fas fa-tags' },
+        { key: 'selectedBuyingBehaviors', label: 'Buying Behaviors', icon: 'fas fa-shopping-cart' },
+        { key: 'selectedProductCategories', label: 'Product Categories', icon: 'fas fa-tags' },
         { key: 'selectedGenders', label: 'Gender', icon: 'fas fa-venus-mars' },
         { key: 'selectedAges', label: 'Age', icon: 'fas fa-birthday-cake' },
         { key: 'selectedIncomes', label: 'Income', icon: 'fas fa-dollar-sign' },
@@ -809,11 +948,21 @@ function removeSelectionChip(selectionKey, item) {
         hidden.value = (window[selectionKey] || []).join(', ');
     }
     
-    // Special handling for categories
-    if (selectionKey === 'selectedCategories') {
-        updateCategoryButtonText(window.selectedCategories || []);
-        if (categoryHidden) {
-            categoryHidden.value = (window.selectedCategories || []).join(', ');
+    // Special handling for buying behaviors
+    if (selectionKey === 'selectedBuyingBehaviors') {
+        updateBuyingBehaviorsButtonText(window.selectedBuyingBehaviors || []);
+        const buyingBehaviorsHidden = document.getElementById('buyingBehaviors');
+        if (buyingBehaviorsHidden) {
+            buyingBehaviorsHidden.value = (window.selectedBuyingBehaviors || []).join(', ');
+        }
+    }
+    
+    // Special handling for product categories
+    if (selectionKey === 'selectedProductCategories') {
+        updateProductCategoriesButtonText(window.selectedProductCategories || []);
+        const productCategoriesHidden = document.getElementById('productCategories');
+        if (productCategoriesHidden) {
+            productCategoriesHidden.value = (window.selectedProductCategories || []).join(', ');
         }
     }
     
@@ -825,14 +974,18 @@ function removeSelectionChip(selectionKey, item) {
 
 
 
-function clearAllCategorySelections() {
-    const checkboxes = categoryList.querySelectorAll('input[type="checkbox"]');
+function clearAllBuyingBehaviorsSelections() {
+    const checkboxes = buyingBehaviorsList.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(cb => cb.checked = false);
-    updateModalSelections();
 }
 
-function filterCategoryModal(searchTerm) {
-    const checkboxes = categoryList.querySelectorAll('.category-checkbox');
+function clearAllProductCategoriesSelections() {
+    const checkboxes = productCategoriesList.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = false);
+}
+
+function filterBuyingBehaviorsModal(searchTerm) {
+    const checkboxes = buyingBehaviorsList.querySelectorAll('.category-checkbox');
     checkboxes.forEach(checkbox => {
         const label = checkbox.querySelector('label').textContent.toLowerCase();
         const matches = label.includes(searchTerm.toLowerCase());
@@ -840,15 +993,36 @@ function filterCategoryModal(searchTerm) {
     });
 }
 
-function showCategoryModal() {
-    if (categoryModal) {
-        categoryModal.style.display = 'flex';
+function filterProductCategoriesModal(searchTerm) {
+    const checkboxes = productCategoriesList.querySelectorAll('.category-checkbox');
+    checkboxes.forEach(checkbox => {
+        const label = checkbox.querySelector('label').textContent.toLowerCase();
+        const matches = label.includes(searchTerm.toLowerCase());
+        checkbox.style.display = matches ? 'block' : 'none';
+    });
+}
+
+function showBuyingBehaviorsModal() {
+    if (buyingBehaviorsModal) {
+        buyingBehaviorsModal.style.display = 'flex';
     }
 }
 
-function hideCategoryModal() {
-    if (categoryModal) {
-        categoryModal.style.display = 'none';
+function hideBuyingBehaviorsModal() {
+    if (buyingBehaviorsModal) {
+        buyingBehaviorsModal.style.display = 'none';
+    }
+}
+
+function showProductCategoriesModal() {
+    if (productCategoriesModal) {
+        productCategoriesModal.style.display = 'flex';
+    }
+}
+
+function hideProductCategoriesModal() {
+    if (productCategoriesModal) {
+        productCategoriesModal.style.display = 'none';
     }
 }
 

@@ -78,11 +78,21 @@
                         <div class="selection-grid">
                             <div class="selection-item">
                                 <div class="category-selector">
-                                    <button type="button" id="openCategoryModal" class="btn btn-outline selection-btn">
-                                        <i class="fas fa-tags"></i> <span id="categoryButtonText">Select Categories</span>
-                                        <span class="category-count" id="categoryCount" style="display: none;">0 selected</span>
+                                    <button type="button" id="openBuyingBehaviorsModal" class="btn btn-outline selection-btn">
+                                        <i class="fas fa-shopping-cart"></i> <span id="buyingBehaviorsButtonText">Select Buying Behaviors</span>
+                                        <span class="category-count" id="buyingBehaviorsCount" style="display: none;">0 selected</span>
                                     </button>
-                                    <input type="hidden" id="category" name="category" required>
+                                    <input type="hidden" id="buyingBehaviors" name="buyingBehaviors" required>
+                                </div>
+                            </div>
+
+                            <div class="selection-item">
+                                <div class="category-selector">
+                                    <button type="button" id="openProductCategoriesModal" class="btn btn-outline selection-btn">
+                                        <i class="fas fa-tags"></i> <span id="productCategoriesButtonText">Select Product Categories</span>
+                                        <span class="category-count" id="productCategoriesCount" style="display: none;">0 selected</span>
+                                    </button>
+                                    <input type="hidden" id="productCategories" name="productCategories" required>
                                 </div>
                             </div>
 
@@ -233,28 +243,48 @@
         </div>
     </div>
 
-    <!-- Category Selection Modal -->
-    <div id="categoryModal" class="modal" style="display: none;">
+    <!-- Buying Behaviors Selection Modal -->
+    <div id="buyingBehaviorsModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Select Participant Categories</h3>
-                <button type="button" id="closeCategoryModal" class="modal-close">&times;</button>
+                <h3>Select Buying Behaviors</h3>
+                <button type="button" id="closeBuyingBehaviorsModal" class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="category-search">
                     <i class="fas fa-search"></i>
-                    <input type="text" id="categorySearch" placeholder="Search categories..." autocomplete="off">
+                    <input type="text" id="buyingBehaviorsSearch" placeholder="Search buying behaviors..." autocomplete="off">
                 </div>
-                <div class="category-tabs" id="categoryTabs">
-                    <!-- Tabs will be populated by JavaScript -->
-                </div>
-                <div class="category-list" id="categoryList">
-                    <!-- Categories will be populated by JavaScript -->
+                <div class="category-list" id="buyingBehaviorsList">
+                    <!-- Buying behaviors will be populated by JavaScript -->
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="clearAllCategories" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
-                <button type="button" id="applyCategories" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
+                <button type="button" id="clearAllBuyingBehaviors" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
+                <button type="button" id="applyBuyingBehaviors" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Categories Selection Modal -->
+    <div id="productCategoriesModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Select Product Categories</h3>
+                <button type="button" id="closeProductCategoriesModal" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="category-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="productCategoriesSearch" placeholder="Search product categories..." autocomplete="off">
+                </div>
+                <div class="category-list" id="productCategoriesList">
+                    <!-- Product categories will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="clearAllProductCategories" class="btn btn-secondary"><i class="fas fa-trash"></i> Clear All</button>
+                <button type="button" id="applyProductCategories" class="btn btn-primary"><i class="fas fa-check"></i> Apply Selection</button>
             </div>
         </div>
     </div>
@@ -577,7 +607,7 @@
         </div>
     </div>
 
-    <script src="config.js?v=58"></script>
-    <script src="script.js?v=58"></script>
+    <script src="config.js?v=59"></script>
+    <script src="script.js?v=59"></script>
 </body>
 </html>
