@@ -2,8 +2,8 @@
 // This file contains settings optimized for live server deployment
 
 const CONFIG = {
-    // Webhook URL for creating focus groups (no longer creating participants)
-    WEBHOOK_URL: "https://creativventures.app.n8n.cloud/webhook/focus-group-ai",
+    // Webhook URL for Focus Group AI 2.0
+    WEBHOOK_URL: "https://creativventures.app.n8n.cloud/webhook/enhanced-focus-group",
     
 
     
