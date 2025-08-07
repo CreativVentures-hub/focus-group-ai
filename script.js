@@ -592,6 +592,7 @@ function validateWebhookData(data) {
 
 
 function setupCharacterCounters() {
+    // Only setup counters for fields that still have maxlength attributes
     const textareas = document.querySelectorAll('textarea[maxlength]');
     textareas.forEach(textarea => {
         // Check if counter already exists
