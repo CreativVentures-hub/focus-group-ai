@@ -65,7 +65,8 @@ const CONFIG = {
         { value: "education_learning", label: "Education and Learning" },
         { value: "hobbies_crafts", label: "Hobbies and Crafts" },
         { value: "gifts_special_occasions", label: "Gifts and Special Occasions" },
-        { value: "tools_hardware", label: "Tools and Hardware" }
+        { value: "tools_hardware", label: "Tools and Hardware" },
+        { value: "camping_outdoors", label: "Camping and Outdoors" }
     ],
     
     // Default form values
