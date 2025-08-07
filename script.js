@@ -241,17 +241,17 @@ function handleSessionTypeChange() {
         case 'product_research':
             const productFields = document.getElementById('productResearchFields');
             if (productFields) productFields.style.display = 'block';
-            initializeQuestions('productQuestions', 10);
+            // AI will generate questions from product name, description, and image
             break;
         case 'market_research':
             const marketFields = document.getElementById('marketResearchFields');
             if (marketFields) marketFields.style.display = 'block';
-            initializeQuestions('marketQuestions', 10);
+            // AI will generate questions from market description
             break;
         case 'brand_perception':
             const brandFields = document.getElementById('brandPerceptionFields');
             if (brandFields) brandFields.style.display = 'block';
-            initializeQuestions('brandQuestions', 10);
+            // AI will generate questions from brand name, description, and image
             break;
     }
     
@@ -322,21 +322,23 @@ function handleFocusGroupForm(e) {
             sessionSpecificData = {
                 product_name: formData.get('productName') || '',
                 product_description: formData.get('productDescription') || '',
-                questions: collectQuestions('productQuestions')
+                product_image: formData.get('productImage') ? 'image_provided' : 'no_image'
+                // AI will generate questions from product name, description, and image
             };
             break;
         case 'market_research':
             sessionSpecificData = {
                 market_name: formData.get('marketName') || '',
-                market_description: formData.get('marketDescription') || '',
-                questions: collectQuestions('marketQuestions')
+                market_description: formData.get('marketDescription') || ''
+                // AI will generate questions from market description
             };
             break;
         case 'brand_perception':
             sessionSpecificData = {
                 brand_name: formData.get('brandName') || '',
                 brand_description: formData.get('brandDescription') || '',
-                questions: collectQuestions('brandQuestions')
+                brand_image: formData.get('brandImage') ? 'image_provided' : 'no_image'
+                // AI will generate questions from brand name, description, and image
             };
             break;
     }
@@ -573,23 +575,12 @@ function validateWebhookData(data) {
     if (data.session_type === 'market_research') {
         if (!data.market_name) errors.push('Market name is required');
         if (!data.market_description) errors.push('Market description is required');
-        if (!data.questions || data.questions.length === 0) errors.push('At least one question is required');
     } else if (data.session_type === 'product_research') {
         if (!data.product_name) errors.push('Product name is required');
         if (!data.product_description) errors.push('Product description is required');
-        if (!data.questions || data.questions.length === 0) errors.push('At least one question is required');
     } else if (data.session_type === 'brand_perception') {
         if (!data.brand_name) errors.push('Brand name is required');
         if (!data.brand_description) errors.push('Brand description is required');
-        if (!data.questions || data.questions.length === 0) errors.push('At least one question is required');
-    }
-    
-    // Check questions
-    if (data.questions) {
-        const validQuestions = data.questions.filter(q => q.text && q.text.trim().length > 0);
-        if (validQuestions.length === 0) {
-            errors.push('Please enter at least one question');
-        }
     }
     
     if (errors.length > 0) {
@@ -602,49 +593,7 @@ function validateWebhookData(data) {
     return { isValid: true };
 }
 
-function collectQuestions(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return [];
-    
-    const questions = [];
-    const questionInputs = container.querySelectorAll('.question-input');
-    
-    questionInputs.forEach(input => {
-        const text = input.value.trim();
-        if (text) {
-            questions.push({ text: text });
-        }
-    });
-    
-    return questions;
-}
-
-function initializeQuestions(containerId, maxQuestions) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    // Clear existing questions
-    container.innerHTML = '';
-    
-    // Add exactly 10 questions without add/remove functionality
-    for (let i = 1; i <= 10; i++) {
-        addQuestion(container, i);
-    }
-}
-
-function addQuestion(container, questionNumber, questionText = '') {
-    const questionItem = document.createElement('div');
-    questionItem.className = 'question-item';
-    
-    const translations = CONFIG.TRANSLATIONS[currentLanguage] || CONFIG.TRANSLATIONS.en;
-    
-    questionItem.innerHTML = `
-        <div class="question-number">${questionNumber}</div>
-        <input type="text" class="question-input" placeholder="${translations.enterQuestion} ${questionNumber}..." value="${questionText}" maxlength="500">
-    `;
-    
-    container.appendChild(questionItem);
-}
+// Question functions removed - AI will generate questions automatically
 
 
 

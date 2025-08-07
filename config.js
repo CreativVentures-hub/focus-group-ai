@@ -231,7 +231,7 @@ const CONFIG = {
         productImage: "Product Image:",
         brandImage: "Brand Image:",
         emailAddress: "Email Address:",
-        questions: "Questions (10 required):",
+        questions: "AI-Generated Questions",
         selectedCriteria: "Selected Criteria:",
         // Placeholders
         enterMarketName: "Enter market name...",
@@ -312,7 +312,7 @@ const CONFIG = {
         productImage: "产品图片:",
         brandImage: "品牌图片:",
         emailAddress: "邮箱地址:",
-        questions: "问题 (需要10个):",
+        questions: "AI生成的问题",
         selectedCriteria: "已选标准:",
         // Placeholders
         enterMarketName: "输入市场名称...",
@@ -393,7 +393,7 @@ const CONFIG = {
         productImage: "產品圖片:",
         brandImage: "品牌圖片:",
         emailAddress: "郵箱地址:",
-        questions: "問題 (需要10個):",
+        questions: "AI生成的問題",
         selectedCriteria: "已選標準:",
         // Placeholders
         enterMarketName: "輸入市場名稱...",
