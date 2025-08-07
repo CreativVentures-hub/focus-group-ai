@@ -329,8 +329,10 @@ function handleSessionTypeChange() {
     // Setup character counters once after showing fields
     setupCharacterCounters();
     
-    // Setup file upload feedback
-    setupFileUploads();
+    // Setup file upload feedback after fields are shown
+    setTimeout(() => {
+        setupFileUploads();
+    }, 100);
 }
 
 function handleFocusGroupForm(e) {
@@ -508,6 +510,11 @@ function showMainSection() {
     console.log('Main section shown, re-attaching modal listeners...');
     setupBuyingBehaviorsModal();
     setupProductCategoriesModal();
+    
+    // Setup file uploads after main section is shown
+    setTimeout(() => {
+        setupFileUploads();
+    }, 200);
     }
 }
 
@@ -1296,11 +1303,16 @@ function initializeSelectionButtons() {
 
 function setupFileUploads() {
     const fileInputs = document.querySelectorAll('input[type="file"]');
+    console.log('setupFileUploads called, found file inputs:', fileInputs.length);
     
     fileInputs.forEach(input => {
+        console.log('Setting up file input:', input.id);
         input.addEventListener('change', function(e) {
+            console.log('File input change event triggered for:', this.id);
             const file = e.target.files[0];
             const uploadText = this.parentNode.querySelector('.file-upload-text');
+            console.log('File selected:', file ? file.name : 'none');
+            console.log('Upload text element:', uploadText);
             
             if (file) {
                 // Show file name and size
