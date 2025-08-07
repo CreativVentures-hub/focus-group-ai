@@ -194,9 +194,9 @@ function setupEventListeners() {
         closeSuccessModalBtn.addEventListener('click', closeSuccessModalHandler);
     }
     
-    // Category modal events
-    setupBuyingBehaviorsModal();
-    setupProductCategoriesModal();
+    // Category modal events - will be set up after login
+    // setupBuyingBehaviorsModal();
+    // setupProductCategoriesModal();
     
     // Setup all demographic modals
     setupDemographicModals();
@@ -222,6 +222,10 @@ function handleLogin(e) {
         populateDropdowns();
         clearLoginForm();
         
+        // Set up modals after login
+        setupBuyingBehaviorsModal();
+        setupProductCategoriesModal();
+        
         // Trigger session type change to show appropriate fields
         handleSessionTypeChange();
     } else {
@@ -239,32 +243,57 @@ function handleSessionTypeChange() {
     const selectedType = sessionTypeSelect.value;
     const sessionFields = document.getElementById('sessionFields');
     
+    console.log('handleSessionTypeChange called with selectedType:', selectedType);
+    console.log('sessionFields:', sessionFields);
+    
     // Hide all session type fields first
     const allSessionTypeFields = document.querySelectorAll('.session-type-fields');
+    console.log('Found session type fields:', allSessionTypeFields.length);
     allSessionTypeFields.forEach(field => {
         field.style.display = 'none';
     });
     
     // Show session fields container
     if (sessionFields) {
-    sessionFields.style.display = 'block';
+        sessionFields.style.display = 'block';
+        console.log('Session fields container shown');
+    } else {
+        console.error('sessionFields element not found!');
     }
     
     // Show specific fields based on session type
     switch (selectedType) {
         case 'product_research':
             const productFields = document.getElementById('productResearchFields');
-            if (productFields) productFields.style.display = 'block';
+            console.log('productFields:', productFields);
+            if (productFields) {
+                productFields.style.display = 'block';
+                console.log('Product research fields shown');
+            } else {
+                console.error('productResearchFields element not found!');
+            }
             // AI will generate questions from product name, description, and image
             break;
         case 'market_research':
             const marketFields = document.getElementById('marketResearchFields');
-            if (marketFields) marketFields.style.display = 'block';
+            console.log('marketFields:', marketFields);
+            if (marketFields) {
+                marketFields.style.display = 'block';
+                console.log('Market research fields shown');
+            } else {
+                console.error('marketResearchFields element not found!');
+            }
             // AI will generate questions from market description
             break;
         case 'brand_perception':
             const brandFields = document.getElementById('brandPerceptionFields');
-            if (brandFields) brandFields.style.display = 'block';
+            console.log('brandFields:', brandFields);
+            if (brandFields) {
+                brandFields.style.display = 'block';
+                console.log('Brand perception fields shown');
+            } else {
+                console.error('brandPerceptionFields element not found!');
+            }
             // AI will generate questions from brand name, description, and image
             break;
     }
