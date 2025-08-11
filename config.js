@@ -48,6 +48,7 @@ const CONFIG = {
         { value: "baby_kid_products", label: "Baby and Kid Products" },
         { value: "home_improvement", label: "Home Improvement" },
         { value: "furniture_decor", label: "Furniture and Decor" },
+        { value: "bedding_linens", label: "Bedding and Linens" },
         { value: "garden_outdoor", label: "Garden and Outdoor" },
         { value: "office_business", label: "Office and Business" },
         { value: "dogs", label: "Dogs" },
